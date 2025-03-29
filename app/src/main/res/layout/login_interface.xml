@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="false"
-    android:background="@color/material_dynamic_tertiary70"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
 
     <!-- background image -->
@@ -16,30 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:contentDescription="@string/background"
-        app:srcCompat="@drawable/background"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp" />
-
-    <!-- App Name Text -->
-    <TextView
-        android:id="@+id/AppName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins_light"
-        android:text="@string/app_Name"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.519" />
+        app:srcCompat="@drawable/background" />
 
-    <!-- Logo -->
+<!--logo-->
     <ImageView
-        android:id="@+id/Logo"
-        android:layout_width="135dp"
-        android:layout_height="121dp"
+        android:id="@+id/logo"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_centerInParent="true"
         android:contentDescription="@string/logo"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +29,6 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.417"
+        app:layout_constraintVertical_bias="0.171"
         app:srcCompat="@drawable/logo" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
