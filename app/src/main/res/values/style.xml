@@ -5,4 +5,10 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:fitsSystemWindows">false</item>
     </style>
+
+    <style name="NoTint" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorControlHighlight">@android:color/transparent</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+    </style>
+
 </resources>

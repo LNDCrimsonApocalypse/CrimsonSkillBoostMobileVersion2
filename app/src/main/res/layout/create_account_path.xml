@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:layout_editor_absoluteX="53dp"
+    tools:layout_editor_absoluteY="-141dp">
+
+
+    <ImageView
+        android:id="@+id/backbtn"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="84dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.085"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/back" />
+
+    <TextView
+        android:id="@+id/header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/create_your_account"
+        android:textColor="#090909"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.14"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backbtn" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/please_use_your_real_name_to_ensure_your_professor_can_accurately_recognize_you"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/header"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/header"
+        app:layout_constraintTop_toBottomOf="@+id/header"
+        app:layout_constraintWidth_percent="0.9" />
+
+    <EditText
+        android:id="@+id/fullname"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:autofillHints=""
+        android:background="@drawable/logins_textfield"
+        android:fontFamily="@font/poppins_regular"
+        android:hint="@string/full_name"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:textColorHint="#A9A9A9"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description"
+        app:layout_constraintVertical_bias="0.096"
+        app:layout_constraintWidth_percent="0.9"
+        tools:ignore="VisualLintTextFieldSize,TextContrastCheck" />
+
+    <EditText
+        android:id="@+id/gender"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/logins_textfield"
+        android:drawableEnd="@drawable/date"
+        android:drawableTint="#A9A9A9"
+        android:fontFamily="@font/poppins_regular"
+        android:hint="@string/birthday"
+        android:inputType="date"
+        android:padding="12dp"
+        android:textColorHint="#A9A9A9"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/fullname"
+        app:layout_constraintStart_toStartOf="@+id/fullname"
+        app:layout_constraintTop_toBottomOf="@+id/fullname"
+        app:layout_constraintWidth_percent="0.9" />
+
+<!--    gender drop down-->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/genderInputLayout"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/logins_textfield"
+        android:hint="@string/gender"
+        android:fontFamily="@font/poppins_regular"
+        android:textColorHint="#A9A9A9"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/gender"
+        app:layout_constraintStart_toStartOf="@+id/gender"
+        app:layout_constraintTop_toBottomOf="@+id/gender"
+        app:layout_constraintWidth_percent="0.9"
+        android:padding="12dp"
+        app:boxBackgroundMode="none"
+        android:gravity="center_vertical"
+        tools:ignore="HardcodedText">
+
+
+        <AutoCompleteTextView
+            android:id="@+id/genderDropdown"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:drawableEnd="@drawable/dropdown"
+            android:drawablePadding="5dp"
+
+            android:drawableTint="#A9A9A9"
+            android:dropDownVerticalOffset="8dp"
+            android:focusable="false"
+            android:inputType="none"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>

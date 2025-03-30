@@ -6,4 +6,11 @@
     <string name="email_or_username">Email or username</string>
     <string name="password">Password</string>
     <string name="log_in">Log in</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="create_new_account">Create new account</string>
+    <string name="create_your_account">Create your account</string>
+    <string name="please_use_your_real_name_to_ensure_your_professor_can_accurately_recognize_you">Please use your real name to ensure your professor can accurately recognize you.</string>
+    <string name="full_name">Full name</string>
+    <string name="birthday">Birthday</string>
+    <string name="gender">Gender</string>
 </resources>
