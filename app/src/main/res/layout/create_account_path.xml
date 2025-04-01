@@ -48,7 +48,7 @@
         app:layout_constraintWidth_percent="0.9" />
 
     <EditText
-        android:id="@+id/fullname"
+        android:id="@+id/username"
         android:layout_width="0dp"
         android:layout_height="60dp"
         android:autofillHints=""
@@ -81,9 +81,9 @@
         android:padding="12dp"
         android:textColorHint="#A9A9A9"
         android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="@+id/fullname"
-        app:layout_constraintStart_toStartOf="@+id/fullname"
-        app:layout_constraintTop_toBottomOf="@+id/fullname"
+        app:layout_constraintEnd_toEndOf="@+id/username"
+        app:layout_constraintStart_toStartOf="@+id/username"
+        app:layout_constraintTop_toBottomOf="@+id/username"
         app:layout_constraintWidth_percent="0.9" />
 
 <!--    gender drop down-->
