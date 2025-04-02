@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">CrimsonSkillBoostMobileV2</string>
+    <string name="app_Name">Crimson Skill Boost</string>
+    <string name="logo">Logo</string>
+    <string name="background">Bckground</string>
+    <string name="email_or_username">Email or username</string>
+    <string name="password">Password</string>
+    <string name="log_in">Log in</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="create_new_account">Create new account</string>
+    <string name="create_your_account">Create your account</string>
+    <string name="please_use_your_real_name_to_ensure_your_professor_can_accurately_recognize_you">Please use your real name to ensure your professor can accurately recognize you.</string>
+    <string name="full_name">Full name</string>
+    <string name="birthday">Birthday</string>
+    <string name="gender">Gender</string>
+    <string name="email">Email</string>
+    <string name="username">Username</string>
+    <string name="confirmation_code">Confirmation code</string>
+    <string name="email_confirmation">To confirm your account, enter the 6-digit code we sent to your email</string>
+    <string name="enter_confirmation_code">Enter Confirmation Code</string>
+    <string name="back_to_previous_page">back to previous page</string>
+    <string name="create_password">Create Password</string>
+    <string name="password_desc">Create a password with at least 6 characters, including a lowercase letter, an uppercase letter, a number, and a special character.</string>
+    <string name="pass">Password</string>
+
+
+
+    <string name="html_text">
+    People who use our platform may have their account details shared with their assigned professors for academic purposes.&#10;
+    <a href="https://yourwebsite.com/learnmore">Learn more</a>&#10;
+
+    &#10;By tapping I agree, you confirm that you &#10;have read and accepted CrimsonSkillBoost's
+    <a href="https://yourwebsite.com/terms">Terms</a>,
+    <a href="https://yourwebsite.com/privacy">Privacy Policy</a>, and
+    <a href="https://yourwebsite.com/cookies">Cookies Policy</a>. &#10; &#10;
+
+        The Privacy Policy explains how we collect,&#10;
+        use, and protect your data when you&#10;
+        create an account. For example, we use&#10;
+        this information to enhance learning&#10;
+        experiences, provide personalized&#10;
+        recommendations, and improve platform&#10;
+        features.
+</string>
+    <string name="terms_and_condition">Terms and Condition</string>
+
+
+</resources>
