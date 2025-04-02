@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:layout_editor_absoluteX="53dp"
+    tools:layout_editor_absoluteY="-141dp"
+    tools:ignore="ExtraText">
+
+    <TextView
+        android:id="@+id/header5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="128dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/terms_and_condition"
+        android:textColor="#090909"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.136"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    " />
+
+    <TextView
+        android:id="@+id/terms"
+        android:layout_width="340dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:autoLink="web"
+        android:lineSpacingExtra="5dp"
+        android:text="@string/html_text"
+        android:textColorLink="#1E90FF"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="@+id/header5"
+
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/header5"
+        app:layout_constraintTop_toBottomOf="@+id/header5"
+        app:layout_constraintWidth_percent="0.9"
+        tools:ignore="LinkPurposeUnclearCheck" />
+
+    <Button
+        android:id="@+id/iagree"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:autofillHints=""
+        android:background="@drawable/button_style"
+        android:fontFamily="@font/poppins_medium"
+        android:text="I agree"
+
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/terms"
+        app:layout_constraintVertical_bias="0.121"
+        app:layout_constraintWidth_percent="0.9"
+        tools:ignore="HardcodedText,TextContrastCheck,VisualLintButtonSize" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:layout_editor_absoluteX="53dp"
+    tools:layout_editor_absoluteY="-141dp">
+
+    <ImageView
+        android:id="@+id/backbtn3"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="84dp"
+        android:contentDescription="@string/back_to_previous_page"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.085"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/back" />
+
+    <TextView
+        android:id="@+id/header3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/enter_confirmation_code"
+        android:textColor="#090909"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.138"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/backbtn3" />
+
+
+    <TextView
+        android:id="@+id/description3"
+        android:layout_width="330dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/email_confirmation"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="@+id/header3"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/header3"
+        app:layout_constraintTop_toBottomOf="@+id/header3"
+        app:layout_constraintWidth_percent="0.9" />
+
+    <Button
+        android:id="@+id/confirmbtn"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:autofillHints=""
+        android:background="@drawable/button_style"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Confirm"
+
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        app:backgroundTint="@null"
+        app:layout_constraintEnd_toEndOf="@+id/code"
+        app:layout_constraintHorizontal_bias="0.291"
+        app:layout_constraintStart_toStartOf="@+id/code"
+        app:layout_constraintTop_toBottomOf="@+id/code"
+        app:layout_constraintWidth_percent="0.9"
+        tools:ignore="HardcodedText,TextContrastCheck,VisualLintButtonSize" />
+
+    <EditText
+        android:id="@+id/code"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:background="@drawable/logins_textfield"
+        android:ems="10"
+        android:fontFamily="@font/poppins_regular"
+        android:hint="@string/confirmation_code"
+        android:inputType="number"
+        android:padding="12dp"
+        android:textColorHint="#A9A9A9"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/description3"
+        app:layout_constraintVertical_bias="0.097"
+        app:layout_constraintWidth_percent="0.9"
+        tools:ignore="VisualLintTextFieldSize,TextContrastCheck" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
