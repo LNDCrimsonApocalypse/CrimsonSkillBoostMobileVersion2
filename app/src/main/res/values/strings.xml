@@ -13,4 +13,13 @@
     <string name="full_name">Full name</string>
     <string name="birthday">Birthday</string>
     <string name="gender">Gender</string>
+    <string name="description1">Enter a valid email and unique username for secure access and recognition.</string>
+    <string name="email">Email</string>
+    <string name="username1">Username1</string>
+    <string name="username">Username</string>
+    <string name="back_to_previous_page">back to previous page</string>
+    <string name="enter_confirmation_code">Enter Confirmation Code</string>
+    <string name="email_confirmation">To confirm your account, enter the 6-digit code we sent to None.none@gmail.com</string>
+    <string name="confirmation_code">confirmation_code</string>
+
 </resources>
