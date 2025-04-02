@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    tools:layout_editor_absoluteX="53dp"
+    tools:layout_editor_absoluteY="-141dp"
+    tools:ignore="ExtraText">
+
+
+    <TextView
+        android:id="@+id/header6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/set_up_your_profile"
+        android:textColor="#090909"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.136"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/setup_desc"
+        android:layout_width="330dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/set_up_desc"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.382"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header6"
+        app:layout_constraintWidth_percent="0.9" />
+
+
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:contentDescription="@string/profile_picture"
+        android:scaleType="centerCrop"
+        android:src="@drawable/profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/setup_desc" />
+
+    <ImageView
+        android:id="@+id/cameraIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="116dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:contentDescription="@string/upload_image"
+
+        android:focusable="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/camera"
+        app:layout_constraintEnd_toEndOf="@+id/profileImageView"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="@+id/profileImageView"
+        app:layout_constraintTop_toTopOf="@+id/profileImageView" />
+
+    <TextView
+        android:id="@+id/fullname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/poppins_regular"
+        android:text="@string/name_placeholder"
+        android:textColor="#090909"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cameraIcon" />
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:text="@string/username_placeholder"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/fullname"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="@+id/fullname"
+        app:layout_constraintTop_toBottomOf="@+id/fullname" />
+    "
+
+    <TextView
+        android:id="@+id/email"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/logins_textfield"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="start|center_vertical"
+        android:text="@string/email_placeholder"
+        android:textColor="#090909"
+        android:textSize="16sp"
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="@+id/username"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintStart_toStartOf="@+id/username"
+        app:layout_constraintTop_toBottomOf="@+id/username"
+        app:layout_constraintWidth_percent="0.85" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/yearfield"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/logins_textfield"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="center_vertical"
+        android:hint="Year"
+        android:padding="12dp"
+        android:textColorHint="#090909"
+
+        android:textSize="16sp"
+        app:boxBackgroundMode="none"
+        app:layout_constraintStart_toStartOf="@+id/email"
+        app:layout_constraintTop_toBottomOf="@+id/email"
+        tools:ignore="HardcodedText">
+
+
+        <AutoCompleteTextView
+            android:id="@+id/yeardropdown"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:drawableEnd="@drawable/dropdown"
+            android:drawablePadding="5dp"
+
+            android:drawableTint="#A9A9A9"
+            android:dropDownVerticalOffset="8dp"
+            android:focusable="false"
+            android:inputType="none"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+<!--    section-->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/sectionfield"
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/logins_textfield"
+        android:fontFamily="@font/poppins_regular"
+        android:gravity="center_vertical"
+        android:hint="Section"
+        android:padding="12dp"
+        android:textColorHint="#090909"
+        android:textSize="16sp"
+        app:boxBackgroundMode="none"
+        app:layout_constraintEnd_toEndOf="@+id/email"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/yearfield"
+        app:layout_constraintTop_toBottomOf="@+id/email"
+        tools:ignore="HardcodedText">
+
+
+        <AutoCompleteTextView
+            android:id="@+id/sectionDropdown"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:drawableEnd="@drawable/dropdown"
+            android:drawablePadding="5dp"
+
+            android:drawableTint="#A9A9A9"
+            android:dropDownVerticalOffset="8dp"
+            android:focusable="false"
+            android:inputType="none"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="92dp"
+        android:background="@drawable/logins_textfield"
+        android:orientation="vertical"
+        android:padding="1dp"
+        app:layout_constraintEnd_toEndOf="@+id/sectionfield"
+        app:layout_constraintStart_toStartOf="@+id/yearfield"
+        app:layout_constraintTop_toBottomOf="@+id/email">
+
+        <!-- EditText for Bio Input with hint as "Your Bio" -->
+        <EditText
+            android:id="@+id/bioEditText"
+            android:layout_width="349dp"
+            android:layout_height="120dp"
+            android:background="@android:color/transparent"
+            android:gravity="top|start"
+            android:hint="@string/your_bio"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            android:textColorHint="#090909"
+            android:textSize="16sp"
+            tools:layout_editor_absoluteX="41dp"
+            tools:layout_editor_absoluteY="639dp" />
+
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/savebtn"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="@drawable/button_style"
+        android:fontFamily="@font/poppins_medium"
+        android:text="Save"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        app:backgroundTint="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintWidth_percent="0.9"
+        tools:ignore="HardcodedText,TextContrastCheck,VisualLintButtonSize" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

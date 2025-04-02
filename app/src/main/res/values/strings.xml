@@ -45,8 +45,14 @@
        features.
 </string>
     <string name="terms_and_condition">Terms and Condition</string>
-
-
+    <string name="set_up_your_profile">Set up your profile</string>
+    <string name="set_up_desc">Upload a clear and professional image to help your professor recognize you.</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="upload_image">Upload Image</string>
+    <string name="name_placeholder">Name Placeholder</string>
+    <string name="username_placeholder">username placeholder</string>
+    <string name="email_placeholder">email placeholder</string>
+    <string name="your_bio">Your Bio</string>
 
 
 </resources>
