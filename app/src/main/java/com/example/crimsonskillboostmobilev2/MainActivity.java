@@ -1,6 +1,8 @@
 package com.example.crimsonskillboostmobilev2;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,7 +20,16 @@ public class MainActivity extends AppCompatActivity {
         logo = findViewById(R.id.Logo);
         appName = findViewById(R.id.AppName);
 
-        // Example logic (optional)
         appName.setText("MyAcademicallyGenius");
+
+        // Transition after 3 seconds (3000 milliseconds)
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish(); // Close the splash screen so user can't go back to it
+            }
+        }, 3000); // Delay in milliseconds
     }
 }

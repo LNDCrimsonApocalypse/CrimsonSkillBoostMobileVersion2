@@ -1,5 +1,6 @@
 package com.example.crimsonskillboostmobilev2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,7 +32,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         createbtn.setOnClickListener(v -> {
-            Toast.makeText(this, "Redirect to Create Account", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this, CreateAccount.class);
+            startActivity(intent);
         });
 
         forgot.setOnClickListener(v -> {
@@ -39,4 +41,3 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 }
-
