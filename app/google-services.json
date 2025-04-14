@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "209462764164",
+    "project_id": "csboostcmo",
+    "storage_bucket": "csboostcmo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:209462764164:android:27f1e326c5a82341d718d1",
+        "android_client_info": {
+          "package_name": "com.mycompany.crimsonskillboost"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEt2N47g51AbU7r2hy-8tWWBugl3hrhk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

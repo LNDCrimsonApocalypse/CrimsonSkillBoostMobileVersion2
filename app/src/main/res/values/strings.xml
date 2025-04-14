@@ -26,22 +26,22 @@
     <string name="pass">Password</string>
 
     <string name="html_text">
-   People who use our platform may have their account details shared with their assigned professors for academic purposes.&#10;
-   <a href="https://yourwebsite.com/learnmore">Learn more</a>&#10;
+   People who use our platform may have their account details shared with their assigned professors for academic purposes.\n
+   &lt;a href="https://yourwebsite.com/learnmore">Learn more&lt;/a>\n
 
 
-   &#10;By tapping I agree, you confirm that you &#10;have read and accepted CrimsonSkillBoost's
-   <a href="https://yourwebsite.com/terms">Terms</a>,
-   <a href="https://yourwebsite.com/privacy">Privacy Policy</a>, and
-   <a href="https://yourwebsite.com/cookies">Cookies Policy</a>. &#10; &#10;
+   \nBy tapping I agree, you confirm that you \nhave read and accepted CrimsonSkillBoost&#8217;s
+   &lt;a href="https://yourwebsite.com/terms">Terms&lt;/a>,
+   &lt;a href="https://yourwebsite.com/privacy">Privacy Policy&lt;/a>, and
+   &lt;a href="https://yourwebsite.com/cookies">Cookies Policy&lt;/a>. \n \n
 
 
-       The Privacy Policy explains how we collect,&#10;
-       use, and protect your data when you&#10;
-       create an account. For example, we use&#10;
-       this information to enhance learning&#10;
-       experiences, provide personalized&#10;
-       recommendations, and improve platform&#10;
+       The Privacy Policy explains how we collect,\n
+       use, and protect your data when you\n
+       create an account. For example, we use\n
+       this information to enhance learning\n
+       experiences, provide personalized\n
+       recommendations, and improve platform\n
        features.
 </string>
     <string name="terms_and_condition">Terms and Condition</string>

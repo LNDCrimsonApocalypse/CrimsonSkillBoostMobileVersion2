@@ -1,5 +1,5 @@
 package com.example.crimsonskillboostmobilev2;
-
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -27,6 +27,7 @@ public class CreateAccount extends AppCompatActivity {
         nextBtn.setOnClickListener(v -> {
             String emailText = email.getText().toString();
             String usernameText = username.getText().toString();
+            Intent intent = new Intent(CreateAccount.this, CreateAccountPath.class);
             Toast.makeText(this, "Next clicked\nEmail: " + emailText + "\nUsername: " + usernameText, Toast.LENGTH_SHORT).show();
         });
 
