@@ -53,6 +53,16 @@
     <string name="username_placeholder">username placeholder</string>
     <string name="email_placeholder">email placeholder</string>
     <string name="your_bio">Your Bio</string>
+    <string name="App_name_header">Crimson Skill Boost</string>
+    <string name="welcomeTxt">Welcome to Crimson Skill Boost Username</string>
+    <string name="welcomeTxt2">Your tech journey begins here!</string>
+    <string name="search_courses">Search courses...</string>
+    <string name="home">Home</string>
+    <string name="path">Path</string>
+    <string name="account">account</string>
+    <string name="no_courses_available_yet">No courses available yet.</string>
+    <string name="enrolled_courses">Enrolled Courses</string>
+    <string name="available_courses">Available Courses</string>
 
 
 </resources>

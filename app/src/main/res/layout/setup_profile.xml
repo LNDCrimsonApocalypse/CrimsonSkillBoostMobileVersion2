@@ -59,7 +59,7 @@
         android:background="?attr/selectableItemBackground"
         android:clickable="true"
         android:contentDescription="@string/upload_image"
-
+        android:foregroundGravity="center_horizontal"
         android:focusable="true"
         android:scaleType="centerInside"
         android:src="@drawable/camera"
