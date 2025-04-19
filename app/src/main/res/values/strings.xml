@@ -63,6 +63,11 @@
     <string name="no_courses_available_yet">No courses available yet.</string>
     <string name="enrolled_courses">Enrolled Courses</string>
     <string name="available_courses">Available Courses</string>
+    <string name="subject_desc">Explore the basics of game design and development, and start creating your own games from scratch.</string>
+    <string name="subject_name">Game Development</string>
+    <string name="pending_approval_icon">Pending Approval Icon</string>
+    <string name="percentage">0%</string>
+    <string name="subject_icon">Subject Icon</string>
 
 
 </resources>

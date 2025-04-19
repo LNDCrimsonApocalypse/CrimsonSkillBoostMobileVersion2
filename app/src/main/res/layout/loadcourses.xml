@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    android:backgroundTint="@android:color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Place holder pending for approval -->
+        <ImageView
+            android:id="@+id/imageViewPending"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="@string/pending_approval_icon"
+            android:src="@drawable/pending"
+            app:tint="#A762E6"
+            android:visibility="visible" />  <!--you switch this to visible to that the pending icon will appear-->
+
+        <!-- Place Holder for subject Icon) -->
+
+        <ImageView
+            android:id="@+id/imageViewSubjectIcon"
+            android:layout_width="64dp"
+            android:layout_height="80dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/subject_icon"
+            android:src="@drawable/gamedev_icon" />
+
+        <TextView
+            android:id="@+id/textViewCourseTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/imageViewSubjectIcon"
+            android:layout_alignTop="@id/imageViewSubjectIcon"
+            android:text="@string/subject_name"
+            android:textColor="@android:color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- Course Overview -->
+        <TextView
+            android:id="@+id/textViewCourseOverview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textViewCourseTitle"
+            android:layout_toEndOf="@id/imageViewSubjectIcon"
+            android:layout_marginTop="4dp"
+            android:text="@string/subject_desc"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="13sp"
+            android:maxLines="3"
+            android:ellipsize="end"/>
+
+
+        <TextView
+            android:id="@+id/textViewProgressPercent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/progressBarCourse"
+            android:layout_alignParentEnd="true"
+            android:text="@string/percentage"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginEnd="4dp"
+            android:visibility="visible"/>
+
+        <!-- Progress Bar (Inactive for available courses) -->
+        <ProgressBar
+            android:id="@+id/progressBarCourse"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_below="@id/imageViewSubjectIcon"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="0dp"
+            android:enabled="true"
+            android:indeterminate="false"
+            android:max="100"
+            android:progress="0"
+            android:progressBackgroundTint="#70D877DD"
+            android:progressTint="#D877DD" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>
