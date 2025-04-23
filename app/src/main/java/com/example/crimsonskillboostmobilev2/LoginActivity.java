@@ -6,8 +6,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -15,15 +18,23 @@ public class LoginActivity extends AppCompatActivity {
     Button loginbtn, createbtn;
     TextView forgot;
 
-    private FirebaseAuth mAuth; // Firebase Authentication instance
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_interface);
 
-        // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            startActivity(new Intent(LoginActivity.this, Home.class));
+            finish(); // Close login activity
+            return; // Exit onCreate
+        }
+
+        // If not logged in, continue to show login screen
+        setContentView(R.layout.login_interface);
 
         fullname = findViewById(R.id.fullname);
         editTextPassword = findViewById(R.id.editTextPassword);
@@ -32,25 +43,24 @@ public class LoginActivity extends AppCompatActivity {
         forgot = findViewById(R.id.Forgot);
 
         loginbtn.setOnClickListener(v -> {
-            String username = fullname.getText().toString();
-            String password = editTextPassword.getText().toString();
+            String username = fullname.getText().toString().trim();
+            String password = editTextPassword.getText().toString().trim();
 
-            // Sign in with email and password
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please enter all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             mAuth.signInWithEmailAndPassword(username, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Toast.makeText(LoginActivity.this, "Login Successful.",
-                                    Toast.LENGTH_SHORT).show();
-                            // You can start a new activity here, like your main app screen
-                            // Example:
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            Toast.makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
+
+                            Intent intent = new Intent(LoginActivity.this, Home.class);
                             startActivity(intent);
-                            finish(); // Optional: Close the login activity
+                            finish(); // Close login activity
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                     });
         });
