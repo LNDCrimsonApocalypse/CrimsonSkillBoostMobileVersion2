@@ -39,11 +39,8 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.firebase.auth)
-<<<<<<< HEAD
     implementation(libs.generativeai)
     implementation(libs.firebase.database)
-=======
->>>>>>> parent of e2a193b (Added Generative AI)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
