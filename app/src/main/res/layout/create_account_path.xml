@@ -110,14 +110,15 @@
         <AutoCompleteTextView
             android:id="@+id/genderDropdown"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="47dp"
             android:background="@null"
             android:drawableEnd="@drawable/dropdown"
             android:drawablePadding="5dp"
 
             android:drawableTint="#A9A9A9"
             android:dropDownVerticalOffset="8dp"
-            android:focusable="false"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:inputType="none"
             android:textColor="@android:color/black"
             android:textSize="16sp" />
@@ -127,7 +128,7 @@
         android:id="@+id/nextbtn"
         android:layout_width="0dp"
         android:layout_height="50dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="48dp"
         android:background="@drawable/button_style"
         android:fontFamily="@font/poppins_medium"
         android:text="Next"

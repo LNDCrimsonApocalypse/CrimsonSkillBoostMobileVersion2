@@ -33,6 +33,9 @@ public class CreateAccountPath extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_account_path);
 
+        String email = getIntent().getStringExtra("email");
+        String username = getIntent().getStringExtra("username");
+
         // Bind views
         fullnameEditText = findViewById(R.id.fullname);
         birthdayEditText = findViewById(R.id.birthday);
@@ -48,6 +51,7 @@ public class CreateAccountPath extends AppCompatActivity {
         String[] genderOptions = {"Male", "Female", "Prefer not to say"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, genderOptions);
         genderDropdown.setAdapter(adapter);
+        genderDropdown.setOnClickListener(v -> genderDropdown.showDropDown());
 
         // Date picker for birthday
         birthdayEditText.setOnClickListener(v -> showDatePickerDialog());
@@ -73,7 +77,7 @@ public class CreateAccountPath extends AppCompatActivity {
             }
 
             String uid = currentUser.getUid();
-            UserProfile profile = new UserProfile(fullName, birthday, gender);
+            UserProfile profile = new UserProfile(fullName, birthday, gender, email, username);
 
             dbRef.child(uid).setValue(profile).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {

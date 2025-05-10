@@ -1,7 +1,8 @@
+// CreateAccount.java
 package com.example.crimsonskillboostmobilev2;
+
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,13 +26,20 @@ public class CreateAccount extends AppCompatActivity {
         backBtn = findViewById(R.id.backbtn2);
 
         nextBtn.setOnClickListener(v -> {
-            String emailText = email.getText().toString();
-            String usernameText = username.getText().toString();
-            Intent intent = new Intent(CreateAccount.this, CreateAccountPath.class);
-            Toast.makeText(this, "Next clicked\nEmail: " + emailText + "\nUsername: " + usernameText, Toast.LENGTH_SHORT).show();
+            String emailText = email.getText().toString().trim();
+            String usernameText = username.getText().toString().trim();
+
+            if (emailText.isEmpty() || usernameText.isEmpty()) {
+                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Intent intent = new Intent(CreateAccount.this, CreatePassword.class);
+            intent.putExtra("email", emailText);
+            intent.putExtra("username", usernameText);
+            startActivity(intent);
         });
 
         backBtn.setOnClickListener(v -> finish());
     }
 }
-
