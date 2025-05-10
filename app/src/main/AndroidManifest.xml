@@ -28,7 +28,6 @@
         </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".CreateAccount" />
-        <activity android:name=".CreatePassword" />
         <activity android:name=".CreateAccountPath" />
         <activity android:name=".EmailConfirmation" />
         <activity android:name=".SetupProfile" />

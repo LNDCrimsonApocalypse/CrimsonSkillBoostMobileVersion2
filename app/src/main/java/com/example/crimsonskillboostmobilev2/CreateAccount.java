@@ -1,13 +1,11 @@
 package com.example.crimsonskillboostmobilev2;
-
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Patterns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class CreateAccount extends AppCompatActivity {
@@ -27,26 +25,13 @@ public class CreateAccount extends AppCompatActivity {
         backBtn = findViewById(R.id.backbtn2);
 
         nextBtn.setOnClickListener(v -> {
-            String emailText = email.getText().toString().trim();
-            String usernameText = username.getText().toString().trim();
-
-            if (emailText.isEmpty() || usernameText.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!Patterns.EMAIL_ADDRESS.matcher(emailText).matches()) {
-                Toast.makeText(this, "Invalid email format", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Intent intent = new Intent(CreateAccount.this, CreatePassword.class);
-            intent.putExtra("email", emailText);
-            intent.putExtra("username", usernameText);
-            Toast.makeText(this, "Proceeding to password", Toast.LENGTH_SHORT).show();
-            startActivity(intent);
+            String emailText = email.getText().toString();
+            String usernameText = username.getText().toString();
+            Intent intent = new Intent(CreateAccount.this, CreateAccountPath.class);
+            Toast.makeText(this, "Next clicked\nEmail: " + emailText + "\nUsername: " + usernameText, Toast.LENGTH_SHORT).show();
         });
 
         backBtn.setOnClickListener(v -> finish());
     }
 }
+
