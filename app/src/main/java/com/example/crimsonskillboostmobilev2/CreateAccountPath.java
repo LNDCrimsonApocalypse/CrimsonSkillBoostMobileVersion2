@@ -77,7 +77,8 @@ public class CreateAccountPath extends AppCompatActivity {
             }
 
             String uid = currentUser.getUid();
-            UserProfile profile = new UserProfile(fullName, birthday, gender, email, username);
+            UserProfile profile = new UserProfile(fullName, birthday, gender, email, username, "student");
+
 
             dbRef.child(uid).setValue(profile).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
