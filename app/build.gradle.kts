@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.crimsonskillboostmobilev2"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.crimsonskillboostmobilev2"
@@ -30,6 +30,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildToolsVersion = "36.0.0"
 }
 
 dependencies {
@@ -41,6 +42,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.generativeai)
     implementation(libs.firebase.database)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

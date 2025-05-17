@@ -1,37 +1,29 @@
 package com.example.crimsonskillboostmobilev2;
 
 public class CourseModel {
+    private int id;
     private String title;
-    private String overview;
-    private int progress;
-    private boolean pending;
-    private int iconResId;
+    private String content;
 
-    public CourseModel(String title, String overview, int progress, boolean pending, int iconResId) {
-        this.title = title;
-        this.overview = overview;
-        this.progress = progress;
-        this.pending = pending;
-        this.iconResId = iconResId;
-    }
-
+    // Add getter methods
     public String getTitle() {
         return title;
     }
 
     public String getOverview() {
-        return overview;
+        return content;
     }
 
     public int getProgress() {
-        return progress;
+        return 0; // Placeholder or derive logic later
     }
 
     public boolean isPending() {
-        return pending;
+        return false; // Placeholder or map from your data
     }
 
     public int getIconResId() {
-        return iconResId;
+        return android.R.drawable.ic_dialog_info; // Default drawable or logic based on title
     }
 }
+

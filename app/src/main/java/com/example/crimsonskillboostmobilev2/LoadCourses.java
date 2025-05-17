@@ -1,26 +1,59 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHolder> {
 
     private Context context;
-    private List<CourseModel> courseList;
+    private List<CourseModel> courseList = new ArrayList<>();
+    private RecyclerView recyclerView;
 
-    public LoadCourses(Context context, List<CourseModel> courseList) {
+    public LoadCourses(Context context, RecyclerView recyclerView) {
         this.context = context;
-        this.courseList = courseList;
+        this.recyclerView = recyclerView;
+        fetchCoursesFromApi(); // Load data on initialization
+    }
+
+    private void fetchCoursesFromApi() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<List<CourseModel>> call = apiService.getCourses();
+
+        call.enqueue(new Callback<List<CourseModel>>() {
+            @Override
+            public void onResponse(Call<List<CourseModel>> call, Response<List<CourseModel>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    courseList = response.body();
+                    notifyDataSetChanged(); // Refresh adapter
+                    recyclerView.setAdapter(LoadCourses.this); // Set adapter after loading
+                } else {
+                    Toast.makeText(context, "Empty or bad response", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<CourseModel>> call, Throwable t) {
+                Toast.makeText(context, "Failed to load courses: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("LoadCourses", "API error", t);
+            }
+        });
     }
 
     @NonNull
@@ -38,14 +71,12 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         holder.progressBar.setProgress(course.getProgress());
         holder.progressPercent.setText(course.getProgress() + "%");
 
-        // Show/hide pending icon based on course status
         if (course.isPending()) {
             holder.pendingIcon.setVisibility(View.VISIBLE);
         } else {
             holder.pendingIcon.setVisibility(View.GONE);
         }
 
-        // Set icon (assuming drawable resource ID is stored in model)
         holder.subjectIcon.setImageResource(course.getIconResId());
     }
 
@@ -71,4 +102,3 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         }
     }
 }
-

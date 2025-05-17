@@ -70,12 +70,9 @@ public class Home extends AppCompatActivity {
         // Setup RecyclerView with dummy data
         recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
 
-        List<CourseModel> dummyCourses = new ArrayList<>();
-        dummyCourses.add(new CourseModel("Game Development", "Learn to build games using Unity.", 0, false, R.drawable.gamedev_icon));
-        dummyCourses.add(new CourseModel("Pending Course", "Awaiting approval...", 0, true, R.drawable.gamedev_icon));
+        RecyclerView recyclerView = findViewById(R.id.recyclerViewCourses);
+        LoadCourses adapter = new LoadCourses(this, recyclerView);
 
-        LoadCourses adapter = new LoadCourses(this, dummyCourses);
-        recyclerViewCourses.setAdapter(adapter);
     }
 
     private void showEnrolledCourses() {
