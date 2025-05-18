@@ -42,7 +42,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.generativeai)
     implementation(libs.firebase.database)
-
+    implementation(libs.retrofit)
+    implementation(libs.gsonconverter)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

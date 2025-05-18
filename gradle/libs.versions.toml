@@ -10,6 +10,7 @@ constraintlayout = "2.2.1"
 firebaseAuth = "23.2.0"
 generativeai = "0.9.0"
 firebaseDatabase = "21.0.0"
+retrofit = "2.9.0"
 
 
 [libraries]
@@ -23,6 +24,8 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+gsonconverter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 
 
 [plugins]
