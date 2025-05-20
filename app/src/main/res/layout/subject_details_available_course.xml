@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <?xml version="1.0" encoding="utf-8"?>
+
+    <ScrollView
+        android:id="@+id/scrollView2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/coursesBG"
+        android:padding="16dp"
+        tools:layout_editor_absoluteX="182dp"
+        tools:layout_editor_absoluteY="0dp"
+        >
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <!-- Course Title -->
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="20dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="170dp"
+                android:layout_marginBottom="12dp"
+                android:clickable="true"
+                android:contentDescription="@string/back"
+                android:focusable="true"
+                android:src="@drawable/back" />
+
+            <TextView
+                android:id="@+id/tvCourseTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:fontFamily="@font/poppins_regular"
+                android:text="@string/subject_title"
+                android:textColor="@android:color/black"
+                android:textSize="27sp"
+                android:textStyle="bold" />
+
+
+            <!-- Instructor Card -->
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:padding="20dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/ivInstructor"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginEnd="16dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/profile" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvInstructorName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Prof. Chessi Kallen"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvInstructorEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/prof_email"
+                            android:textColor="#191919"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- Course Overview Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:elevation="10dp"
+                android:padding="16dp"
+                app:cardCornerRadius="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:background="#807653EC"
+                        android:fontFamily="@font/poppins_medium"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="5dp"
+                        android:text="@string/course_overview"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvCourseOverview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/card_outline"
+                        android:padding="15dp"
+                        android:text="@string/course_overview_desc"
+                        android:textColor="#5F5F5F"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Topic Overview Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:elevation="3dp"
+                android:padding="16dp"
+                app:cardCornerRadius="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:background="#807653EC"
+                        android:fontFamily="@font/poppins_medium"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="5dp"
+                        android:text="@string/topic_overview"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvTopicOverview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="15dp"
+                        android:text="@string/topic_desc"
+                        android:textColor="#5F5F5F"
+                        android:textSize="13sp"
+                        android:background="@drawable/card_outline"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- Requirements Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:elevation="3dp"
+                android:padding="16dp"
+                app:cardCornerRadius="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:background="#807653EC"
+                        android:fontFamily="@font/poppins_medium"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="5dp"
+                        android:text="@string/requirements_prerequisites"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvRequirements"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="15dp"
+                        android:text="@string/requirements_desc"
+                        android:textColor="#5F5F5F"
+                        android:textSize="13sp"
+                        android:background="@drawable/card_outline"/>
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- Enroll Button -->
+            <Button
+                android:id="@+id/btnEnroll"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:backgroundTint="#B388EB"
+                android:fontFamily="@font/poppins_medium"
+                android:text="@string/enroll_btn"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+
+<!-- pop up layout   -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/popupContainer"
+            android:layout_width="330dp"
+            android:layout_height="150dp"
+            android:background="@drawable/popup_bg"
+            android:elevation="8dp"
+            android:padding="14dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.493"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.439">
+
+            <TextView
+                android:id="@+id/tvDialogTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:text="Enrollment Request Sent"
+                android:textColor="@android:color/black"
+                android:textSize="18sp"
+                android:textStyle="bold"
+
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvDialogMessage"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="start"
+                android:text="Your enrollment request has been sent to the professor for approval. You will be notified once it’s approved."
+                android:textColor="@android:color/black"
+
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDialogTitle" />
+
+            <Button
+
+                android:id="@+id/btnDialogOK"
+                android:layout_width="60dp"
+                android:layout_height="35dp"
+                android:backgroundTint="#D877DD"
+                android:paddingTop="-8dp"
+                android:paddingBottom="-8dp"
+                android:text="Ok"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                android:textSize="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDialogMessage"
+                app:layout_constraintVertical_bias="0.75" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--Thomas once na click yung ok button sa pop up dapat magchange din yung text sa enroll btn ng "pending request -->
+<!--suggested jave code-->
+<!--
+// Inside your Dialog OK button's onClickListener
+Button btnEnroll = findViewById(R.id.btnEnroll);
+
+btnDialogOK.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        // Change text
+        btnEnroll.setText("Pending Request");
+
+        // Disable button
+        btnEnroll.setEnabled(false);
+        btnEnroll.setClickable(false);
+
+        // Optional: Change button color to look disabled
+        btnEnroll.setBackgroundColor(getResources().getColor(R.color.gray)); // or use a custom drawable
+    }
+});
+-->

@@ -68,6 +68,19 @@
     <string name="pending_approval_icon">Pending Approval Icon</string>
     <string name="percentage">0%</string>
     <string name="subject_icon">Subject Icon</string>
+    <string name="backbtn">Backbtn</string>
+    <string name="courseOverviewDesc">SLorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas gravida magna nec quam vestibulum, ornare ullamcorper nulla tristique. In posuere metus massa, vel fermentum ipsum ullamcorper quis. Praesent turpis tellus, tempus vitae posuere id, efficitur non augue. Aenean in nulla at neque eleifend placerat. Mauris porttitor viverra dolor. Nulla ornare.</string>
+    <string name="course_overview">Course Overview</string>
+    <string name="subject_title">Mobile Development</string>
+    <string name="back">Back</string>
+    <string name="course_overview_desc">Explore the basics of game design and development, and start creating your own games from scratch. Gain hands-on experience with game engines, storytelling, and interactive mechanics to bring your ideas to life.</string>
+    <string name="topic_overview">Topic Overview</string>
+    <string name="requirements_prerequisites">Requirements / Prerequisites</string>
+    <string name="requirements_desc">Basic knowledge of programming (preferably in Java, Kotlin, or JavaScript) and understanding of how mobile devices work. Familiarity with HTML, CSS, and basic app structures is a plus.</string>
+    <string name="enroll_btn">Enroll</string>
+    <string name="prof_email">kallen.charles@gmail.com</string>
+    <string name="topic_desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut auctor mauris. Aliquam eget massa sit amet libero posuere viverra eget ut ligula. Sed feugiat quis neque ac dictum. Nulla nec risus pellentesque, scelerisque leo sed, iaculis diam. Duis vehicula commodo libero. Vivamus ac mi felis. Cras accumsan lectus odio.</string>
+    <string name="hometask_icon">HomeTask_icon</string>
 
 
 </resources>

@@ -91,6 +91,22 @@
           it will reflect in here-->
 
 
+    <!-- Bottom Navigation -->
+
+    <ImageView
+        android:id="@+id/coursesIcon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="540dp"
+        android:clickable="true"
+        android:contentDescription="@string/hometask_icon"
+        android:focusable="true"
+        android:src="@drawable/TaskHome"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.921"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCourses"
         android:layout_width="0dp"
@@ -101,13 +117,10 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        app:layout_constraintVertical_bias="0.0" />
-
-
-    <!-- Bottom Navigation -->
+        app:layout_constraintVertical_bias="1.0" />
 
     <LinearLayout
         android:layout_width="match_parent"
