@@ -101,7 +101,7 @@
         android:clickable="true"
         android:contentDescription="@string/hometask_icon"
         android:focusable="true"
-        android:src="@drawable/TaskHome"
+        android:src="@drawable/taskhome"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.921"
         app:layout_constraintStart_toStartOf="parent"
