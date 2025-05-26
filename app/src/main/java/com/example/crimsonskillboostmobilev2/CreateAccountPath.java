@@ -1,6 +1,7 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -83,6 +84,7 @@ public class CreateAccountPath extends AppCompatActivity {
             dbRef.child(uid).setValue(profile).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(CreateAccountPath.this, TermsAndCondition.class);
                     // TODO: Navigate to next screen here
                 } else {
                     Toast.makeText(this, "Failed to save profile.", Toast.LENGTH_SHORT).show();

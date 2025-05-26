@@ -93,7 +93,7 @@ public class SetupProfile extends AppCompatActivity {
 
         // Simulate saving
         Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show();
-
+        Intent intent = new Intent(SetupProfile.this, Home.class);
         // TODO: Save to Firebase or SQLite or SharedPreferences
         // Example:
         // saveToFirebase(year, section, bio, imageUri);
