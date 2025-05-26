@@ -14,10 +14,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreateAccountPath extends AppCompatActivity {
 
@@ -27,7 +28,7 @@ public class CreateAccountPath extends AppCompatActivity {
     private ImageView backBtn;
 
     private FirebaseAuth mAuth;
-    private DatabaseReference dbRef;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +47,7 @@ public class CreateAccountPath extends AppCompatActivity {
 
         // Firebase init
         mAuth = FirebaseAuth.getInstance();
-        dbRef = FirebaseDatabase.getInstance().getReference("users");
+        firestore = FirebaseFirestore.getInstance();
 
         // Gender dropdown
         String[] genderOptions = {"Male", "Female", "Prefer not to say"};
@@ -78,14 +79,22 @@ public class CreateAccountPath extends AppCompatActivity {
             }
 
             String uid = currentUser.getUid();
-            UserProfile profile = new UserProfile(fullName, birthday, gender, email, username, "student");
 
+            // Create Firestore user data
+            Map<String, Object> profile = new HashMap<>();
+            profile.put("fullName", fullName); // ✅ Add this line
+            profile.put("bio", "");
+            profile.put("birthday", birthday);
+            profile.put("gender", gender);
+            profile.put("email", email);
+            profile.put("username", username);
+            profile.put("role", "student");
+            profile.put("updatedAt", com.google.firebase.Timestamp.now());
 
-            dbRef.child(uid).setValue(profile).addOnCompleteListener(task -> {
+            firestore.collection("users").document(uid).set(profile).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(CreateAccountPath.this, TermsAndCondition.class);
-                    // TODO: Navigate to next screen here
+                    startActivity(new Intent(CreateAccountPath.this, TermsAndCondition.class));
                 } else {
                     Toast.makeText(this, "Failed to save profile.", Toast.LENGTH_SHORT).show();
                 }
@@ -101,7 +110,7 @@ public class CreateAccountPath extends AppCompatActivity {
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(this,
                 (view, selectedYear, selectedMonth, selectedDay) -> {
-                    String date = (selectedMonth + 1) + "/" + selectedDay + "/" + selectedYear;
+                    String date = selectedYear + "-" + String.format("%02d", (selectedMonth + 1)) + "-" + String.format("%02d", selectedDay);
                     birthdayEditText.setText(date);
                 }, year, month, day);
 
