@@ -81,6 +81,10 @@
     <string name="prof_email">kallen.charles@gmail.com</string>
     <string name="topic_desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean ut auctor mauris. Aliquam eget massa sit amet libero posuere viverra eget ut ligula. Sed feugiat quis neque ac dictum. Nulla nec risus pellentesque, scelerisque leo sed, iaculis diam. Duis vehicula commodo libero. Vivamus ac mi felis. Cras accumsan lectus odio.</string>
     <string name="hometask_icon">HomeTask_icon</string>
+    <string name="personal_information">Personal Information</string>
+    <string name="name">Name</string>
+    <string name="jerine_carl_m_diaz">Jerine Carl M. Diaz</string>
+    <string name="course_progress">Course Progress</string>
 
 
 </resources>
