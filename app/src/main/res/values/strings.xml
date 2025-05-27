@@ -85,6 +85,11 @@
     <string name="name">Name</string>
     <string name="jerine_carl_m_diaz">Jerine Carl M. Diaz</string>
     <string name="course_progress">Course Progress</string>
+    <string name="quiz_name">Quiz 1: Conditional Statement</string>
+    <string name="question">What is the correct syntax for an if statement in Java?</string>
+    <string name="option_1">Option 1</string>
+    <string name="next">Next</string>
+    <string name="course_subject">Computer Programming</string>
 
 
 </resources>

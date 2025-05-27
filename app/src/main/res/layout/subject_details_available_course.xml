@@ -35,7 +35,8 @@
                 android:clickable="true"
                 android:contentDescription="@string/back"
                 android:focusable="true"
-                android:src="@drawable/back" />
+                android:src="@drawable/back"
+                />
 
             <TextView
                 android:id="@+id/tvCourseTitle"
