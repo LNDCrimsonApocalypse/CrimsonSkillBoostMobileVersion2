@@ -43,11 +43,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
+                android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/poppins_regular"
                 android:text="@string/subject_title"
                 android:textColor="@android:color/black"
                 android:textSize="27sp"
                 android:textStyle="bold" />
+
+
 
 
             <!-- Instructor Card -->

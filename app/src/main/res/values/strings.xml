@@ -90,6 +90,14 @@
     <string name="option_1">Option 1</string>
     <string name="next">Next</string>
     <string name="course_subject">Computer Programming</string>
+    <string name="forgot_passwordpath">Forgot Password?</string>
+    <string name="forgot_password_desc">Enter your email address below and we’ll send you a verification code to reset your password.</string>
+    <string name="email_address">Email address</string>
+    <string name="enter_verification_code">Enter Verification Code</string>
+    <string name="verification_desc">We’ve sent a 6-digit code to your email. Please enter it below to verify your identity.</string>
+    <string name="set_new_password">Set New Password</string>
+    <string name="desc">Create a strong password with at least 8 characters, including uppercase and lowercase letters, a number, and a special character.</string>
+    <string name="pass_reset_desc">Your password has been updated. You can now log in with your new credentials.</string>
 
 
 </resources>
