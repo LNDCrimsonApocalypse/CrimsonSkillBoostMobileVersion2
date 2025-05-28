@@ -20,6 +20,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintVertical_bias="0.0"
+        android:scrollbars="none"
         android:visibility="visible">
 
         <LinearLayout
@@ -55,8 +56,7 @@
                 android:layout_height="wrap_content"
                 app:cardElevation="7dp"
                 app:cardCornerRadius="10dp"
-                android:layout_marginBottom="20dp"
-                >
+                android:layout_marginBottom="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -95,16 +95,14 @@
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
-                            <EditText
-                                android:id="@+id/editName"
-                                android:layout_width="wrap_content"
+                            <TextView
+                                android:id="@+id/tvName"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Jerine Carl m. Diaz"
-                                android:background="@null"
-                                android:inputType="textPersonName"
-                                android:padding="4dp"
-                                android:textSize="14sp"/>
+                                android:text="Jerine Carl M. Diaz"
+                                android:textSize="14sp"
+                                android:padding="4dp" />
                         </LinearLayout>
 
                         <!-- Username -->
@@ -120,16 +118,14 @@
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
-                            <EditText
-                                android:id="@+id/editUsername"
+                            <TextView
+                                android:id="@+id/tvUsername"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="@Rohesia110203"
-                                android:background="@null"
-                                android:inputType="text"
-                                android:padding="4dp"
-                                android:textSize="14sp"/>
+                                android:textSize="14sp"
+                                android:padding="4dp" />
                         </LinearLayout>
 
                         <!-- Email -->
@@ -145,16 +141,14 @@
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
-                            <EditText
-                                android:id="@+id/editEmail"
+                            <TextView
+                                android:id="@+id/tvEmail"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="jdiaz.a12240995@umak.edu.ph"
-                                android:background="@null"
-                                android:inputType="textEmailAddress"
-                                android:padding="4dp"
-                                android:textSize="14sp"/>
+                                android:textSize="14sp"
+                                android:padding="4dp" />
                         </LinearLayout>
 
                         <!-- Year -->
@@ -170,16 +164,14 @@
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
-                            <EditText
-                                android:id="@+id/editYear"
+                            <TextView
+                                android:id="@+id/tvYear"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="Third Year"
-                                android:background="@null"
-                                android:inputType="text"
-                                android:padding="4dp"
-                                android:textSize="14sp"/>
+                                android:textSize="14sp"
+                                android:padding="4dp" />
                         </LinearLayout>
 
                         <!-- Section -->
@@ -195,26 +187,20 @@
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
 
-                            <EditText
-                                android:id="@+id/editSection"
+                            <TextView
+                                android:id="@+id/tvSection"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:text="BCSAD"
-                                android:background="@null"
-                                android:inputType="text"
-                                android:padding="4dp"
-                                android:textSize="14sp"/>
+                                android:textSize="14sp"
+                                android:padding="4dp" />
                         </LinearLayout>
-
                     </LinearLayout>
-
-
-
-
                 </LinearLayout>
-
             </androidx.cardview.widget.CardView>
+
+
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
@@ -431,6 +417,46 @@
 
             </androidx.cardview.widget.CardView>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:paddingTop="25dp"
+                android:layout_marginBottom="100dp">
+
+                <ImageButton
+                    android:id="@+id/btnProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@drawable/quizzes"
+                    android:contentDescription="@string/profile"
+                    android:layout_weight="0.5"
+                     />
+
+                <ImageButton
+                    android:id="@+id/btnSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@drawable/assign"
+                    android:contentDescription="@string/settings"
+                    android:layout_weight="0.5"
+                     />
+
+                <ImageButton
+                    android:id="@+id/btnLogout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:src="@drawable/code"
+                    android:contentDescription="@string/logout"
+                    android:layout_weight="0.5"
+                    />
+            </LinearLayout>
+
+
         </LinearLayout>
     </ScrollView>
 
@@ -528,14 +554,176 @@
             android:src="@drawable/account" />
     </LinearLayout>
 
+<!-- POP UP settings-->
 
 
-    <!--    <ImageView-->
-<!--        android:id="@+id/imageView"-->
-<!--        android:layout_width="630dp"-->
-<!--        android:layout_height="1110dp"-->
-<!--        app:srcCompat="@drawable/account_page"-->
-<!--        tools:layout_editor_absoluteX="-104dp"-->
-<!--        tools:layout_editor_absoluteY="-36dp" />-->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/account_popup"
+        android:elevation="6dp"
+        android:orientation="vertical"
+        android:padding="8dp"
+        tools:layout_editor_absoluteX="267dp"
+        tools:layout_editor_absoluteY="100dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/btn_edit_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:text="EDIT ACCOUNT"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#80FFFFFF" />
+
+        <TextView
+            android:id="@+id/btn_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="6dp"
+            android:text="PASSWORD"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#80FFFFFF" />
+
+        <TextView
+            android:id="@+id/btn_logout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="5dp"
+            android:text="LOG OUT"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+
+
+    <!--  pop up log out          -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/popupOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#80000000"
+        android:visibility="gone"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/popupContainer"
+            android:layout_width="330dp"
+            android:layout_height="100dp"
+            android:background="@drawable/popup_bg"
+            android:elevation="8dp"
+            android:padding="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.493"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.439">
+
+
+            <TextView
+                android:id="@+id/tvDialogMessage"
+                android:layout_width="290dp"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:fontFamily="@font/poppins_medium"
+                android:gravity="start"
+                android:text="Are you sure you want to Log out?"
+                android:textColor="@android:color/black"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDialogTitle" />
+
+            <Button
+                android:id="@+id/btnBack"
+                android:layout_width="70dp"
+                android:layout_height="35dp"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="#D877DD"
+                android:text="Yes"
+                android:textAllCaps="false"
+                android:textColor="#000000"
+                android:textSize="10sp"
+                app:layout_constraintTop_toBottomOf="@id/tvDialogMessage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnTryAgain" />
+
+            <Button
+                android:id="@+id/btnTryAgain"
+                android:layout_width="70dp"
+                android:layout_height="35dp"
+                android:backgroundTint="#D877DD"
+                android:text="No"
+                android:textAllCaps="false"
+                android:textColor="@android:color/black"
+                android:textSize="10sp"
+                app:layout_constraintTop_toBottomOf="@id/tvDialogMessage"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="16dp"/>
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+<!-- suggested script to trigger the settings button
+// Inside your Activity class
+
+ImageView settingsButton = findViewById(R.id.settings_button); // Your settings icon
+
+settingsButton.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        // Inflate popup layout
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_menu, null);
+
+        // Create PopupWindow
+        final PopupWindow popupWindow = new PopupWindow(
+                popupView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                true // Focusable
+        );
+
+        // Optional: make outside click dismiss the popup
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popupWindow.setElevation(10f); // Requires API 21+
+
+        // Measure the popupView to get its width
+        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int popupWidth = popupView.getMeasuredWidth();
+
+        // Calculate offset to align popup to right of button
+        int xOffset = v.getWidth() - popupWidth;
+        int yOffset = 0; // Adjust if you want to move it up/down
+
+        // Show the popup just below the settings icon, right-aligned
+        popupWindow.showAsDropDown(v, xOffset, yOffset);
+    }
+});
+
+
+-->
+

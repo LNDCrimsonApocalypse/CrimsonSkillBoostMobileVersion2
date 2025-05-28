@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:cardview="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- Header -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:background="#B6BCFF"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/backButtonTask"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="20dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="Back"
+            android:layout_marginTop="65dp"
+            android:src="@drawable/back2"
+            android:tint="#000000" />
+
+        <TextView
+            android:id="@+id/headerTitleTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="60dp"
+            android:layout_toEndOf="@id/backButtonTask"
+            android:fontFamily="@font/poppins_medium"
+            android:text="Task"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+
+    <!-- Scrollable List -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Example Card Item -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                cardview:cardCornerRadius="10dp"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginVertical="25dp"
+                cardview:cardElevation="10dp"
+
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@android:color/white">
+
+                    <!-- Header -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:background="#D3A4F4"
+                        android:fontFamily="@font/poppins_medium"
+                        android:padding="6dp"
+                        android:paddingStart="20dp"
+                        android:text="Computer Programming"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+                    <!-- Quiz Info -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingLeft="20dp"
+                        android:paddingTop="10dp"
+                        android:paddingRight="16dp"
+                        android:paddingBottom="5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="start|center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/task_icon"
+                                android:layout_marginEnd="6dp"
+                                android:tint="#000000"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/quiz_name"
+                                android:textColor="#000000"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/poppins_regular" />
+                        </LinearLayout>
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/text_placeholder"
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="1dp"
+                            android:fontFamily="@font/poppins_light" />
+
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="5dp"
+                            android:background="#000000" />
+
+                        <!-- Footer -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal"
+                            android:gravity="end|center_vertical"
+                            android:layout_marginBottom="5dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.9"
+                                android:orientation="horizontal"
+                                android:gravity="start|center_vertical">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/due_icon"
+                                    android:tint="#FFA500"
+                                    android:layout_marginEnd="3dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Due today at 5:00 PM"
+                                    android:textColor="#FFA500"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/poppins_medium" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:textColor="#D877DD"
+                                android:textSize="12sp"
+                                android:fontFamily="@font/poppins_medium" />
+
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- 2nd card view -->
+
+            <!-- Example Card Item -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                cardview:cardCornerRadius="10dp"
+                android:layout_marginHorizontal="15dp"
+                cardview:cardElevation="10dp"
+
+                >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@android:color/white">
+
+                    <!-- Header -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:background="#D3A4F4"
+                        android:fontFamily="@font/poppins_medium"
+                        android:padding="6dp"
+                        android:paddingStart="20dp"
+                        android:text="@string/quiz2_coursename"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+                    <!-- Quiz Info -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingLeft="20dp"
+                        android:paddingTop="10dp"
+                        android:paddingRight="16dp"
+                        android:paddingBottom="5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="start|center_vertical">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/task_icon"
+                                android:layout_marginEnd="6dp"
+                                android:tint="#000000"
+                                />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/quiz_name"
+                                android:textColor="#000000"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                android:fontFamily="@font/poppins_regular" />
+                        </LinearLayout>
+
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="@string/text_placeholder"
+                            android:textColor="#777777"
+                            android:textSize="12sp"
+                            android:lineSpacingExtra="1dp"
+                            android:fontFamily="@font/poppins_light" />
+
+                        <!-- Divider -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="5dp"
+                            android:background="#000000" />
+
+                        <!-- Footer -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal"
+                            android:gravity="end|center_vertical"
+                            android:layout_marginBottom="5dp">
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.9"
+                                android:orientation="horizontal"
+                                android:gravity="start|center_vertical">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/due_icon"
+                                    android:tint="#4CAF50"
+                                    android:layout_marginEnd="3dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Completed on April 2 2025"
+                                    android:textColor="#4CAF50"
+                                    android:textSize="11sp"
+                                    android:fontFamily="@font/poppins_medium" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Score: 8 / 10"
+                                android:textColor="#D877DD"
+                                android:textSize="12sp"
+                                android:fontFamily="@font/poppins_medium" />
+
+
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <!-- Add more CardViews here if needed -->
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

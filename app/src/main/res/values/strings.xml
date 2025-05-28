@@ -98,6 +98,10 @@
     <string name="set_new_password">Set New Password</string>
     <string name="desc">Create a strong password with at least 8 characters, including uppercase and lowercase letters, a number, and a special character.</string>
     <string name="pass_reset_desc">Your password has been updated. You can now log in with your new credentials.</string>
+    <string name="email_forgot">We couldn’t find an account with that email. Please check the spelling or try a different one.</string>
+    <string name="text_placeholder">Score: 10 /10</string>
+    <string name="quiz2_coursename">Calculus</string>
+    <string name="quiz_name_course">Computer Programming</string>
 
 
 </resources>

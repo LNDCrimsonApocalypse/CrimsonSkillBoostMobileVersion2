@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- HEADER -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:background="#B6BCFF"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/backButtonTask2"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="65dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/back2"
+            android:tint="#000000" />
+
+        <TextView
+            android:id="@+id/headerTitleTask"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/backButtonTask2"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="60dp"
+            android:fontFamily="@font/poppins_medium"
+            android:text="Computer Programming"
+            android:textColor="#000000"
+            android:textSize="20sp" />
+    </RelativeLayout>
+
+    <!-- BODY SCROLL -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="10dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="30dp">
+
+            <!-- Assignment Title -->
+            <TextView
+                android:text="Programming Assignment #3"
+                android:textColor="#000000"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp" />
+
+            <!-- Due Date -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/due_icon"
+                    android:tint="#4CAF50"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:text="Completed on April 2, 2025"
+                    android:textColor="#4CAF50"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginBottom="16dp"
+                android:background="#000000" />
+
+            <!-- Instructions -->
+            <TextView
+                android:text="Instructions are available in the PDF below. Complete the assignment according to the requirements and submit your work before the deadline."
+                android:textColor="#444444"
+                android:textSize="13sp"
+                android:fontFamily="@font/poppins_regular"
+                android:layout_marginBottom="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- PDF File Row -->
+            <LinearLayout
+                android:layout_width="270dp"
+                android:layout_height="35dp"
+                android:background="@drawable/bg_pdf_item"
+                android:gravity="center_vertical"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:layout_marginBottom="20dp"
+                android:elevation="3dp"
+                android:translationZ="2dp"
+                android:outlineProvider="background"
+                android:clipToOutline="false"
+                >
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/pdf_icon"
+                    android:tint="#000000" />
+
+                <TextView
+                    android:text="Assignment3_Instructions.pdf"
+                    android:layout_marginStart="10dp"
+                    android:textColor="#000"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/poppins_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- Upload Container -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:layout_marginHorizontal="10dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="10dp"
+                android:background="#F9F9FF">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <!-- Upload Section -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Submitted"
+                        android:textSize="14sp"
+                        android:textColor="#000000"
+                        android:fontFamily="@font/poppins_bold"
+                        android:layout_marginBottom="12dp"/>
+
+
+
+                    <!-- Upload Area -->
+
+                        <LinearLayout
+                            android:layout_width="270dp"
+                            android:layout_height="35dp"
+                            android:background="@drawable/bg_pdf_item"
+                            android:gravity="center_vertical"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="14dp"
+                            android:layout_marginBottom="20dp"
+                            android:elevation="3dp"
+                            android:translationZ="2dp"
+                            android:outlineProvider="background"
+                            android:clipToOutline="false"
+                            >
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/pdf_icon"
+                                android:tint="#000000" />
+
+                            <TextView
+                                android:text="Assignment3_Instructions.pdf"
+                                android:layout_marginStart="10dp"
+                                android:textColor="#000"
+                                android:textSize="13sp"
+                                android:fontFamily="@font/poppins_medium"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+
+                    <!-- submit section -->
+                    <TextView
+                        android:id="@+id/fileNameText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Grade: "
+                        android:textColor="#747373"
+                        android:textSize="13sp"
+                        android:fontFamily="@font/poppins_medium" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+
+
+
+
+        </LinearLayout>
+    </ScrollView>
+    
+
+</LinearLayout>
