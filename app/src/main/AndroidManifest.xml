@@ -37,6 +37,7 @@
         <activity android:name=".TermsAndCondition" />
         <activity android:name=".Home" />
         <activity android:name=".AccountPage" />
+        <activity android:name=".SubjectDetailsAvailableCourse" />
 
 
     </application>

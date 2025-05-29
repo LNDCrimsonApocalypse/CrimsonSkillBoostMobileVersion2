@@ -1,49 +1,46 @@
 package com.example.crimsonskillboostmobilev2;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class EmailConfirmation extends AppCompatActivity {
 
     private ImageView backBtn;
-    private EditText codeEditText;
-    private Button confirmBtn;
+    private Button checkVerificationBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.email_confirmation);
 
-        // Bind views
         backBtn = findViewById(R.id.backbtn3);
-        codeEditText = findViewById(R.id.code);
-        confirmBtn = findViewById(R.id.confirmbtn);
+        checkVerificationBtn = findViewById(R.id.confirmbtn); // re-use the same button
 
-        // Back button to finish activity
         backBtn.setOnClickListener(v -> finish());
 
-        // Confirm button
-        confirmBtn.setOnClickListener(v -> {
-            String enteredCode = codeEditText.getText().toString().trim();
-
-            if (enteredCode.isEmpty()) {
-                Toast.makeText(EmailConfirmation.this, "Please enter the confirmation code.", Toast.LENGTH_SHORT).show();
-            } else if (enteredCode.length() != 6) { // assuming code is 6 digits
-                Toast.makeText(EmailConfirmation.this, "Invalid code. Please check and try again.", Toast.LENGTH_SHORT).show();
-            } else {
-                // Simulate success — replace with real backend verification if needed
-                Toast.makeText(EmailConfirmation.this, "Code confirmed!", Toast.LENGTH_SHORT).show();
-                // TODO: Proceed to the next activity (e.g., password creation)
-                // Intent intent = new Intent(EmailConfirmation.this, CreatePassword.class);
-                // startActivity(intent);
+        checkVerificationBtn.setOnClickListener(v -> {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) {
+                user.reload().addOnCompleteListener(task -> {
+                    if (user.isEmailVerified()) {
+                        Toast.makeText(this, "Email verified!", Toast.LENGTH_SHORT).show();
+                        // Go to next screen
+                        Intent intent = new Intent(this, CreateAccountPath.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(this, "Please verify your email first.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
 }
-

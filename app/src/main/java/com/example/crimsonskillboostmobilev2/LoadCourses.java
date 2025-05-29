@@ -1,6 +1,7 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,12 +28,18 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
     private final List<CourseModel> courseList = new ArrayList<>();
     private final RecyclerView recyclerView;
 
-    public LoadCourses(Context context, RecyclerView recyclerView) {
+    private final String mode; // "available" or "enrolled"
+    private int studentId;
+
+    public LoadCourses(Context context, RecyclerView recyclerView, String mode, int studentId) {
         this.context = context;
         this.recyclerView = recyclerView;
-        this.recyclerView.setAdapter(this); // Attach adapter
-        fetchCoursesFromApi(); // Trigger API fetch
+        this.mode = mode;
+        this.studentId = studentId;
+        this.recyclerView.setAdapter(this);
+        fetchCoursesFromApi();
     }
+
 
     public void fetchCoursesFromApi() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
@@ -96,10 +103,24 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
 
         holder.pendingIcon.setVisibility(course.isPending() ? View.VISIBLE : View.GONE);
 
-        // Optional safeguard: fallback image if iconResId is 0
         int iconResId = course.getIconResId() != 0 ? course.getIconResId() : R.drawable.gamedev_icon;
         holder.subjectIcon.setImageResource(iconResId);
+
+        // 👉 Add this block for navigating to SubjectDetailsAvailableCourse
+        if (mode.equals("available")) {
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(context, SubjectDetailsAvailableCourse.class);
+                intent.putExtra("title", course.getTitle());
+                intent.putExtra("instructor_name", course.getInstructorName());
+                intent.putExtra("instructor_email", course.getInstructorEmail());
+                intent.putExtra("overview", course.getOverview());
+                intent.putExtra("topic", course.getTopic());
+                intent.putExtra("requirements", course.getRequirements());
+                context.startActivity(intent);
+            });
+        }
     }
+
 
     @Override
     public int getItemCount() {

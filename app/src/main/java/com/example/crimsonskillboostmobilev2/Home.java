@@ -65,21 +65,22 @@ public class Home extends AppCompatActivity {
 
         recyclerViewCourses.setVisibility(View.VISIBLE);
         emptyStateText.setVisibility(View.GONE);
-
-        // Setup RecyclerView with dummy data
         recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerViewCourses);
-        LoadCourses adapter = new LoadCourses(this, recyclerView);
-
+        new LoadCourses(Home.this, recyclerViewCourses, "available", 0); // no student ID needed
     }
 
     private void showEnrolledCourses() {
         btnEnrolledCourses.setBackgroundResource(R.drawable.bg_button_selected);
         btnAvailableCourses.setBackgroundResource(R.drawable.button_style3);
 
-        // Assume no enrolled courses yet
-        recyclerViewCourses.setVisibility(View.INVISIBLE);
-        emptyStateText.setVisibility(View.VISIBLE);
+        recyclerViewCourses.setVisibility(View.VISIBLE);
+        emptyStateText.setVisibility(View.GONE);
+        recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
+
+        int studentId = 123; // Replace with real logged-in ID
+        new LoadCourses(Home.this, recyclerViewCourses, "enrolled", studentId);
     }
+
+
 }
