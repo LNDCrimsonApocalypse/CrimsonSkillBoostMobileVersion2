@@ -102,6 +102,7 @@
     <string name="text_placeholder">Score: 10 /10</string>
     <string name="quiz2_coursename">Calculus</string>
     <string name="quiz_name_course">Computer Programming</string>
+    <string name="topic_name">Introduction to DSA</string>
 
 
 </resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_intro" android:title="Introduction to DSA" />
+    <item android:id="@+id/nav_arrays" android:title="Arrays" />
+    <item android:id="@+id/nav_linked_list" android:title="Linked List" />
+    <item android:id="@+id/nav_stack_queues" android:title="Stack and Queues" />
+    <item android:id="@+id/nav_hash_tables" android:title="Hash Tables" />
+    <item android:id="@+id/nav_trees" android:title="Trees" />
+    <item android:id="@+id/nav_graphs" android:title="Graphs" />
+</menu>
