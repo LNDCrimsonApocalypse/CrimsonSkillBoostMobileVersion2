@@ -1,4 +1,3 @@
-// CreatePassword.java
 package com.example.crimsonskillboostmobilev2;
 
 import android.content.Intent;
@@ -7,9 +6,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreatePassword extends AppCompatActivity {
 
@@ -18,6 +25,7 @@ public class CreatePassword extends AppCompatActivity {
     private ImageView backBtn;
 
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +37,7 @@ public class CreatePassword extends AppCompatActivity {
         backBtn = findViewById(R.id.backbtn4);
 
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         String email = getIntent().getStringExtra("email");
         String username = getIntent().getStringExtra("username");
@@ -44,12 +53,40 @@ public class CreatePassword extends AppCompatActivity {
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(task -> {
                             if (task.isSuccessful()) {
-                                Toast.makeText(this, "Account created!", Toast.LENGTH_SHORT).show();
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                if (user != null) {
+                                    user.sendEmailVerification()
+                                            .addOnCompleteListener(verifyTask -> {
+                                                if (verifyTask.isSuccessful()) {
 
-                                Intent intent = new Intent(CreatePassword.this, CreateAccountPath.class);
-                                intent.putExtra("email", email);
-                                intent.putExtra("username", username);
-                                startActivity(intent);
+                                                    // Prepare user data
+                                                    Map<String, Object> userProfile = new HashMap<>();
+                                                    userProfile.put("fullName", username); // Replace with real full name if available
+                                                    userProfile.put("email", email);
+                                                    userProfile.put("username", username);
+                                                    userProfile.put("role", "student");
+                                                    userProfile.put("updatedAt", new Timestamp(new Date()));
+
+                                                    // Save to Firestore
+                                                    db.collection("users").document(user.getUid())
+                                                            .set(userProfile)
+                                                            .addOnSuccessListener(aVoid -> {
+                                                                Toast.makeText(this, "Account created! Verification email sent.", Toast.LENGTH_SHORT).show();
+                                                                Intent intent = new Intent(CreatePassword.this, EmailConfirmation.class);
+                                                                intent.putExtra("email", email);
+                                                                intent.putExtra("username", username);
+                                                                startActivity(intent);
+                                                                finish();
+                                                            })
+                                                            .addOnFailureListener(e -> {
+                                                                Toast.makeText(this, "Failed to save user profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                                            });
+
+                                                } else {
+                                                    Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+                                }
                             } else {
                                 Toast.makeText(this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                             }

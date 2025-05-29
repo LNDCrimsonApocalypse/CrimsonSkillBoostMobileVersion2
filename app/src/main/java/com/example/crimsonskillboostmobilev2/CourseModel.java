@@ -7,24 +7,41 @@ public class CourseModel {
     @SerializedName("id")
     private int id;
 
-    @SerializedName("course_name")  // <-- THIS IS THE FIX
+    @SerializedName("course_name")
     private String title;
 
-    // The API doesn’t return this, but keep it to avoid breaking layout binding
-    private String content = "Overview not available.";
+    @SerializedName("overview")
+    private String content;
 
-    private int progress = 0; // Default if not in JSON
+    @SerializedName("instructor_name")
+    private String instructorName;
 
-    private boolean pending = true; // Default if not in JSON
+    @SerializedName("instructor_email")
+    private String instructorEmail;
 
-    private int iconResId = R.drawable.gamedev_icon; // Fallback drawable
+    @SerializedName("topic")
+    private String topic;
+
+    @SerializedName("requirements")
+    private String requirements;
+
+    private int progress = 0;
+
+    private boolean pending = true;
+
+    private int iconResId = R.drawable.gamedev_icon;
 
     public CourseModel() {}
 
-    public CourseModel(int id, String title, String content, int progress, boolean pending, int iconResId) {
+    public CourseModel(int id, String title, String content, String instructorName, String instructorEmail,
+                       String topic, String requirements, int progress, boolean pending, int iconResId) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.instructorName = instructorName;
+        this.instructorEmail = instructorEmail;
+        this.topic = topic;
+        this.requirements = requirements;
         this.progress = progress;
         this.pending = pending;
         this.iconResId = iconResId;
@@ -40,6 +57,22 @@ public class CourseModel {
 
     public String getOverview() {
         return content;
+    }
+
+    public String getInstructorName() {
+        return instructorName;
+    }
+
+    public String getInstructorEmail() {
+        return instructorEmail;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public String getRequirements() {
+        return requirements;
     }
 
     public int getProgress() {
@@ -64,6 +97,22 @@ public class CourseModel {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setInstructorName(String instructorName) {
+        this.instructorName = instructorName;
+    }
+
+    public void setInstructorEmail(String instructorEmail) {
+        this.instructorEmail = instructorEmail;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public void setRequirements(String requirements) {
+        this.requirements = requirements;
     }
 
     public void setProgress(int progress) {

@@ -59,8 +59,8 @@
     android:textStyle="bold"
     android:layout_gravity="center"
     android:textColor="#000000"
-    android:fontFamily="@font/poppins_medium"
-    android:backgroundTint=""/>
+    android:fontFamily="@font/poppins_medium"/>
+<!--    android:backgroundTint=""/>-->
 </FrameLayout>
 
     <!-- Result Text -->
