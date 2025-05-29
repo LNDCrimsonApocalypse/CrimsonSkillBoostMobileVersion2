@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <!-- HEADER -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="124dp"
+        android:background="#B6BCFF"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/bckbttn"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginTop="64dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/back2"
+            android:tint="#000000" />
+    </RelativeLayout>
+
+    <!-- CODING AREA -->
+    <LinearLayout
+        android:id="@+id/codeSection"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="#F9F9F9">
+
+        <EditText
+            android:id="@+id/codeEditor"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:hint="Write your code here..."
+            android:background="#EEEEEE"
+            android:gravity="top|start"
+            android:inputType="textMultiLine"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#888888"
+            android:maxLines="20"
+            android:scrollbars="vertical" />
+
+        <Button
+            android:id="@+id/runCodeBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Run Code"
+            android:backgroundTint="#B6BCFF"
+            android:textColor="#000000"
+            android:layout_marginTop="12dp" />
+
+        <TextView
+            android:id="@+id/outputView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Output will appear here..."
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:layout_marginTop="16dp"
+            android:background="#DDDDDD"
+            android:padding="12dp" />
+    </LinearLayout>
+
+</LinearLayout>

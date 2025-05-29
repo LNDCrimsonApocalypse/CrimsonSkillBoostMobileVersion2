@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Zoomable ImageView using PhotoView -->
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/zoomableImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/structured_path"
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Bottom Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/bottomNavigation"
+        android:layout_width="0dp"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/white"
+        android:elevation="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageButton
+            android:id="@+id/btnHome"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_unselected"
+            android:contentDescription="@string/home"
+            android:src="@drawable/home"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:padding="20dp"/>
+
+        <ImageButton
+            android:id="@+id/btnFlow"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_selected"
+        android:contentDescription="@string/path"
+        android:src="@drawable/path"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:padding="20dp"/>
+
+        <ImageButton
+            android:id="@+id/btnProfile"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_button_unselected"
+            android:contentDescription="@string/account"
+            android:src="@drawable/account"
+            android:scaleType="fitCenter"
+            android:adjustViewBounds="true"
+            android:padding="20dp"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
