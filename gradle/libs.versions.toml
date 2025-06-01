@@ -28,7 +28,7 @@ firebase-database = { group = "com.google.firebase", name = "firebase-database",
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 gsonconverter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
-
+photoview = { module = "com.github.chrisbanes:PhotoView", version = "2.3.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

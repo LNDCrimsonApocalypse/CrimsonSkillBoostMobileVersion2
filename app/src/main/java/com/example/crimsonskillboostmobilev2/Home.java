@@ -48,8 +48,8 @@ public class Home extends AppCompatActivity {
         });
 
         btnFlow.setOnClickListener(v -> {
-            // TODO: Navigate to Flow Activity
-            // startActivity(new Intent(Home.this, FlowActivity.class));
+            startActivity(new Intent(Home.this, StructuredPathActivity.class));
+            finish();
         });
 
         btnProfile.setOnClickListener(v -> {

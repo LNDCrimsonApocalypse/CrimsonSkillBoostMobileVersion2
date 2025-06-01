@@ -76,7 +76,37 @@ public class SetupProfile extends AppCompatActivity {
         cameraIcon.setOnClickListener(v -> openImagePicker());
 
         // Save button
-        saveBtn.setOnClickListener(v -> saveProfile());
+        saveBtn.setOnClickListener(v -> {
+            String year = yearDropdown.getText().toString().trim();
+            String section = sectionDropdown.getText().toString().trim();
+            String bio = bioEditText.getText().toString().trim();
+
+            if (year.isEmpty() || section.isEmpty() || bio.isEmpty()) {
+                Toast.makeText(this, "Please complete all fields.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            FirebaseUser currentUser = auth.getCurrentUser();
+            if (currentUser == null) {
+                Toast.makeText(this, "User not signed in.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("year", year);
+            updates.put("section", section);
+            updates.put("bio", bio);
+
+            db.collection("users").document(currentUser.getUid())
+                    .update(updates)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(SetupProfile.this, Home.class));
+                        finish();
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        });
 
         // Load Firebase user data
         loadUserInfo();

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.google.firebase.auth.FirebaseAuth;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         logo = findViewById(R.id.Logo);
         appName = findViewById(R.id.AppName);
 
-        appName.setText("MyAcademicallyGenius");
+        appName.setText("Crimson Skill Boost");
 
         // Transition after 3 seconds (3000 milliseconds)
         new Handler().postDelayed(new Runnable() {

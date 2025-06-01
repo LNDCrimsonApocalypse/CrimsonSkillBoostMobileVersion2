@@ -28,6 +28,7 @@ public class CreateAccount extends AppCompatActivity {
         nextBtn.setOnClickListener(v -> {
             String emailText = email.getText().toString().trim();
             String usernameText = username.getText().toString().trim();
+            String fullNameText = "Default Name"; // Replace with actual full name input if available
 
             if (emailText.isEmpty() || usernameText.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
@@ -37,6 +38,7 @@ public class CreateAccount extends AppCompatActivity {
             Intent intent = new Intent(CreateAccount.this, CreatePassword.class);
             intent.putExtra("email", emailText);
             intent.putExtra("username", usernameText);
+            intent.putExtra("fullName", fullNameText); // Pass fullName to next activity
             startActivity(intent);
         });
 

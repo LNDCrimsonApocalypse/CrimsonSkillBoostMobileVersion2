@@ -38,6 +38,9 @@
         <activity android:name=".Home" />
         <activity android:name=".AccountPage" />
         <activity android:name=".SubjectDetailsAvailableCourse" />
+        <activity android:name=".ForgetPassword1Activity" />
+        <activity android:name=".QuizListActivity" />
+        <activity android:name=".ResultActivity" />
 
 
     </application>

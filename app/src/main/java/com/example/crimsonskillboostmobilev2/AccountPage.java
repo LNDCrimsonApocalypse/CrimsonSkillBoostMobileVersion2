@@ -2,7 +2,6 @@ package com.example.crimsonskillboostmobilev2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -19,7 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class AccountPage extends AppCompatActivity {
 
     // Personal Info
-    private EditText editName, editUsername, editEmail, editYear, editSection, bioEditText;
+    private TextView tvName, tvUsername, tvEmail, tvYear, tvSection, bioEditText;
 
     // Progress Texts
     private TextView courseTitle1, progress1, courseTitle2, progress2;
@@ -51,11 +50,11 @@ public class AccountPage extends AppCompatActivity {
     }
 
     private void initViews() {
-        editName = findViewById(R.id.editName);
-        editUsername = findViewById(R.id.editUsername);
-        editEmail = findViewById(R.id.editEmail);
-        editYear = findViewById(R.id.editYear);
-        editSection = findViewById(R.id.editSection);
+        tvName = findViewById(R.id.tvName);
+        tvUsername = findViewById(R.id.tvUsername);
+        tvEmail = findViewById(R.id.tvEmail);
+        tvYear = findViewById(R.id.tvYear);
+        tvSection = findViewById(R.id.tvSection);
         bioEditText = findViewById(R.id.bioEditText);
 
         courseTitle1 = findViewById(R.id.textViewCourseTitle1);
@@ -80,9 +79,12 @@ public class AccountPage extends AppCompatActivity {
         btnHome.setOnClickListener(v -> {
             Toast.makeText(this, "Home clicked", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, Home.class));
+            finish();
         });
 
         btnFlow.setOnClickListener(v -> {
+            startActivity(new Intent(this, StructuredPathActivity.class));
+            finish();
             Toast.makeText(this, "Flow clicked", Toast.LENGTH_SHORT).show();
         });
 
@@ -123,16 +125,16 @@ public class AccountPage extends AppCompatActivity {
     }
 
     private void populateFields(DocumentSnapshot document) {
-        editName.setText(document.getString("fullName"));
-        editUsername.setText(document.getString("username"));
-        editEmail.setText(document.getString("email"));
+        tvName.setText(document.getString("fullName"));
+        tvUsername.setText(document.getString("username"));
+        tvEmail.setText(document.getString("email"));
 
         if (document.contains("year")) {
-            editYear.setText(document.getString("year"));
+            tvYear.setText(document.getString("year"));
         }
 
         if (document.contains("section")) {
-            editSection.setText(document.getString("section"));
+            tvSection.setText(document.getString("section"));
         }
 
         if (document.contains("bio")) {

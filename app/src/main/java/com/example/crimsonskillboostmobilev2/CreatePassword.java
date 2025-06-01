@@ -42,8 +42,10 @@ public class CreatePassword extends AppCompatActivity {
         String email = getIntent().getStringExtra("email");
         String username = getIntent().getStringExtra("username");
 
+        // CreatePassword.java
         confirmBtn.setOnClickListener(view -> {
             String password = passField.getText().toString().trim();
+            String fullName = getIntent().getStringExtra("fullName"); // Get fullName from intent
 
             if (password.isEmpty()) {
                 Toast.makeText(this, "Password cannot be empty!", Toast.LENGTH_SHORT).show();
@@ -58,16 +60,13 @@ public class CreatePassword extends AppCompatActivity {
                                     user.sendEmailVerification()
                                             .addOnCompleteListener(verifyTask -> {
                                                 if (verifyTask.isSuccessful()) {
-
-                                                    // Prepare user data
                                                     Map<String, Object> userProfile = new HashMap<>();
-                                                    userProfile.put("fullName", username); // Replace with real full name if available
+                                                    userProfile.put("fullName", fullName); // Use fullName from intent
                                                     userProfile.put("email", email);
                                                     userProfile.put("username", username);
                                                     userProfile.put("role", "student");
                                                     userProfile.put("updatedAt", new Timestamp(new Date()));
 
-                                                    // Save to Firestore
                                                     db.collection("users").document(user.getUid())
                                                             .set(userProfile)
                                                             .addOnSuccessListener(aVoid -> {
@@ -81,7 +80,6 @@ public class CreatePassword extends AppCompatActivity {
                                                             .addOnFailureListener(e -> {
                                                                 Toast.makeText(this, "Failed to save user profile: " + e.getMessage(), Toast.LENGTH_LONG).show();
                                                             });
-
                                                 } else {
                                                     Toast.makeText(this, "Failed to send verification email.", Toast.LENGTH_LONG).show();
                                                 }

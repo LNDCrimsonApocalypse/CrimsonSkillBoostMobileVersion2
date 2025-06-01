@@ -70,6 +70,8 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         forgot.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, ForgetPassword1Activity.class);
+            startActivity(intent);
             Toast.makeText(this, "Redirect to Forgot Password", Toast.LENGTH_SHORT).show();
         });
     }

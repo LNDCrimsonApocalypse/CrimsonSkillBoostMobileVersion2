@@ -80,14 +80,13 @@ public class CreateAccountPath extends AppCompatActivity {
 
             String uid = currentUser.getUid();
 
-            // Create Firestore user data
             Map<String, Object> profile = new HashMap<>();
-            profile.put("fullName", fullName); // ✅ Add this line
+            profile.put("fullName", fullName);
             profile.put("bio", "");
             profile.put("birthday", birthday);
             profile.put("gender", gender);
-            profile.put("email", email);
-            profile.put("username", username);
+            profile.put("email", email); // Ensure email is passed correctly
+            profile.put("username", username); // Ensure username is passed correctly
             profile.put("role", "student");
             profile.put("updatedAt", com.google.firebase.Timestamp.now());
 
