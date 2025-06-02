@@ -1,39 +1,76 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.ImageButton;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class QuizListActivity extends AppCompatActivity {
 
-    private ImageButton backButton;
-    private Button startQuizButton, reviewQuizButton;
+    private LinearLayout quizListContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_list);
 
-        backButton = findViewById(R.id.backButton);
-        startQuizButton = findViewById(R.id.startQuizButton); // Replace with actual id if added
-        reviewQuizButton = findViewById(R.id.reviewQuizButton); // Replace with actual id if added
+        quizListContainer = findViewById(R.id.quizListContainer);
 
-        backButton.setOnClickListener(v -> finish());
+        fetchQuizzes();
+    }
 
-        // Start Quiz Example
-        startQuizButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(QuizListActivity.this, QuizActivity.class);
-//            intent.putExtra("quizId", 1); // Pass relevant quiz data
-//            startActivity(intent);
+    private void fetchQuizzes() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        apiService.getQuizzes().enqueue(new Callback<List<QuizModel>>() {
+            @Override
+            public void onResponse(Call<List<QuizModel>> call, Response<List<QuizModel>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<QuizModel> quizzes = response.body();
+                    populateQuizList(quizzes);
+                } else {
+                    Toast.makeText(QuizListActivity.this, "Failed to load quizzes", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<QuizModel>> call, Throwable t) {
+                Toast.makeText(QuizListActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
+    }
 
-        // Review Quiz Example
-        reviewQuizButton.setOnClickListener(v -> {
-//            Intent intent = new Intent(QuizListActivity.this, ReviewActivity.class);
-//            intent.putExtra("quizId", 1);
-//            startActivity(intent);
-        });
+    private void populateQuizList(List<QuizModel> quizzes) {
+        quizListContainer.removeAllViews(); // Clear existing views
+
+        for (QuizModel quiz : quizzes) {
+            View quizItemView = getLayoutInflater().inflate(R.layout.quiz_item, quizListContainer, false);
+
+            TextView quizTitle = quizItemView.findViewById(R.id.quizTitle);
+            TextView quizDescription = quizItemView.findViewById(R.id.quizDescription);
+
+            quizTitle.setText(quiz.getTitle());
+            quizDescription.setText(quiz.getDescription());
+
+            quizItemView.setOnClickListener(v -> {
+                // Handle quiz item click
+                Toast.makeText(this, "Selected Quiz: " + quiz.getTitle(), Toast.LENGTH_SHORT).show();
+            });
+
+            quizListContainer.addView(quizItemView);
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed(); // This will return to the previous activity
     }
 }

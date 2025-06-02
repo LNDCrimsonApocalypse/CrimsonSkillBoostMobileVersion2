@@ -41,6 +41,8 @@
         <activity android:name=".ForgetPassword1Activity" />
         <activity android:name=".QuizListActivity" />
         <activity android:name=".ResultActivity" />
+        <activity android:name=".StructuredPathActivity" />
+<!--        <activity android:name="." />-->
 
 
     </application>

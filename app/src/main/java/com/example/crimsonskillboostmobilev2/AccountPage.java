@@ -3,7 +3,6 @@ package com.example.crimsonskillboostmobilev2;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,10 +26,7 @@ public class AccountPage extends AppCompatActivity {
     private ProgressBar progressBar1, progressBar2;
 
     // Navigation Buttons
-    private ImageButton btnHome, btnFlow, btnProfile;
-
-    // Top bar icons
-    private ImageView backBtn, settingsBtn, notificationBtn;
+    private ImageButton btnHome, btnQuiz, btnTask, btnFlow, btnCode;
 
     // Firebase
     private FirebaseAuth mAuth;
@@ -61,45 +57,41 @@ public class AccountPage extends AppCompatActivity {
         progress1 = findViewById(R.id.textViewProgress1);
         progressBar1 = findViewById(R.id.progressBar1);
 
-        // If needed, configure more than one progress component
-        courseTitle2 = courseTitle1;
-        progress2 = progress1;
-        progressBar2 = progressBar1;
-
+        // Initialize all ImageButtons
+        btnQuiz = findViewById(R.id.btnQuiz);
+        btnTask = findViewById(R.id.btnTask);
+        btnCode = findViewById(R.id.btnCode);
         btnHome = findViewById(R.id.btnHome);
         btnFlow = findViewById(R.id.btnFlow);
-        btnProfile = findViewById(R.id.btnProfile);
 
-        backBtn = findViewById(R.id.backbtnA1);
-        settingsBtn = findViewById(R.id.settings);
-        notificationBtn = findViewById(R.id.notification);
+        // Verify initialization
+        if (btnQuiz == null || btnTask == null || btnCode == null || btnHome == null || btnFlow == null) {
+            throw new NullPointerException("One or more ImageButtons are not properly initialized. Check layout IDs.");
+        }
     }
 
     private void setupNavigation() {
-        btnHome.setOnClickListener(v -> {
-            Toast.makeText(this, "Home clicked", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this, Home.class));
-            finish();
+        btnQuiz.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountPage.this, QuizListActivity.class);
+            startActivity(intent);
         });
 
-        btnFlow.setOnClickListener(v -> {
-            startActivity(new Intent(this, StructuredPathActivity.class));
-            finish();
-            Toast.makeText(this, "Flow clicked", Toast.LENGTH_SHORT).show();
-        });
-
-        btnProfile.setOnClickListener(v -> {
-            Toast.makeText(this, "Already on Profile", Toast.LENGTH_SHORT).show();
-        });
-
-        backBtn.setOnClickListener(v -> finish());
-
-        settingsBtn.setOnClickListener(v -> {
+        btnTask.setOnClickListener(v -> {
             Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
         });
 
-        notificationBtn.setOnClickListener(v -> {
-            Toast.makeText(this, "Notifications clicked", Toast.LENGTH_SHORT).show();
+        btnCode.setOnClickListener(v -> {
+            Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show();
+        });
+        // Bottom navigation buttons
+        btnHome.setOnClickListener(v -> {
+            Intent intent = new Intent(AccountPage.this, Home.class);
+            startActivity(intent);
+        });
+
+        btnFlow.setOnClickListener(v -> {
+            startActivity(new Intent(AccountPage.this, StructuredPathActivity.class));
+            finish();
         });
     }
 

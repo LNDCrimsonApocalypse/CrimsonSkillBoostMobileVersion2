@@ -9,12 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,31 +49,14 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
                 if (response.isSuccessful() && response.body() != null) {
                     courseList.clear();
                     courseList.addAll(response.body());
-                    Log.d("API_RESPONSE", "Courses loaded: " + courseList.size());
-
-                    for (CourseModel c : courseList) {
-                        Log.d("COURSE_DEBUG", "Title: " + c.getTitle() + ", Overview: " + c.getOverview());
-                    }
-
                     notifyDataSetChanged();
                 } else {
-                    String errorMsg = "Empty or bad response";
-                    try {
-                        if (response.errorBody() != null) {
-                            errorMsg = response.errorBody().string();
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                     Log.e("API_RESPONSE", "Unsuccessful: code=" + response.code());
-                    Log.e("API_RESPONSE", "Error body: " + errorMsg);
-                    Toast.makeText(context, "Failed: " + errorMsg, Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<CourseModel>> call, Throwable t) {
-                Toast.makeText(context, "Failed to load courses: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("LoadCourses", "API error", t);
             }
         });
