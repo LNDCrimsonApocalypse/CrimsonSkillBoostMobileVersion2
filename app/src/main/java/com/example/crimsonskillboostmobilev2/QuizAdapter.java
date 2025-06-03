@@ -1,9 +1,11 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,8 +37,13 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         holder.quizTitle.setText(quiz.getTitle());
         holder.quizDescription.setText(quiz.getDescription());
 
-        holder.itemView.setOnClickListener(v -> {
-            Toast.makeText(context, "Selected Quiz: " + quiz.getTitle(), Toast.LENGTH_SHORT).show();
+        // Set click listener for the "Start Quiz" button
+        holder.startQuizButton.setOnClickListener(v -> {
+            int quizId = quiz.getId();
+            Toast.makeText(context, "Quiz ID: " + quizId, Toast.LENGTH_SHORT).show(); // Debugging
+            Intent intent = new Intent(context, QuizActivity.class);
+            intent.putExtra("quizId", quizId);
+            context.startActivity(intent);
         });
     }
 
@@ -47,11 +54,13 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
 
     public static class QuizViewHolder extends RecyclerView.ViewHolder {
         TextView quizTitle, quizDescription;
+        Button startQuizButton;
 
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
             quizTitle = itemView.findViewById(R.id.quizTitle);
             quizDescription = itemView.findViewById(R.id.quizDescription);
+            startQuizButton = itemView.findViewById(R.id.startQuizButton);
         }
     }
 }

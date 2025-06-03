@@ -1,7 +1,9 @@
 package com.example.crimsonskillboostmobilev2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,9 +63,11 @@ public class QuizListActivity extends AppCompatActivity {
             quizTitle.setText(quiz.getTitle());
             quizDescription.setText(quiz.getDescription());
 
-            quizItemView.setOnClickListener(v -> {
-                // Handle quiz item click
-                Toast.makeText(this, "Selected Quiz: " + quiz.getTitle(), Toast.LENGTH_SHORT).show();
+            Button startQuizButton = quizItemView.findViewById(R.id.startQuizButton);
+            startQuizButton.setOnClickListener(v -> {
+                Intent intent = new Intent(this, QuizActivity.class);
+                intent.putExtra("quizId", quiz.getId()); // Pass the selected quiz ID
+                startActivity(intent);
             });
 
             quizListContainer.addView(quizItemView);

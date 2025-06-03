@@ -16,7 +16,7 @@ public class ResultActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.quiz_score); // Make sure the XML file is named activity_result.xml
+        setContentView(R.layout.quiz_score);
 
         // Initialize Views
         tvSubject = findViewById(R.id.tvSubject);
@@ -26,9 +26,12 @@ public class ResultActivity extends AppCompatActivity {
         progressRing = findViewById(R.id.progressRing);
         btnNext = findViewById(R.id.btnNext);
 
-        // Set score dynamically (this is just a sample, you can pass score via Intent extras)
-        int score = 35;
-        int maxScore = 50;
+        // Retrieve score and maxScore from Intent
+        int score = getIntent().getIntExtra("score", 0);
+        int maxScore = getIntent().getIntExtra("maxScore", 0);
+
+        // Set score dynamically
+        progressRing.setMax(maxScore);
         progressRing.setProgress(score);
         tvScore.setText(score + "/" + maxScore);
 
@@ -36,7 +39,7 @@ public class ResultActivity extends AppCompatActivity {
         if (score == maxScore) {
             tvResult.setText("Outstanding!");
             tvMessage.setText("You got everything right, our hard work really shows!!");
-        } else if (score >= 40) {
+        } else if (score >= maxScore * 0.8) {
             tvResult.setText("Great Job!");
             tvMessage.setText("You did well, just a few mistakes.");
         } else {
@@ -46,8 +49,7 @@ public class ResultActivity extends AppCompatActivity {
 
         // Handle Finish button click
         btnNext.setOnClickListener(v -> {
-            // Close activity or navigate back
-            finish();
+            finish(); // Close activity or navigate back
         });
     }
 }

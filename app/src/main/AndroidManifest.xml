@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
@@ -28,20 +29,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Authentication Activities -->
         <activity android:name=".LoginActivity" />
         <activity android:name=".CreateAccount" />
         <activity android:name=".CreatePassword" />
         <activity android:name=".CreateAccountPath" />
         <activity android:name=".EmailConfirmation" />
+        <activity android:name=".ForgetPassword1Activity" />
+
+        <!-- Profile and Account Activities -->
         <activity android:name=".SetupProfile" />
         <activity android:name=".TermsAndCondition" />
-        <activity android:name=".Home" />
         <activity android:name=".AccountPage" />
-        <activity android:name=".SubjectDetailsAvailableCourse" />
-        <activity android:name=".ForgetPassword1Activity" />
-        <activity android:name=".QuizListActivity" />
-        <activity android:name=".ResultActivity" />
+        <activity android:name=".EditProfile" />
+
+        <!-- Home and Navigation Activities -->
+        <activity android:name=".Home" />
         <activity android:name=".StructuredPathActivity" />
+        <activity android:name=".SubjectDetailsAvailableCourse" />
+
+        <!-- Quiz Activities -->
+        <activity android:name=".QuizListActivity" />
+        <activity android:name=".QuizActivity" />
+        <activity android:name=".ResultActivity" />
 <!--        <activity android:name="." />-->
 
 
