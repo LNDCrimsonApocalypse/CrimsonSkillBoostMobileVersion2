@@ -52,6 +52,14 @@
         <activity android:name=".QuizListActivity" />
         <activity android:name=".QuizActivity" />
         <activity android:name=".ResultActivity" />
+
+        <!-- Task Activities -->
+        <activity android:name=".TaskPath1Activity" />
+        <activity android:name=".TaskPath2Activity" />
+        <activity android:name=".TaskPath3Activity" />
+
+        <!-- Code Activities -->
+        <activity android:name=".CodingPathActivity" />
 <!--        <activity android:name="." />-->
 
 

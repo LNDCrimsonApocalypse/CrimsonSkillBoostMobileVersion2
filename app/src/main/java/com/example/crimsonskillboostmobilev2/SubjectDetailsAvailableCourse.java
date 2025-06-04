@@ -6,9 +6,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SubjectDetailsAvailableCourse extends AppCompatActivity {
 
@@ -35,63 +43,78 @@ public class SubjectDetailsAvailableCourse extends AppCompatActivity {
         scrollView = findViewById(R.id.scrollView2);
         ImageView ivBack = findViewById(R.id.ivBack);
 
-        // Optional: get data from intent
-        String courseTitle = getIntent().getStringExtra("title");
-        String instructorName = getIntent().getStringExtra("instructor_name");
-        String instructorEmail = getIntent().getStringExtra("instructor_email");
-        String courseOverview = getIntent().getStringExtra("overview");
-        String topicOverview = getIntent().getStringExtra("topic");
-        String requirements = getIntent().getStringExtra("requirements");
+        // Retrieve courseId from intent
+        String courseId = getIntent().getStringExtra("course_id");
 
-        // Set text fields (fallbacks if null)
-        tvCourseTitle.setText(courseTitle != null ? courseTitle : "Course Title");
-        tvInstructorName.setText(instructorName != null ? instructorName : "Prof. Name");
-        tvInstructorEmail.setText(instructorEmail != null ? instructorEmail : "Email");
-        tvCourseOverview.setText(courseOverview != null ? courseOverview : "Course overview here.");
-        tvTopicOverview.setText(topicOverview != null ? topicOverview : "Topic overview here.");
-        tvRequirements.setText(requirements != null ? requirements : "Requirements listed here.");
+        // Validate courseId
+        if (courseId == null || courseId.isEmpty()) {
+            Toast.makeText(this, "Invalid course ID received", Toast.LENGTH_SHORT).show();
+            finish(); // Close the activity if courseId is invalid
+            return;
+        }
 
         // Back button behavior
         ivBack.setOnClickListener(v -> finish());
 
         // Enroll button click
-        btnEnroll.setOnClickListener(v -> showPopup());
+        btnEnroll.setOnClickListener(v -> enrollInCourse(courseId));
 
         // OK button in popup
         btnDialogOK.setOnClickListener(v -> {
             popupContainer.setVisibility(View.GONE);
             scrollView.setAlpha(1f); // Reset background dim
-
-            btnEnroll.setText("Pending Request");
-            btnEnroll.setEnabled(false);
-            btnEnroll.setClickable(false);
-            btnEnroll.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
         });
+    }
 
-        Button btnEnroll = findViewById(R.id.btnEnroll);
-        Button btnDialogOK = findViewById(R.id.btnDialogOK); // Make sure this is declared and points to the right ID
+    private void enrollInCourse(String courseId) {
+        String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        btnDialogOK.setOnClickListener(new View.OnClickListener() {
+        if (courseId == null || courseId.isEmpty()) {
+            Toast.makeText(this, "Invalid course ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnEnroll.setEnabled(false);
+
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<Void> call = apiService.enrollInCourse(studentId, courseId);
+
+        call.enqueue(new Callback<Void>() {
             @Override
-            public void onClick(View v) {
-                // Change text to indicate request is pending
-                btnEnroll.setText("Pending Request");
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    btnEnroll.setText("Pending Request");
+                    btnEnroll.setEnabled(false);
+                    btnEnroll.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Enrollment request sent successfully!", Toast.LENGTH_SHORT).show();
+                } else {
+                    btnEnroll.setEnabled(true);
+                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Failed to enroll: " + response.message(), Toast.LENGTH_SHORT).show();
+                }
+            }
 
-                // Disable the button
-                btnEnroll.setEnabled(false);
-                btnEnroll.setClickable(false);
-
-                // Optional: Change button color to a disabled-like appearance
-                btnEnroll.setBackgroundColor(getResources().getColor(R.color.black)); // Ensure gray exists in colors.xml
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                btnEnroll.setEnabled(true);
+                Toast.makeText(SubjectDetailsAvailableCourse.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void showPopup() {
-        popupContainer.setVisibility(View.VISIBLE);
-        scrollView.setAlpha(0.2f); // Dim background
+    private void assignStudentId(String documentId) {
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        // You could trigger an API request here for real enrollment
-        // For example: enrollStudentInCourse(studentId, courseId);
+        String studentId = mAuth.getCurrentUser().getUid(); // Get Firebase user ID
+
+        // Update the student_id field in Firestore
+        firestore.collection("students").document(documentId)
+                .update("student_id", studentId)
+                .addOnSuccessListener(aVoid -> {
+                    System.out.println("Student ID assigned successfully!");
+                })
+                .addOnFailureListener(e -> {
+                    System.err.println("Error assigning Student ID: " + e.getMessage());
+                });
     }
 }

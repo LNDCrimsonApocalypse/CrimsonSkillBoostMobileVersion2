@@ -41,7 +41,9 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
 
     public void fetchCoursesFromApi() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<List<CourseModel>> call = apiService.getCourses();
+        Call<List<CourseModel>> call = mode.equals("enrolled")
+                ? apiService.getEnrolledCourses(studentId)
+                : apiService.getCourses();
 
         call.enqueue(new Callback<List<CourseModel>>() {
             @Override
@@ -87,10 +89,11 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         int iconResId = course.getIconResId() != 0 ? course.getIconResId() : R.drawable.gamedev_icon;
         holder.subjectIcon.setImageResource(iconResId);
 
-        // 👉 Add this block for navigating to SubjectDetailsAvailableCourse
+        // Pass course_id to SubjectDetailsAvailableCourse
         if (mode.equals("available")) {
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, SubjectDetailsAvailableCourse.class);
+                intent.putExtra("course_id", String.valueOf(course.getId())); // Pass course_id
                 intent.putExtra("title", course.getTitle());
                 intent.putExtra("instructor_name", course.getInstructorName());
                 intent.putExtra("instructor_email", course.getInstructorEmail());

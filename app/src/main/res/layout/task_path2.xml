@@ -54,6 +54,7 @@
 
             <!-- Assignment Title -->
             <TextView
+                android:id="@+id/titleTask"
                 android:text="Programming Assignment #3"
                 android:textColor="#000000"
                 android:textSize="16sp"
@@ -79,6 +80,7 @@
                     android:layout_marginEnd="6dp" />
 
                 <TextView
+                    android:id="@+id/taskDueDate"
                     android:text="Due today at 5:00 PM"
                     android:textColor="#FFA500"
                     android:textSize="12sp"
@@ -96,6 +98,7 @@
 
             <!-- Instructions -->
             <TextView
+                android:id="@+id/taskDescription"
                 android:text="Instructions are available in the PDF below. Complete the assignment according to the requirements and submit your work before the deadline."
                 android:textColor="#444444"
                 android:textSize="13sp"

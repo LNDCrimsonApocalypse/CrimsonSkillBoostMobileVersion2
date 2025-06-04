@@ -78,7 +78,7 @@ public class Home extends AppCompatActivity {
         emptyStateText.setVisibility(View.GONE);
         recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
 
-        int studentId = 123; // Replace with real logged-in ID
+        int studentId = 123; // Replace with actual logged-in student ID
         new LoadCourses(Home.this, recyclerViewCourses, "enrolled", studentId);
     }
 

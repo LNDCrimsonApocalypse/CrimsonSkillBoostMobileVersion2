@@ -77,11 +77,13 @@ public class AccountPage extends AppCompatActivity {
         });
 
         btnTask.setOnClickListener(v -> {
-            Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(AccountPage.this, TaskPath1Activity.class);
+            startActivity(intent);
         });
 
         btnCode.setOnClickListener(v -> {
-            Toast.makeText(this, "Logout clicked", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(AccountPage.this, CodingPathActivity.class);
+            startActivity(intent);
         });
         // Bottom navigation buttons
         btnHome.setOnClickListener(v -> {
