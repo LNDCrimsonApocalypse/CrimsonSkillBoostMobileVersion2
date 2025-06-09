@@ -112,6 +112,7 @@ public class SetupProfile extends AppCompatActivity {
         loadUserInfo();
     }
 
+    // Fix in SetupProfile.java
     private void loadUserInfo() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
@@ -123,6 +124,9 @@ public class SetupProfile extends AppCompatActivity {
                             fullname.setText(documentSnapshot.getString("fullName"));
                             username.setText(documentSnapshot.getString("username"));
                             email.setText(documentSnapshot.getString("email"));
+                            yearDropdown.setText(documentSnapshot.getString("year"), false);
+                            sectionDropdown.setText(documentSnapshot.getString("section"), false);
+                            bioEditText.setText(documentSnapshot.getString("bio"));
                         } else {
                             Toast.makeText(this, "User profile not found.", Toast.LENGTH_SHORT).show();
                         }

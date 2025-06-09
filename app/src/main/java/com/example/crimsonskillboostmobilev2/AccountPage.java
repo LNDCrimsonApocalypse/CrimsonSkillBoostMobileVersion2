@@ -118,21 +118,15 @@ public class AccountPage extends AppCompatActivity {
                 });
     }
 
+    // Fix in AccountPage.java
     private void populateFields(DocumentSnapshot document) {
         tvName.setText(document.getString("fullName"));
-        tvUsername.setText(document.getString("username"));
-        tvEmail.setText(document.getString("email"));
+        tvUsername.setText(document.getString("username") != null ? document.getString("username") : "Not set");
+        tvEmail.setText(document.getString("email") != null ? document.getString("email") : "Not set");
 
-        if (document.contains("year")) {
-            tvYear.setText(document.getString("year"));
-        }
-
-        if (document.contains("section")) {
-            tvSection.setText(document.getString("section"));
-        }
-
-        if (document.contains("bio")) {
-            bioEditText.setText(document.getString("bio"));
-        }
+        // Ensure year, section, and bio are retrieved correctly
+        tvYear.setText(document.getString("year") != null ? document.getString("year") : "Not set");
+        tvSection.setText(document.getString("section") != null ? document.getString("section") : "Not set");
+        bioEditText.setText(document.getString("bio") != null ? document.getString("bio") : "No bio available");
     }
 }

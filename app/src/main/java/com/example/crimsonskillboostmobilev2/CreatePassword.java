@@ -42,7 +42,6 @@ public class CreatePassword extends AppCompatActivity {
         String email = getIntent().getStringExtra("email");
         String username = getIntent().getStringExtra("username");
 
-        // CreatePassword.java
         confirmBtn.setOnClickListener(view -> {
             String password = passField.getText().toString().trim();
             String fullName = getIntent().getStringExtra("fullName"); // Get fullName from intent
@@ -61,7 +60,7 @@ public class CreatePassword extends AppCompatActivity {
                                             .addOnCompleteListener(verifyTask -> {
                                                 if (verifyTask.isSuccessful()) {
                                                     Map<String, Object> userProfile = new HashMap<>();
-                                                    userProfile.put("fullName", fullName); // Use fullName from intent
+                                                    userProfile.put("fullName", fullName);
                                                     userProfile.put("email", email);
                                                     userProfile.put("username", username);
                                                     userProfile.put("role", "student");
