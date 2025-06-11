@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,10 @@ public class QuizListActivity extends AppCompatActivity {
         setContentView(R.layout.quiz_list);
 
         quizListContainer = findViewById(R.id.quizListContainer);
+
+        // Back button functionality
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish()); // Navigate back to the previous activity
 
         fetchQuizzes();
     }
