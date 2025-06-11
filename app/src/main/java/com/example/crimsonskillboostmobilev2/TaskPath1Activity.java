@@ -10,11 +10,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaskPath1Activity extends AppCompatActivity {
 
@@ -29,27 +29,25 @@ public class TaskPath1Activity extends AppCompatActivity {
         ImageButton backButton = findViewById(R.id.backButtonTask);
 
         backButton.setOnClickListener(v -> finish()); // Navigate back
-        fetchTasks();
+        fetchTasksFromFirebase();
     }
 
-    private void fetchTasks() {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-
-        apiService.getTasks().enqueue(new Callback<List<TaskModel>>() {
-            @Override
-            public void onResponse(Call<List<TaskModel>> call, Response<List<TaskModel>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    populateTaskList(response.body());
-                } else {
-                    Toast.makeText(TaskPath1Activity.this, "Failed to load tasks", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<TaskModel>> call, Throwable t) {
-                Toast.makeText(TaskPath1Activity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void fetchTasksFromFirebase() {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        firestore.collection("tasks")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<TaskModel> tasks = new ArrayList<>();
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        TaskModel task = document.toObject(TaskModel.class);
+                        task.setId(document.getId()); // Set Firestore document ID
+                        tasks.add(task);
+                    }
+                    populateTaskList(tasks);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(TaskPath1Activity.this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void populateTaskList(List<TaskModel> tasks) {

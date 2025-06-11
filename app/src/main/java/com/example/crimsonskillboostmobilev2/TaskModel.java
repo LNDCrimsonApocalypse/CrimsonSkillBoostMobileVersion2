@@ -3,7 +3,7 @@ package com.example.crimsonskillboostmobilev2;
 import com.google.gson.annotations.SerializedName;
 
 public class TaskModel {
-    private int id;
+    private String id; // Change from int to String
 
     @SerializedName("title")
     private String title;
@@ -17,8 +17,12 @@ public class TaskModel {
     @SerializedName("status")
     private String status;
 
-    public int getId() {
+    public String getId() { // Update getter
         return id;
+    }
+
+    public void setId(String id) { // Update setter
+        this.id = id;
     }
 
     public String getTitle() {
@@ -35,10 +39,6 @@ public class TaskModel {
 
     public String getStatus() {
         return status;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public void setTitle(String title) {
