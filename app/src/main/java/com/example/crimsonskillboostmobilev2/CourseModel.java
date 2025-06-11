@@ -1,5 +1,6 @@
 package com.example.crimsonskillboostmobilev2;
 
+import com.google.firebase.Timestamp;
 import com.google.gson.annotations.SerializedName;
 
 public class CourseModel {
@@ -31,10 +32,12 @@ public class CourseModel {
 
     private int iconResId = R.drawable.gamedev_icon;
 
+    private Timestamp createdAt; // Firestore timestamp for created_at
+
     public CourseModel() {}
 
     public CourseModel(int id, String title, String content, String instructorName, String instructorEmail,
-                       String topic, String requirements, int progress, boolean pending, int iconResId) {
+                       String topic, String requirements, int progress, boolean pending, int iconResId, Timestamp createdAt) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -45,6 +48,7 @@ public class CourseModel {
         this.progress = progress;
         this.pending = pending;
         this.iconResId = iconResId;
+        this.createdAt = createdAt;
     }
 
     public int getId() {
@@ -87,6 +91,10 @@ public class CourseModel {
         return iconResId;
     }
 
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+
     public void setId(int id) {
         this.id = id;
     }
@@ -97,6 +105,10 @@ public class CourseModel {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setOverview(String overview) {
+        this.content = overview;
     }
 
     public void setInstructorName(String instructorName) {
@@ -125,5 +137,9 @@ public class CourseModel {
 
     public void setIconResId(int iconResId) {
         this.iconResId = iconResId;
+    }
+
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
     }
 }

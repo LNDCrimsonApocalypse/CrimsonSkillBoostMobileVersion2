@@ -1,39 +1,58 @@
 package com.example.crimsonskillboostmobilev2;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     private static Retrofit retrofit = null;
 
-    public static Retrofit getClient() {
+    public static synchronized Retrofit getClient() {
         if (retrofit == null) {
-            OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .writeTimeout(30, TimeUnit.SECONDS)
-                    .build();
+            try {
+                // Logging interceptor for detailed debugging
+                HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+                loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-            Type optionsType = new TypeToken<List<String>>(){}.getType();
+                // OkHttpClient with enhanced retry mechanism and increased timeouts
+                OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                        .connectTimeout(60, TimeUnit.SECONDS) // Increased connection timeout
+                        .readTimeout(60, TimeUnit.SECONDS)    // Increased read timeout
+                        .writeTimeout(60, TimeUnit.SECONDS)   // Increased write timeout
+                        .addInterceptor(loggingInterceptor)   // Enable detailed logging
+                        .addInterceptor(chain -> {            // Retry mechanism
+                            int tryCount = 0;
+                            int maxLimit = 3;
+                            while (tryCount < maxLimit) {
+                                try {
+                                    return chain.proceed(chain.request());
+                                } catch (java.net.ProtocolException e) {
+                                    tryCount++;
+                                    if (tryCount >= maxLimit) {
+                                        throw e;
+                                    }
+                                }
+                            }
+                            try {
+                                throw new Exception("Max retry limit reached");
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .build();
 
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(optionsType, new OptionsTypeAdapter())
-                    .create();
-
-            retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2/CrimsonSkillBoost-Web/")
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .client(okHttpClient)
-                    .build();
+                // Retrofit instance
+                retrofit = new Retrofit.Builder()
+                        .baseUrl("http://10.0.2.2/CrimsonSkillBoost-Web/") // Update if needed
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .client(okHttpClient)
+                        .build();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return retrofit;
     }

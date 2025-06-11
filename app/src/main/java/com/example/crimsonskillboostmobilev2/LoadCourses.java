@@ -7,61 +7,56 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHolder> {
 
     private final Context context;
-    private final List<CourseModel> courseList = new ArrayList<>();
     private final RecyclerView recyclerView;
 
     private final String mode; // "available" or "enrolled"
-    private int studentId;
+    private final String studentId;
 
-    public LoadCourses(Context context, RecyclerView recyclerView, String mode, int studentId) {
+    private final List<CourseModel> courseList = new ArrayList<>();
+
+    public LoadCourses(Context context, RecyclerView recyclerView, String mode, String studentId) {
         this.context = context;
         this.recyclerView = recyclerView;
         this.mode = mode;
         this.studentId = studentId;
         this.recyclerView.setAdapter(this);
-        fetchCoursesFromApi();
+        fetchCoursesFromFirestore();
     }
 
+    public void fetchCoursesFromFirestore() {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        String collection = mode.equals("enrolled") ? "enrolled_courses" : "available_courses";
 
-    public void fetchCoursesFromApi() {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<List<CourseModel>> call = mode.equals("enrolled")
-                ? apiService.getEnrolledCourses(studentId)
-                : apiService.getCourses();
-
-        call.enqueue(new Callback<List<CourseModel>>() {
-            @Override
-            public void onResponse(Call<List<CourseModel>> call, Response<List<CourseModel>> response) {
-                if (response.isSuccessful() && response.body() != null) {
+        firestore.collection(collection)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
                     courseList.clear();
-                    courseList.addAll(response.body());
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        CourseModel course = new CourseModel();
+                        course.setTitle(document.getString("course_name"));
+                        course.setOverview(document.getString("overview"));
+                        course.setInstructorName(document.getString("instructor_name"));
+                        course.setRequirements(document.getString("requirements"));
+                        course.setCreatedAt(document.getTimestamp("created_at"));
+                        courseList.add(course);
+                    }
                     notifyDataSetChanged();
-                } else {
-                    Log.e("API_RESPONSE", "Unsuccessful: code=" + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<CourseModel>> call, Throwable t) {
-                Log.e("LoadCourses", "API error", t);
-            }
-        });
+                })
+                .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching courses: " + e.getMessage(), e));
     }
 
     @NonNull
@@ -81,30 +76,20 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
 
         holder.courseTitle.setText(title);
         holder.courseOverview.setText(overview);
-        holder.progressBar.setProgress(course.getProgress());
-        holder.progressPercent.setText(course.getProgress() + "%");
-
-        holder.pendingIcon.setVisibility(course.isPending() ? View.VISIBLE : View.GONE);
-
-        int iconResId = course.getIconResId() != 0 ? course.getIconResId() : R.drawable.gamedev_icon;
-        holder.subjectIcon.setImageResource(iconResId);
 
         // Pass course_id to SubjectDetailsAvailableCourse
         if (mode.equals("available")) {
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(context, SubjectDetailsAvailableCourse.class);
-                intent.putExtra("course_id", String.valueOf(course.getId())); // Pass course_id
+                intent.putExtra("course_id", course.getId()); // Pass Firestore document ID
                 intent.putExtra("title", course.getTitle());
                 intent.putExtra("instructor_name", course.getInstructorName());
-                intent.putExtra("instructor_email", course.getInstructorEmail());
                 intent.putExtra("overview", course.getOverview());
-                intent.putExtra("topic", course.getTopic());
                 intent.putExtra("requirements", course.getRequirements());
                 context.startActivity(intent);
             });
         }
     }
-
 
     @Override
     public int getItemCount() {
@@ -112,18 +97,14 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
     }
 
     public static class CourseViewHolder extends RecyclerView.ViewHolder {
-        TextView courseTitle, courseOverview, progressPercent;
-        ProgressBar progressBar;
-        ImageView subjectIcon, pendingIcon;
+        TextView courseTitle, courseOverview;
+        ImageView subjectIcon;
 
         public CourseViewHolder(@NonNull View itemView) {
             super(itemView);
             courseTitle = itemView.findViewById(R.id.textViewCourseTitle);
             courseOverview = itemView.findViewById(R.id.textViewCourseOverview);
-            progressBar = itemView.findViewById(R.id.progressBarCourse);
-            progressPercent = itemView.findViewById(R.id.textViewProgressPercent);
             subjectIcon = itemView.findViewById(R.id.imageViewSubjectIcon);
-            pendingIcon = itemView.findViewById(R.id.imageViewPending);
         }
     }
 }

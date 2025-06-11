@@ -1,6 +1,7 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,9 +15,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SubjectDetailsAvailableCourse extends AppCompatActivity {
 
@@ -70,35 +70,38 @@ public class SubjectDetailsAvailableCourse extends AppCompatActivity {
         String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         if (courseId == null || courseId.isEmpty()) {
+            Log.e("EnrollError", "Invalid course ID");
             Toast.makeText(this, "Invalid course ID", Toast.LENGTH_SHORT).show();
             return;
         }
 
         btnEnroll.setEnabled(false);
+        Log.d("EnrollDebug", "Enrollment process started for courseId: " + courseId + ", studentId: " + studentId);
 
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<Void> call = apiService.enrollInCourse(studentId, courseId);
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful()) {
+        // Create enrollment data
+        Map<String, Object> enrollmentData = new HashMap<>();
+        enrollmentData.put("student_id", studentId);
+        enrollmentData.put("course_id", courseId);
+        enrollmentData.put("status", "pending");
+        enrollmentData.put("created_at", System.currentTimeMillis());
+
+        // Add enrollment request to Firestore
+        firestore.collection("enrollment_requests")
+                .add(enrollmentData)
+                .addOnSuccessListener(documentReference -> {
+                    Log.d("EnrollDebug", "Enrollment request successful for courseId: " + courseId);
                     btnEnroll.setText("Pending Request");
                     btnEnroll.setEnabled(false);
                     btnEnroll.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                     Toast.makeText(SubjectDetailsAvailableCourse.this, "Enrollment request sent successfully!", Toast.LENGTH_SHORT).show();
-                } else {
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("EnrollError", "Error during enrollment: " + e.getMessage(), e);
                     btnEnroll.setEnabled(true);
-                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Failed to enroll: " + response.message(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                btnEnroll.setEnabled(true);
-                Toast.makeText(SubjectDetailsAvailableCourse.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void assignStudentId(String documentId) {
