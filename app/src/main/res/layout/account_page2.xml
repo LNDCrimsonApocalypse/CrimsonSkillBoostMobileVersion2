@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
-    tools:ignore="ExtraText">
-
+    android:background="@drawable/gradient_background">
 
     <ImageView
         android:id="@+id/backbtnA1"
@@ -48,13 +46,13 @@
         app:layout_constraintStart_toStartOf="@+id/profileImageView"
         app:layout_constraintTop_toTopOf="@+id/profileImageView" />
 
-    <TextView
+    <EditText
         android:id="@+id/fullname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:fontFamily="@font/poppins_regular"
-        android:text="@string/name_placeholder"
+        android:hint="@string/name_placeholder"
         android:textColor="#090909"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -62,12 +60,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cameraIcon" />
 
-    <TextView
+    <EditText
         android:id="@+id/username"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/username_placeholder"
+        android:hint="@string/username_placeholder"
         android:textSize="14sp"
         android:paddingBottom="25dp"
         app:layout_constraintEnd_toEndOf="@+id/fullname"
@@ -75,9 +73,7 @@
         app:layout_constraintStart_toStartOf="@+id/fullname"
         app:layout_constraintTop_toBottomOf="@+id/fullname" />
 
-
-    <!--  not editable  -->
-    <TextView
+    <EditText
         android:id="@+id/email"
         android:layout_width="0dp"
         android:layout_height="60dp"
@@ -85,17 +81,17 @@
         android:background="@drawable/logins_textfield"
         android:fontFamily="@font/poppins_regular"
         android:gravity="start|center_vertical"
-        android:text="@string/email_placeholder"
+        android:hint="@string/email_placeholder"
         android:textColor="#090909"
         android:textSize="16sp"
         android:padding="12dp"
+        android:focusable="false"
         app:layout_constraintEnd_toEndOf="@+id/username"
         app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="@+id/username"
         app:layout_constraintTop_toBottomOf="@+id/username"
         app:layout_constraintWidth_percent="0.85" />
 
-    <!-- Year Dropdown -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/yearfield"
         android:layout_width="170dp"
@@ -125,7 +121,6 @@
             android:textSize="16sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Section Dropdown -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/sectionfield"
         android:layout_width="170dp"
@@ -198,8 +193,5 @@
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         app:layout_constraintVertical_bias="0.716"
         app:layout_constraintWidth_percent="0.9" />
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

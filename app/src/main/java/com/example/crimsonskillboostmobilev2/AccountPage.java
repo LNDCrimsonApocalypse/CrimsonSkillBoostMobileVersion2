@@ -2,7 +2,10 @@ package com.example.crimsonskillboostmobilev2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +45,50 @@ public class AccountPage extends AppCompatActivity {
 
         initViews();
         setupNavigation();
-        loadUserData();  // Fetch user data from Firestore
+        loadUserData();
+
+        // Settings button functionality
+        ImageView settingsButton = findViewById(R.id.settings);
+        settingsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, EditProfile.class);
+            startActivityForResult(intent, 1); // Start EditProfile with request code 1
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            // Reload user data after editing
+            loadUserData();
+        }
+    }
+
+    private void showSettingsMenu(View anchor) {
+        PopupMenu popupMenu = new PopupMenu(this, anchor);
+        popupMenu.getMenuInflater().inflate(R.menu.settings_menu, popupMenu.getMenu());
+
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.menu_edit_profile) {
+                Intent intent = new Intent(this, EditProfile.class);
+                startActivity(intent);
+                return true;
+            } else if (id == R.id.menu_password_change) {
+                Toast.makeText(this, "Password Change selected", Toast.LENGTH_SHORT).show();
+                return true;
+            } else if (id == R.id.menu_signout) {
+                mAuth.signOut();
+                Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+                return true;
+            }
+            return false;
+        });
+
+        popupMenu.show();
     }
 
     private void initViews() {
