@@ -10,18 +10,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
     private TextView subjectTitle, textQuestionNumber, textQuestion;
     private Button option1, option2, option3, option4, btnNext;
-
     private List<QuestionModel> questionList = new ArrayList<>();
     private int currentQuestionIndex = 0;
     private int score = 0;
@@ -35,9 +33,8 @@ public class QuizActivity extends AppCompatActivity {
 
         // Retrieve quizId from Intent
         int quizId = getIntent().getIntExtra("quizId", -1);
-        Toast.makeText(this, "Received Quiz ID: " + quizId, Toast.LENGTH_SHORT).show(); // Debugging
         if (quizId != -1) {
-            fetchQuestions(quizId); // Pass quizId to fetchQuestions
+            fetchQuestionsFromFirebase(quizId); // Fetch questions from Firebase
         } else {
             Toast.makeText(this, "Invalid Quiz ID", Toast.LENGTH_SHORT).show();
             finish();
@@ -56,42 +53,28 @@ public class QuizActivity extends AppCompatActivity {
         setOptionClickListeners();
     }
 
-    private void fetchQuestions(int quizId) {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        apiService.getQuizQuestions(quizId).enqueue(new Callback<List<QuestionModel>>() {
-            @Override
-            public void onResponse(Call<List<QuestionModel>> call, Response<List<QuestionModel>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<QuestionModel> allQuestions = response.body();
-
-                    // Filter questions by quizId
+    private void fetchQuestionsFromFirebase(int quizId) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        firestore.collection("quizzes")
+                .document(String.valueOf(quizId))
+                .collection("questions")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
                     questionList.clear();
-                    for (QuestionModel question : allQuestions) {
-                        if (question.getId() == quizId) {
-                            questionList.add(question);
-                        }
+                    for (QueryDocumentSnapshot document : querySnapshot) {
+                        QuestionModel question = document.toObject(QuestionModel.class);
+                        questionList.add(question);
                     }
-
-                    Log.d("QuizActivity", "Filtered Questions: " + questionList);
-
                     if (questionList.isEmpty()) {
-                        Log.e("QuizActivity", "No questions found for quiz ID: " + quizId);
-                        Toast.makeText(QuizActivity.this, "No questions available for this quiz.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "No questions available for this quiz.", Toast.LENGTH_SHORT).show();
                     } else {
                         displayQuestion(); // Display the first question
                     }
-                } else {
-                    Log.e("QuizActivity", "Failed to load questions. Response code: " + response.code());
-                    Toast.makeText(QuizActivity.this, "Failed to load questions.", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<QuestionModel>> call, Throwable t) {
-                Log.e("QuizActivity", "Error fetching questions: " + t.getMessage(), t);
-                Toast.makeText(QuizActivity.this, "Error fetching questions.", Toast.LENGTH_SHORT).show();
-            }
-        });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("QuizActivity", "Error fetching questions: " + e.getMessage(), e);
+                    Toast.makeText(this, "Error fetching questions.", Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void initViews() {
@@ -114,29 +97,16 @@ public class QuizActivity extends AppCompatActivity {
         QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
         List<String> options = currentQuestion.getOptions();
 
-        // Debugging logs
-        Log.d("QuizActivity", "Displaying Question: " + currentQuestion.getQuestionText());
-        Log.d("QuizActivity", "Options: " + options);
-
         if (options != null && options.size() >= 4) {
-            textQuestion.setText(currentQuestion.getQuestionText()); // Display question text
+            textQuestion.setText(currentQuestion.getQuestionText());
             option1.setText(options.get(0));
             option2.setText(options.get(1));
             option3.setText(options.get(2));
             option4.setText(options.get(3));
             textQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + " of " + questionList.size());
         } else {
-            Log.e("QuizActivity", "Invalid options data for question ID: " + currentQuestion.getId());
             Toast.makeText(this, "Error loading question options.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void finishQuiz() {
-        Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
-        intent.putExtra("score", score); // Pass the score
-        intent.putExtra("maxScore", questionList.size()); // Pass the maximum score
-        startActivity(intent);
-        finish(); // Close the current activity
     }
 
     private void setOptionClickListeners() {
@@ -149,7 +119,6 @@ public class QuizActivity extends AppCompatActivity {
             Button selectedButton = (Button) v;
             int selectedAnswerIndex = -1;
 
-            // Get the index of the selected button
             if (selectedButton == option1) selectedAnswerIndex = 1;
             else if (selectedButton == option2) selectedAnswerIndex = 2;
             else if (selectedButton == option3) selectedAnswerIndex = 3;
@@ -157,19 +126,14 @@ public class QuizActivity extends AppCompatActivity {
 
             QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
 
-            // Debugging logs
-            Log.d("QuizActivity", "Selected Answer Index: " + selectedAnswerIndex);
-            Log.d("QuizActivity", "Correct Answer Index: " + currentQuestion.getCorrectAnswer());
-
-            // Compare the indices
             if (selectedAnswerIndex == currentQuestion.getCorrectAnswer() + 1) {
                 score++;
                 Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show();
                 if (currentQuestionIndex < questionList.size() - 1) {
                     currentQuestionIndex++;
-                    displayQuestion(); // Proceed to next question
+                    displayQuestion();
                 } else {
-                    finishQuiz(); // Redirect to ResultActivity
+                    finishQuiz();
                 }
             } else {
                 Toast.makeText(this, "Wrong!", Toast.LENGTH_SHORT).show();
@@ -180,5 +144,13 @@ public class QuizActivity extends AppCompatActivity {
         option2.setOnClickListener(listener);
         option3.setOnClickListener(listener);
         option4.setOnClickListener(listener);
+    }
+
+    private void finishQuiz() {
+        Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
+        intent.putExtra("score", score);
+        intent.putExtra("maxScore", questionList.size());
+        startActivity(intent);
+        finish();
     }
 }
