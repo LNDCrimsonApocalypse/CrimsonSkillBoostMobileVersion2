@@ -49,10 +49,7 @@ public class AccountPage extends AppCompatActivity {
 
         // Settings button functionality
         ImageView settingsButton = findViewById(R.id.settings);
-        settingsButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EditProfile.class);
-            startActivityForResult(intent, 1); // Start EditProfile with request code 1
-        });
+        settingsButton.setOnClickListener(v -> showSettingsMenu(v)); // Call showSettingsMenu here
     }
 
     @Override
