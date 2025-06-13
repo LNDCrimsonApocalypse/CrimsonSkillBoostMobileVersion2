@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         firestore.collection("courses").add(courseData).addOnSuccessListener(courseRef -> {
             String courseId = courseRef.getId();
+            Log.d("Firestore", "Course added with ID: " + courseId);
 
             // Add sample lessons/topics
             for (int i = 1; i <= 3; i++) {
@@ -64,7 +65,11 @@ public class MainActivity extends AppCompatActivity {
                 lessonData.put("course_id", courseId);
                 lessonData.put("created_at", Timestamp.now());
 
-                firestore.collection("lessons").add(lessonData);
+                firestore.collection("lessons").add(lessonData).addOnSuccessListener(lessonRef -> {
+                    Log.d("Firestore", "Lesson added with ID: " + lessonRef.getId());
+                }).addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error adding lesson: " + e.getMessage());
+                });
             }
 
             // Add sample tasks
@@ -76,7 +81,11 @@ public class MainActivity extends AppCompatActivity {
                 taskData.put("status", "Pending");
                 taskData.put("course_id", courseId);
 
-                firestore.collection("tasks").add(taskData);
+                firestore.collection("tasks").add(taskData).addOnSuccessListener(taskRef -> {
+                    Log.d("Firestore", "Task added with ID: " + taskRef.getId());
+                }).addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error adding task: " + e.getMessage());
+                });
             }
 
             // Add sample quiz
@@ -87,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
             firestore.collection("quizzes").add(quizData).addOnSuccessListener(quizRef -> {
                 String quizId = quizRef.getId();
+                Log.d("Firestore", "Quiz added with ID: " + quizId);
 
                 // Add 5 sample questions to the quiz
                 for (int i = 1; i <= 5; i++) {
@@ -96,11 +106,17 @@ public class MainActivity extends AppCompatActivity {
                     questionData.put("correct_answer", 1); // Index of the correct answer
                     questionData.put("quiz_id", quizId);
 
-                    firestore.collection("quizzes").document(quizId).collection("questions").add(questionData);
+                    firestore.collection("quizzes").document(quizId).collection("questions").add(questionData).addOnSuccessListener(questionRef -> {
+                        Log.d("Firestore", "Question added with ID: " + questionRef.getId());
+                    }).addOnFailureListener(e -> {
+                        Log.e("Firestore", "Error adding question: " + e.getMessage());
+                    });
                 }
+            }).addOnFailureListener(e -> {
+                Log.e("Firestore", "Error adding quiz: " + e.getMessage());
             });
         }).addOnFailureListener(e -> {
-            Log.e("MainActivity", "Error adding sample data: " + e.getMessage());
+            Log.e("Firestore", "Error adding course: " + e.getMessage());
         });
     }
 }
