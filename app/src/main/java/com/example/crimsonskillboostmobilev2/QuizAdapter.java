@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,10 +38,9 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
 
         // Set click listener for the "Start Quiz" button
         holder.startQuizButton.setOnClickListener(v -> {
-            int quizId = quiz.getId();
-            Toast.makeText(context, "Quiz ID: " + quizId, Toast.LENGTH_SHORT).show(); // Debugging
+            String quizId = quiz.getId(); // Pass the ID as a String
             Intent intent = new Intent(context, QuizActivity.class);
-            intent.putExtra("quizId", quizId);
+            intent.putExtra("quizId", quizId); // Pass the quizId to QuizActivity
             context.startActivity(intent);
         });
     }

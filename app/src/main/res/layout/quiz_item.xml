@@ -6,8 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
     android:layout_marginHorizontal="15dp"
-    cardview:cardCornerRadius="10dp"
-    cardview:cardElevation="10dp">
+    cardview:cardCornerRadius="12dp"
+    cardview:cardElevation="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,19 +15,21 @@
         android:orientation="vertical"
         android:background="@android:color/white">
 
+        <!-- Header -->
         <TextView
             android:id="@+id/quizTitle"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:background="#D3A4F4"
+            android:layout_height="40dp"
+            android:background="#B6BCFF"
             android:fontFamily="@font/poppins_medium"
-            android:padding="6dp"
+            android:padding="8dp"
             android:paddingStart="20dp"
             android:text="Quiz Title"
-            android:textColor="@color/black"
-            android:textSize="14sp"
+            android:textColor="#000000"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
+        <!-- Content -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,44 +37,70 @@
             android:paddingLeft="20dp"
             android:paddingTop="10dp"
             android:paddingRight="16dp"
-            android:paddingBottom="5dp">
+            android:paddingBottom="10dp">
 
+            <!-- Description -->
             <TextView
                 android:id="@+id/quizDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Quiz Description"
                 android:textColor="#777777"
-                android:textSize="12sp"
-                android:lineSpacingExtra="1dp"
+                android:textSize="14sp"
+                android:lineSpacingExtra="2dp"
                 android:fontFamily="@font/poppins_regular" />
 
+            <!-- Divider -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:background="#000000" />
+                android:layout_marginTop="8dp"
+                android:background="#CCCCCC" />
 
+            <!-- Footer -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:gravity="end|center_vertical"
-                android:layout_marginBottom="-5dp">
+                android:gravity="end|center_vertical">
 
+                <!-- Due Date -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal"
+                    android:gravity="start|center_vertical">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/due_icon"
+                        android:tint="#FFA500"
+                        android:layout_marginEnd="5dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Due today at 5:00 PM"
+                        android:textColor="#FFA500"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/poppins_medium" />
+                </LinearLayout>
+
+                <!-- Start Quiz Button -->
                 <Button
                     android:id="@+id/startQuizButton"
-                    android:layout_width="85dp"
+                    android:layout_width="100dp"
                     android:layout_height="40dp"
                     android:text="Start Quiz"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textColor="@android:color/white"
                     android:backgroundTint="#D877DD"
                     android:fontFamily="@font/poppins_medium"
                     android:textAllCaps="false"
-                    android:paddingLeft="-5dp"
-                    android:paddingRight="-5dp" />
+                    android:paddingHorizontal="10dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -32,9 +32,9 @@ public class QuizActivity extends AppCompatActivity {
         initViews();
 
         // Retrieve quizId from Intent
-        int quizId = getIntent().getIntExtra("quizId", -1);
-        if (quizId != -1) {
-            fetchQuestionsFromFirebase(quizId); // Fetch questions from Firebase
+        String quizId = getIntent().getStringExtra("quizId");
+        if (quizId != null && !quizId.isEmpty()) {
+            fetchQuestionsFromFirebase(quizId); // Pass quizId as a String
         } else {
             Toast.makeText(this, "Invalid Quiz ID", Toast.LENGTH_SHORT).show();
             finish();
@@ -53,28 +53,86 @@ public class QuizActivity extends AppCompatActivity {
         setOptionClickListeners();
     }
 
-    private void fetchQuestionsFromFirebase(int quizId) {
+    private void fetchQuestionsFromFirebase(String quizId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         firestore.collection("quizzes")
-                .document(String.valueOf(quizId))
+                .document(quizId)
                 .collection("questions")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     questionList.clear();
                     for (QueryDocumentSnapshot document : querySnapshot) {
-                        QuestionModel question = document.toObject(QuestionModel.class);
-                        questionList.add(question);
+                        try {
+                            // Log raw document data
+                            Log.d("QuizActivity", "Document Data: " + document.getData());
+
+                            // Retrieve fields from Firestore
+                            String questionText = document.getString("question_text");
+                            List<String> options = (List<String>) document.get("options");
+                            Object correctAnswerObj = document.get("correct_answer");
+                            String correctAnswer = correctAnswerObj != null ? correctAnswerObj.toString() : null;
+
+                            // Validate and map options
+                            if (options != null && options.size() == 4) {
+                                String option1 = options.get(0);
+                                String option2 = options.get(1);
+                                String option3 = options.get(2);
+                                String option4 = options.get(3);
+
+                                // Validate and add to question list
+                                if (questionText != null && correctAnswer != null) {
+                                    QuestionModel question = new QuestionModel();
+                                    question.setQuestion(questionText);
+                                    question.setOption1(option1);
+                                    question.setOption2(option2);
+                                    question.setOption3(option3);
+                                    question.setOption4(option4);
+                                    question.setCorrectAnswer(correctAnswer);
+                                    questionList.add(question);
+
+                                    // Log added question
+                                    Log.d("QuizActivity", "Added Question: " + question.getQuestion());
+                                } else {
+                                    Log.w("QuizActivity", "Invalid Question Data: " + document.getId());
+                                }
+                            } else {
+                                Log.w("QuizActivity", "Invalid Options Data: " + document.getId());
+                            }
+                        } catch (Exception e) {
+                            Log.e("QuizActivity", "Error processing document: " + document.getId(), e);
+                        }
                     }
+                    // Log final question list
+                    Log.d("QuizActivity", "Final Question List: " + questionList);
+
                     if (questionList.isEmpty()) {
-                        Toast.makeText(this, "No questions available for this quiz.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "No valid questions found for this quiz.", Toast.LENGTH_SHORT).show();
+                        finish();
                     } else {
-                        displayQuestion(); // Display the first question
+                        displayQuestion();
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("QuizActivity", "Error fetching questions: " + e.getMessage(), e);
-                    Toast.makeText(this, "Error fetching questions.", Toast.LENGTH_SHORT).show();
+                    Log.e("QuizActivity", "Failed to load questions: " + e.getMessage(), e);
+                    Toast.makeText(this, "Failed to load questions: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    finish();
                 });
+    }
+
+    private void displayQuestion() {
+        if (currentQuestionIndex < questionList.size()) {
+            QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
+
+            // Log current question
+            Log.d("QuizActivity", "Displaying Question: " + currentQuestion.getQuestion());
+
+            textQuestion.setText(currentQuestion.getQuestion());
+            option1.setText(currentQuestion.getOption1());
+            option2.setText(currentQuestion.getOption2());
+            option3.setText(currentQuestion.getOption3());
+            option4.setText(currentQuestion.getOption4());
+            textQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + " of " + questionList.size());
+        }
     }
 
     private void initViews() {
@@ -88,55 +146,42 @@ public class QuizActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btnNext);
     }
 
-    private void displayQuestion() {
-        if (questionList.isEmpty()) {
-            Log.e("QuizActivity", "Question list is empty.");
-            return;
-        }
-
-        QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
-        List<String> options = currentQuestion.getOptions();
-
-        if (options != null && options.size() >= 4) {
-            textQuestion.setText(currentQuestion.getQuestionText());
-            option1.setText(options.get(0));
-            option2.setText(options.get(1));
-            option3.setText(options.get(2));
-            option4.setText(options.get(3));
-            textQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + " of " + questionList.size());
-        } else {
-            Toast.makeText(this, "Error loading question options.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void setOptionClickListeners() {
         View.OnClickListener listener = v -> {
-            if (questionList.isEmpty()) {
-                Toast.makeText(this, "No questions available", Toast.LENGTH_SHORT).show();
-                return;
+            QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
+            String selectedAnswer = "";
+
+            // Determine which option was clicked
+            if (v.getId() == R.id.option1) {
+                selectedAnswer = currentQuestion.getOption1();
+            } else if (v.getId() == R.id.option2) {
+                selectedAnswer = currentQuestion.getOption2();
+            } else if (v.getId() == R.id.option3) {
+                selectedAnswer = currentQuestion.getOption3();
+            } else if (v.getId() == R.id.option4) {
+                selectedAnswer = currentQuestion.getOption4();
             }
 
-            Button selectedButton = (Button) v;
-            int selectedAnswerIndex = -1;
+            // Log values for debugging
+            Log.d("QuizActivity", "Selected Answer: " + selectedAnswer);
+            Log.d("QuizActivity", "Correct Answer: " + currentQuestion.getCorrectAnswer());
 
-            if (selectedButton == option1) selectedAnswerIndex = 1;
-            else if (selectedButton == option2) selectedAnswerIndex = 2;
-            else if (selectedButton == option3) selectedAnswerIndex = 3;
-            else if (selectedButton == option4) selectedAnswerIndex = 4;
-
-            QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
-
-            if (selectedAnswerIndex == currentQuestion.getCorrectAnswer() + 1) {
+            // Check if the selected answer is correct
+            if (selectedAnswer.trim().equalsIgnoreCase(currentQuestion.getCorrectAnswer().trim())) {
                 score++;
-                Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show();
-                if (currentQuestionIndex < questionList.size() - 1) {
-                    currentQuestionIndex++;
-                    displayQuestion();
-                } else {
-                    finishQuiz();
-                }
+            }
+
+            // Proceed to the next question or finish the quiz
+            if (currentQuestionIndex < questionList.size() - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
             } else {
-                Toast.makeText(this, "Wrong!", Toast.LENGTH_SHORT).show();
+                // Navigate to ResultActivity
+                Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
+                intent.putExtra("score", score);
+                intent.putExtra("maxScore", questionList.size());
+                startActivity(intent);
+                finish();
             }
         };
 
@@ -144,13 +189,5 @@ public class QuizActivity extends AppCompatActivity {
         option2.setOnClickListener(listener);
         option3.setOnClickListener(listener);
         option4.setOnClickListener(listener);
-    }
-
-    private void finishQuiz() {
-        Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
-        intent.putExtra("score", score);
-        intent.putExtra("maxScore", questionList.size());
-        startActivity(intent);
-        finish();
     }
 }
