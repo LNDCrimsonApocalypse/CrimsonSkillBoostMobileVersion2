@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,12 +16,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
-
 public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHolder> {
 
     private final Context context;
     private final RecyclerView recyclerView;
-
     private final String mode; // "available" or "enrolled"
     private final String studentId;
 
@@ -39,22 +36,37 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
 
     public void fetchCoursesFromFirestore() {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        String collection = mode.equals("enrolled") ? "enrolled_courses" : "available_courses";
+        String collection = mode.equals("enrolled") ? "enrolled_courses" : "courses";
+
+        Log.d("LoadCourses", "Fetching courses from collection: " + collection);
 
         firestore.collection(collection)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     courseList.clear();
+                    Log.d("LoadCourses", "Query successful. Number of documents: " + querySnapshot.size());
                     for (QueryDocumentSnapshot document : querySnapshot) {
-                        CourseModel course = new CourseModel();
-                        course.setTitle(document.getString("course_name"));
-                        course.setOverview(document.getString("overview"));
-                        course.setInstructorName(document.getString("instructor_name"));
-                        course.setRequirements(document.getString("requirements"));
-                        course.setCreatedAt(document.getTimestamp("created_at"));
-                        courseList.add(course);
+                        try {
+                            Log.d("LoadCourses", "Processing document: " + document.getId());
+                            CourseModel course = new CourseModel();
+                            course.setCourseName(document.getString("course_name"));
+                            course.setCreatedAt(document.getTimestamp("created_at"));
+                            course.setInstructorName(document.getString("instructor_name"));
+                            course.setOverview(document.getString("overview"));
+                            course.setRequirements(document.getString("requirements"));
+
+                            Log.d("LoadCourses", "Course details: " +
+                                    "Name=" + course.getCourseName() +
+                                    ", Instructor=" + course.getInstructorName() +
+                                    ", Overview=" + course.getOverview());
+
+                            courseList.add(course);
+                        } catch (Exception e) {
+                            Log.e("LoadCourses", "Error processing document: " + document.getId(), e);
+                        }
                     }
                     notifyDataSetChanged();
+                    Log.d("LoadCourses", "Courses loaded. Total courses: " + courseList.size());
                 })
                 .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching courses: " + e.getMessage(), e));
     }
@@ -65,46 +77,47 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         View view = LayoutInflater.from(context).inflate(R.layout.loadcourses, parent, false);
         return new CourseViewHolder(view);
     }
-
     @Override
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         CourseModel course = courseList.get(position);
 
         // Safeguard: check for nulls
-        String title = course.getTitle() != null ? course.getTitle() : "Untitled";
-        String overview = course.getOverview() != null ? course.getOverview() : "No description.";
+        String courseName = course.getCourseName() != null ? course.getCourseName() : "Untitled Course";
+        String overview = course.getOverview() != null ? course.getOverview() : "No overview available.";
 
-        holder.courseTitle.setText(title);
-        holder.courseOverview.setText(overview);
+        Log.d("LoadCourses", "Binding course to view: Name=" + courseName + ", Overview=" + overview);
 
-        // Pass course_id to SubjectDetailsAvailableCourse
-        if (mode.equals("available")) {
-            holder.itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(context, SubjectDetailsAvailableCourse.class);
-                intent.putExtra("course_id", course.getId()); // Pass Firestore document ID
-                intent.putExtra("title", course.getTitle());
-                intent.putExtra("instructor_name", course.getInstructorName());
-                intent.putExtra("overview", course.getOverview());
-                intent.putExtra("requirements", course.getRequirements());
-                context.startActivity(intent);
-            });
-        }
+        // Set course name and overview
+        holder.courseTitle.setText(courseName);
+        holder.courseDescription.setText(overview);
+
+        // Set click listener based on mode
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent;
+            if (mode.equals("available")) {
+                intent = new Intent(context, SubjectDetailsAvailableCourse.class);
+            } else {
+                intent = new Intent(context, SubjectDetailsEnrolledCourse.class);
+            }
+            intent.putExtra("course_id", course.getCourseName()); // Pass course name as ID
+            intent.putExtra("overview", course.getOverview());
+            context.startActivity(intent);
+        });
     }
 
     @Override
     public int getItemCount() {
+        Log.d("LoadCourses", "RecyclerView item count: " + courseList.size());
         return courseList.size();
     }
 
     public static class CourseViewHolder extends RecyclerView.ViewHolder {
-        TextView courseTitle, courseOverview;
-        ImageView subjectIcon;
+        TextView courseTitle, courseDescription;
 
         public CourseViewHolder(@NonNull View itemView) {
             super(itemView);
             courseTitle = itemView.findViewById(R.id.textViewCourseTitle);
-            courseOverview = itemView.findViewById(R.id.textViewCourseOverview);
-            subjectIcon = itemView.findViewById(R.id.imageViewSubjectIcon);
+            courseDescription = itemView.findViewById(R.id.textViewCourseOverview);
         }
     }
 }

@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Place holder pending for approval -->
+        <!-- Pending Approval Icon -->
         <ImageView
             android:id="@+id/imageViewPending"
             android:layout_width="24dp"
@@ -22,10 +22,9 @@
             android:contentDescription="@string/pending_approval_icon"
             android:src="@drawable/pending"
             app:tint="#A762E6"
-            android:visibility="visible" />  <!--you switch this to visible to that the pending icon will appear-->
+            android:visibility="gone" />
 
-        <!-- Place Holder for subject Icon) -->
-
+        <!-- Subject Icon -->
         <ImageView
             android:id="@+id/imageViewSubjectIcon"
             android:layout_width="64dp"
@@ -37,6 +36,7 @@
             android:contentDescription="@string/subject_icon"
             android:src="@drawable/gamedev_icon" />
 
+        <!-- Course Title -->
         <TextView
             android:id="@+id/textViewCourseTitle"
             android:layout_width="wrap_content"
@@ -60,9 +60,9 @@
             android:textColor="@android:color/darker_gray"
             android:textSize="13sp"
             android:maxLines="3"
-            android:ellipsize="end"/>
+            android:ellipsize="end" />
 
-
+        <!-- Progress Percentage -->
         <TextView
             android:id="@+id/textViewProgressPercent"
             android:layout_width="wrap_content"
@@ -73,9 +73,9 @@
             android:textColor="@android:color/black"
             android:textStyle="bold"
             android:layout_marginEnd="4dp"
-            android:visibility="visible"/>
+            android:visibility="gone" />
 
-        <!-- Progress Bar (Inactive for available courses) -->
+        <!-- Progress Bar -->
         <ProgressBar
             android:id="@+id/progressBarCourse"
             style="@android:style/Widget.ProgressBar.Horizontal"
@@ -92,7 +92,8 @@
             android:max="100"
             android:progress="0"
             android:progressBackgroundTint="#70D877DD"
-            android:progressTint="#D877DD" />
+            android:progressTint="#D877DD"
+            android:visibility="gone" />
 
     </RelativeLayout>
 </androidx.cardview.widget.CardView>

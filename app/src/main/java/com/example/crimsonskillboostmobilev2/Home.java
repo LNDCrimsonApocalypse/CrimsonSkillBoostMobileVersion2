@@ -68,7 +68,7 @@ public class Home extends AppCompatActivity {
         recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
 
         String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get logged-in user ID
-        new LoadCourses(Home.this, recyclerViewCourses, "available", studentId);
+        new LoadCourses(Home.this, recyclerViewCourses, "available", studentId); // Pass "available" mode
     }
 
     private void showEnrolledCourses() {
@@ -80,6 +80,6 @@ public class Home extends AppCompatActivity {
         recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
 
         String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get logged-in user ID
-        new LoadCourses(Home.this, recyclerViewCourses, "enrolled", studentId);
+        new LoadCourses(Home.this, recyclerViewCourses, "enrolled", studentId); // Pass "enrolled" mode
     }
 }
