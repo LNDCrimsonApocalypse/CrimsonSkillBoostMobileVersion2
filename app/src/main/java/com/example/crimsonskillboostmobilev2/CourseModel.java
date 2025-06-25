@@ -7,8 +7,12 @@ public class CourseModel {
     private String courseName;
     private Timestamp createdAt;
     private String instructorName;
+    private String userId; // Educator's ownership
     private String overview;
     private String requirements;
+    private String year; // Year assigned for students
+    private String section; // Section assigned for students
+    private String semester; // Semester assigned for students
 
     // Getters
     public String getCourseName() {
@@ -23,12 +27,28 @@ public class CourseModel {
         return instructorName;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
     public String getOverview() {
         return overview;
     }
 
     public String getRequirements() {
         return requirements;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public String getSection() {
+        return section;
+    }
+
+    public String getSemester() {
+        return semester;
     }
 
     // Setters
@@ -44,11 +64,27 @@ public class CourseModel {
         this.instructorName = instructorName;
     }
 
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     public void setOverview(String overview) {
         this.overview = overview;
     }
 
     public void setRequirements(String requirements) {
         this.requirements = requirements;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public void setSection(String section) {
+        this.section = section;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 }

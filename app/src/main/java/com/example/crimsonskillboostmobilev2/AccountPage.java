@@ -2,6 +2,7 @@ package com.example.crimsonskillboostmobilev2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -46,6 +47,7 @@ public class AccountPage extends AppCompatActivity {
         initViews();
         setupNavigation();
         loadUserData();
+        loadCourseProgress();
 
         // Settings button functionality
         ImageView settingsButton = findViewById(R.id.settings);
@@ -158,6 +160,48 @@ public class AccountPage extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error loading data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+    private void loadCourseProgress() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        firestore.collection("course_progress")
+                .whereEqualTo("student_id", userId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                            String courseTitle = document.getString("course_title");
+                            int progress = document.getLong("progress").intValue();
+
+                            // Update UI based on course title
+                            if ("Course 1".equals(courseTitle)) {
+                                if (courseTitle1 != null) courseTitle1.setText(courseTitle);
+                                if (progress1 != null) progress1.setText(progress + "%");
+                                if (progressBar1 != null) progressBar1.setProgress(progress);
+                            } else if ("Course 2".equals(courseTitle)) {
+                                if (courseTitle2 != null) courseTitle2.setText(courseTitle);
+                                if (progress2 != null) progress2.setText(progress + "%");
+                                if (progressBar2 != null) progressBar2.setProgress(progress);
+                            }
+                        }
+                    } else {
+                        // Clear progress-related UI elements
+                        if (courseTitle1 != null) courseTitle1.setText("");
+                        if (progress1 != null) progress1.setText("");
+                        if (progressBar1 != null) progressBar1.setProgress(0);
+
+                        if (courseTitle2 != null) courseTitle2.setText("");
+                        if (progress2 != null) progress2.setText("");
+                        if (progressBar2 != null) progressBar2.setProgress(0);
+
+                        Toast.makeText(this, "No progress data found.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ProgressLoadError", "Error loading progress: " + e.getMessage(), e);
+                    Toast.makeText(this, "Error loading progress.", Toast.LENGTH_SHORT).show();
                 });
     }
 
