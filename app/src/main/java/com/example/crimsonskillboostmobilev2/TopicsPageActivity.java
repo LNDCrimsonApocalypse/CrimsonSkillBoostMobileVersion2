@@ -1,38 +1,60 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.os.Bundle;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TopicsPageActivity extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
-    private ImageButton navButton;
-    private TextView headerTitle;
+    private RecyclerView rvTopics;
+    private TextView tvLessonDescription;
+    private TopicsAdapter topicsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.topics_page);
 
-        // Initialize views
-        drawerLayout = findViewById(R.id.drawer_layout);
-        navButton = findViewById(R.id.navButton);
-        headerTitle = findViewById(R.id.headerTitle);
+        rvTopics = findViewById(R.id.rvTopics);
+        tvLessonDescription = findViewById(R.id.tvLessonDescription);
 
-        // Set up navigation button click listener
-        navButton.setOnClickListener(v -> {
-            if (drawerLayout.isDrawerOpen(findViewById(R.id.navigation_view))) {
-                drawerLayout.closeDrawer(findViewById(R.id.navigation_view));
-            } else {
-                drawerLayout.openDrawer(findViewById(R.id.navigation_view));
-            }
+        rvTopics.setLayoutManager(new LinearLayoutManager(this));
+        topicsAdapter = new TopicsAdapter(new ArrayList<>(), description -> {
+            // Display the lesson description when a topic is clicked
+            tvLessonDescription.setText(description);
         });
+        rvTopics.setAdapter(topicsAdapter);
 
-        // Set header title dynamically (optional)
-        headerTitle.setText(getString(R.string.topic_name));
+        loadTopics();
+    }
+
+    private void loadTopics() {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        String courseId = getIntent().getStringExtra("course_id");
+
+        firestore.collection("courses").document(courseId).collection("topics")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<TopicModel> topics = new ArrayList<>();
+                    querySnapshot.forEach(document -> {
+                        TopicModel topic = new TopicModel();
+                        topic.setTitle(document.getString("title"));
+                        topic.setDescription(document.getString("description"));
+                        topic.setCreatedAt(document.getTimestamp("created_at"));
+                        topics.add(topic);
+                    });
+                    topicsAdapter.updateTopics(topics);
+                })
+                .addOnFailureListener(e -> {
+                    // Handle error
+                });
     }
 }

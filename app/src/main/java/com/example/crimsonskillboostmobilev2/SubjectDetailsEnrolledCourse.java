@@ -1,6 +1,7 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
         // Retrieve courseId from intent
         String courseId = getIntent().getStringExtra("course_id");
+        Log.d("SubjectDetailsEnrolledCourse", "Received course_id: " + courseId);
 
         // Validate courseId
         if (courseId == null || courseId.isEmpty()) {
@@ -74,19 +76,43 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         // Fetch course details from Firestore
-        firestore.collection("enrolled_courses").document(courseId)
+        firestore.collection("courses").document(courseId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        tvCourseTitle.setText(documentSnapshot.getString("title"));
+                        Log.d("Firestore", "Course details fetched successfully: " + documentSnapshot.getData());
+                        tvCourseTitle.setText(documentSnapshot.getString("course_name"));
                         tvInstructorName.setText(documentSnapshot.getString("instructor_name"));
-                        tvInstructorEmail.setText(documentSnapshot.getString("instructor_email"));
+
+                        // Fetch instructor email using user_id
+                        String userId = documentSnapshot.getString("user_id");
+                        if (userId != null && !userId.isEmpty()) {
+                            firestore.collection("users").document(userId)
+                                    .get()
+                                    .addOnSuccessListener(userDocument -> {
+                                        if (userDocument.exists()) {
+                                            String email = userDocument.getString("email");
+                                            tvInstructorEmail.setText(email != null ? email : "Email Not Available");
+                                        } else {
+                                            tvInstructorEmail.setText("Email Not Available");
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Log.e("Firestore", "Error fetching instructor email: " + e.getMessage(), e);
+                                        tvInstructorEmail.setText("Email Not Available");
+                                    });
+                        } else {
+                            tvInstructorEmail.setText("Email Not Available");
+                        }
+
                         tvCourseOverview.setText(documentSnapshot.getString("overview"));
                     } else {
+                        Log.e("Firestore", "Course details not found for course_id: " + courseId);
                         Toast.makeText(this, "Course details not found.", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Error fetching course details: " + e.getMessage(), e);
                     Toast.makeText(this, "Failed to load course details: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
@@ -95,15 +121,23 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         // Fetch topics from Firestore
-        firestore.collection("enrolled_courses").document(courseId).collection("topics")
+        firestore.collection("courses").document(courseId).collection("topics")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    List<String> topics = new ArrayList<>();
-                    querySnapshot.forEach(document -> topics.add(document.getString("name")));
+                    List<TopicModel> topics = new ArrayList<>();
+                    querySnapshot.forEach(document -> {
+                        TopicModel topic = new TopicModel();
+                        topic.setTitle(document.getString("title"));
+                        topic.setDescription(document.getString("description"));
+                        topic.setCreatedAt(document.getTimestamp("created_at"));
+                        topic.setCreatedBy(document.getString("created_by"));
+                        topics.add(topic);
+                    });
                     topicsAdapter.updateTopics(topics);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load topics: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("CourseTopicsError", e.getMessage(), e);
                 });
     }
 
@@ -111,7 +145,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         // Fetch tasks from Firestore
-        firestore.collection("enrolled_courses").document(courseId).collection("tasks")
+        firestore.collection("courses").document(courseId).collection("tasks")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<String> tasks = new ArrayList<>();
@@ -127,7 +161,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         // Fetch quizzes from Firestore
-        firestore.collection("enrolled_courses").document(courseId).collection("quizzes")
+        firestore.collection("courses").document(courseId).collection("quizzes")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<String> quizzes = new ArrayList<>();

@@ -47,6 +47,7 @@
         <activity android:name=".Home" />
         <activity android:name=".StructuredPathActivity" />
         <activity android:name=".SubjectDetailsAvailableCourse" />
+        <activity android:name=".SubjectDetailsEnrolledCourse" />
 
         <!-- Quiz Activities -->
         <activity android:name=".QuizListActivity" />

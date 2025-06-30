@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp;
 
 public class CourseModel {
 
+    private String courseId; // Add courseId field
     private String courseName;
     private Timestamp createdAt;
     private String instructorName;
@@ -15,6 +16,10 @@ public class CourseModel {
     private String semester; // Semester assigned for students
 
     // Getters
+    public String getCourseId() {
+        return courseId; // Getter for courseId
+    }
+
     public String getCourseName() {
         return courseName;
     }
@@ -52,6 +57,10 @@ public class CourseModel {
     }
 
     // Setters
+    public void setCourseId(String courseId) {
+        this.courseId = courseId; // Setter for courseId
+    }
+
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }

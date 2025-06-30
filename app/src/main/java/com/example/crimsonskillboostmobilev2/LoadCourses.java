@@ -11,16 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHolder> {
 
@@ -40,31 +35,66 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         fetchCoursesFromFirestore();
     }
 
+    // Updated fetchCoursesFromFirestore method in LoadCourses.java
+    // Updated fetchCoursesFromFirestore method in LoadCourses.java
     public void fetchCoursesFromFirestore() {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        String collection = mode.equals("enrolled") ? "enrolled_courses" : "courses";
 
-        Log.d("LoadCourses", "Fetching courses from collection: " + collection);
+        if (mode.equals("enrolled")) {
+            // Fetch approved enrollment requests
+            firestore.collection("enrollment_requests")
+                    .whereEqualTo("student_id", studentId)
+                    .whereEqualTo("status", "approved")
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
+                        courseList.clear();
+                        Log.d("LoadCourses", "Query successful. Number of enrollment requests: " + querySnapshot.size());
+                        for (QueryDocumentSnapshot document : querySnapshot) {
+                            String courseId = document.getString("course_id");
 
-        firestore.collection("users").document(studentId).get()
-                .addOnSuccessListener(userDocument -> {
-                    if (userDocument.exists()) {
-                        String year = userDocument.getString("year");
-                        String section = userDocument.getString("section");
-
-                        Log.d("LoadCourses", "User data retrieved: Year=" + year + ", Section=" + section);
-
-                        firestore.collection(collection)
-                                .whereEqualTo("year", year)
-                                .whereEqualTo("section", section)
-                                .get()
-                                .addOnSuccessListener(querySnapshot -> {
-                                    courseList.clear();
-                                    Log.d("LoadCourses", "Query successful. Number of documents: " + querySnapshot.size());
-                                    for (QueryDocumentSnapshot document : querySnapshot) {
-                                        Log.d("LoadCourses", "Document data: " + document.getData());
-                                        try {
+                            // Fetch course by document ID
+                            firestore.collection("courses").document(courseId)
+                                    .get()
+                                    .addOnSuccessListener(courseDoc -> {
+                                        if (courseDoc.exists()) {
                                             CourseModel course = new CourseModel();
+                                            course.setCourseId(courseId); // Set courseId properly
+                                            course.setCourseName(courseDoc.getString("course_name"));
+                                            course.setInstructorName(courseDoc.getString("instructor_name"));
+                                            course.setOverview(courseDoc.getString("overview"));
+                                            course.setRequirements(courseDoc.getString("requirements"));
+                                            course.setYear(courseDoc.getString("year"));
+                                            course.setSection(courseDoc.getString("section"));
+                                            course.setSemester(courseDoc.getString("semester"));
+                                            course.setUserId(courseDoc.getString("user_id"));
+
+                                            courseList.add(course);
+                                            notifyDataSetChanged();
+                                        } else {
+                                            Log.e("LoadCourses", "Course not found for ID: " + courseId);
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching course details: " + e.getMessage(), e));
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching enrollment requests: " + e.getMessage(), e));
+        } else {
+            // Fetch available courses
+            firestore.collection("users").document(studentId).get()
+                    .addOnSuccessListener(userDocument -> {
+                        if (userDocument.exists()) {
+                            String year = userDocument.getString("year");
+                            String section = userDocument.getString("section");
+
+                            firestore.collection("courses")
+                                    .whereEqualTo("year", year)
+                                    .whereEqualTo("section", section)
+                                    .get()
+                                    .addOnSuccessListener(querySnapshot -> {
+                                        courseList.clear();
+                                        for (QueryDocumentSnapshot document : querySnapshot) {
+                                            CourseModel course = new CourseModel();
+                                            course.setCourseId(document.getId()); // Set courseId properly
                                             course.setCourseName(document.getString("course_name"));
                                             course.setInstructorName(document.getString("instructor_name"));
                                             course.setOverview(document.getString("overview"));
@@ -74,32 +104,17 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
                                             course.setSemester(document.getString("semester"));
                                             course.setUserId(document.getString("user_id"));
 
-                                            // Handle created_at field as a string and convert to Timestamp
-                                            String createdAtString = document.getString("created_at");
-                                            if (createdAtString != null) {
-                                                try {
-                                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
-                                                    Date date = sdf.parse(createdAtString);
-                                                    Timestamp createdAt = new Timestamp(date);
-                                                    course.setCreatedAt(createdAt);
-                                                } catch (ParseException e) {
-                                                    Log.e("LoadCourses", "Error parsing created_at field: " + createdAtString, e);
-                                                }
-                                            }
-
                                             courseList.add(course);
-                                        } catch (Exception e) {
-                                            Log.e("LoadCourses", "Error processing document: " + document.getId(), e);
                                         }
-                                    }
-                                    notifyDataSetChanged();
-                                })
-                                .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching courses: " + e.getMessage(), e));
-                    } else {
-                        Log.e("LoadCourses", "User data not found for ID: " + studentId);
-                    }
-                })
-                .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching user data: " + e.getMessage(), e));
+                                        notifyDataSetChanged();
+                                    })
+                                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching courses: " + e.getMessage(), e));
+                        } else {
+                            Log.e("LoadCourses", "User data not found for ID: " + studentId);
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching user data: " + e.getMessage(), e));
+        }
     }
 
     @NonNull
@@ -109,6 +124,7 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         return new CourseViewHolder(view);
     }
 
+    // Updated onBindViewHolder method in LoadCourses.java
     @Override
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         CourseModel course = courseList.get(position);
@@ -121,9 +137,9 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         holder.courseDescription.setText(overview + " | Year: " + year);
 
         holder.itemView.setOnClickListener(v -> {
+            Log.d("LoadCourses", "Navigating to SubjectDetailsEnrolledCourse with course_id: " + course.getCourseId());
             Intent intent = new Intent(context, mode.equals("available") ? SubjectDetailsAvailableCourse.class : SubjectDetailsEnrolledCourse.class);
-            intent.putExtra("course_id", course.getCourseName());
-            intent.putExtra("overview", course.getOverview());
+            intent.putExtra("course_id", course.getCourseId()); // Use the correct course_id
             context.startActivity(intent);
         });
     }

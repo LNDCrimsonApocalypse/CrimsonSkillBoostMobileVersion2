@@ -29,6 +29,8 @@ public class SubjectDetailsAvailableCourse extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.subject_details_available_course);
+        String courseId = getIntent().getStringExtra("course_id");
+        Log.d("SubjectDetailsEnrolledCourse", "Received course_id: " + courseId);
 
         // View bindings
         tvCourseTitle = findViewById(R.id.tvCourseTitle);
@@ -42,9 +44,6 @@ public class SubjectDetailsAvailableCourse extends AppCompatActivity {
         popupContainer = findViewById(R.id.popupContainer);
         scrollView = findViewById(R.id.scrollView2);
         ImageView ivBack = findViewById(R.id.ivBack);
-
-        // Retrieve courseId from intent
-        String courseId = getIntent().getStringExtra("course_id");
 
         // Validate courseId
         if (courseId == null || courseId.isEmpty()) {
@@ -67,7 +66,6 @@ public class SubjectDetailsAvailableCourse extends AppCompatActivity {
             popupContainer.setVisibility(View.GONE);
             scrollView.setAlpha(1f);
         });
-
         // Load course details
         loadCourseDetails(courseId);
     }
@@ -93,6 +91,7 @@ public class SubjectDetailsAvailableCourse extends AppCompatActivity {
                 });
     }
 
+    // Updated enrollInCourse method in SubjectDetailsAvailableCourse.java
     private void enrollInCourse(String courseId) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -108,47 +107,68 @@ public class SubjectDetailsAvailableCourse extends AppCompatActivity {
         btnEnroll.setEnabled(false);
         Log.d("EnrollDebug", "Enrollment process started for courseId: " + courseId + ", studentId: " + studentId);
 
-        // Retrieve logged-in user's fullName from Firestore
-        firestore.collection("users").document(studentId)
+        // Fetch course details using the correct courseId
+        firestore.collection("courses").document(courseId)
                 .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String studentName = documentSnapshot.getString("fullName");
-                        if (studentName == null || studentName.isEmpty()) {
-                            studentName = "Unknown Student"; // Fallback value
-                        }
+                .addOnSuccessListener(courseDocument -> {
+                    if (courseDocument.exists()) {
+                        String courseCode = courseDocument.getString("course_code");
+                        String courseName = courseDocument.getString("course_name");
 
-                        // Create enrollment data
-                        Map<String, Object> enrollmentData = new HashMap<>();
-                        enrollmentData.put("student_id", studentId);
-                        enrollmentData.put("student_name", studentName);
-                        enrollmentData.put("course_id", courseId);
-                        enrollmentData.put("status", "pending");
-                        enrollmentData.put("created_at", System.currentTimeMillis());
+                        // Retrieve logged-in user's fullName from Firestore
+                        firestore.collection("users").document(studentId)
+                                .get()
+                                .addOnSuccessListener(documentSnapshot -> {
+                                    if (documentSnapshot.exists()) {
+                                        String studentName = documentSnapshot.getString("fullName");
+                                        if (studentName == null || studentName.isEmpty()) {
+                                            studentName = "Unknown Student"; // Fallback value
+                                        }
 
-                        // Add enrollment request to Firestore
-                        firestore.collection("enrollment_requests")
-                                .add(enrollmentData)
-                                .addOnSuccessListener(documentReference -> {
-                                    Log.d("EnrollDebug", "Enrollment request successful for courseId: " + courseId);
-                                    btnEnroll.setText("Pending Request");
-                                    btnEnroll.setEnabled(false);
-                                    btnEnroll.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Enrollment request sent successfully!", Toast.LENGTH_SHORT).show();
+                                        // Create enrollment data
+                                        Map<String, Object> enrollmentData = new HashMap<>();
+                                        enrollmentData.put("student_id", studentId);
+                                        enrollmentData.put("student_name", studentName);
+                                        enrollmentData.put("course_id", courseId); // Correct document ID
+                                        enrollmentData.put("course_code", courseCode); // Course code
+                                        enrollmentData.put("course_name", courseName); // Course name
+                                        enrollmentData.put("status", "pending");
+                                        enrollmentData.put("created_at", System.currentTimeMillis());
+
+                                        // Add enrollment request to Firestore
+                                        firestore.collection("enrollment_requests")
+                                                .add(enrollmentData)
+                                                .addOnSuccessListener(documentReference -> {
+                                                    Log.d("EnrollDebug", "Enrollment request successful for courseId: " + courseId);
+                                                    btnEnroll.setText("Pending Request");
+                                                    btnEnroll.setEnabled(false);
+                                                    btnEnroll.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                                                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Enrollment request sent successfully!", Toast.LENGTH_SHORT).show();
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("EnrollError", "Error during enrollment: " + e.getMessage(), e);
+                                                    btnEnroll.setEnabled(true);
+                                                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                });
+                                    } else {
+                                        Log.e("EnrollError", "Student data not found");
+                                        Toast.makeText(this, "Failed to retrieve student data.", Toast.LENGTH_SHORT).show();
+                                        btnEnroll.setEnabled(true);
+                                    }
                                 })
                                 .addOnFailureListener(e -> {
-                                    Log.e("EnrollError", "Error during enrollment: " + e.getMessage(), e);
+                                    Log.e("EnrollError", "Error retrieving student data: " + e.getMessage(), e);
+                                    Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                     btnEnroll.setEnabled(true);
-                                    Toast.makeText(SubjectDetailsAvailableCourse.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                 });
                     } else {
-                        Log.e("EnrollError", "Student data not found");
-                        Toast.makeText(this, "Failed to retrieve student data.", Toast.LENGTH_SHORT).show();
+                        Log.e("EnrollError", "Course data not found for courseId: " + courseId);
+                        Toast.makeText(this, "Failed to retrieve course data.", Toast.LENGTH_SHORT).show();
                         btnEnroll.setEnabled(true);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("EnrollError", "Error retrieving student data: " + e.getMessage(), e);
+                    Log.e("EnrollError", "Error retrieving course data: " + e.getMessage(), e);
                     Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     btnEnroll.setEnabled(true);
                 });

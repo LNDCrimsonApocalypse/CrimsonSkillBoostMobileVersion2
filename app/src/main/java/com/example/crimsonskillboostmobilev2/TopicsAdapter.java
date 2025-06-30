@@ -8,14 +8,20 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.Timestamp;
+
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewHolder> {
 
-    private List<String> topics;
+    private List<TopicModel> topics;
+    private OnTopicClickListener listener;
 
-    public TopicsAdapter(List<String> topics) {
+    public TopicsAdapter(List<TopicModel> topics, OnTopicClickListener listener) {
         this.topics = topics;
+        this.listener = listener;
     }
 
     @NonNull
@@ -27,7 +33,25 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
 
     @Override
     public void onBindViewHolder(@NonNull TopicViewHolder holder, int position) {
-        holder.tvTopicName.setText(topics.get(position));
+        TopicModel topic = topics.get(position);
+
+        holder.tvTitle.setText(topic.getTitle());
+
+        // Format and display the created_at timestamp
+        Timestamp createdAt = topic.getCreatedAt();
+        if (createdAt != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
+            holder.tvCreatedAt.setText(sdf.format(createdAt.toDate()));
+        } else {
+            holder.tvCreatedAt.setText("Unknown Date");
+        }
+
+        // Set click listener to show the lesson description
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTopicClick(topic.getDescription());
+            }
+        });
     }
 
     @Override
@@ -35,17 +59,22 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
         return topics.size();
     }
 
-    public void updateTopics(List<String> newTopics) {
+    public void updateTopics(List<TopicModel> newTopics) {
         this.topics = newTopics;
         notifyDataSetChanged();
     }
 
     static class TopicViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTopicName;
+        TextView tvTitle, tvCreatedAt;
 
         public TopicViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvTopicName = itemView.findViewById(R.id.tvTopicName);
+            tvTitle = itemView.findViewById(R.id.tvTitle);
+            tvCreatedAt = itemView.findViewById(R.id.tvCreatedAt);
         }
+    }
+
+    public interface OnTopicClickListener {
+        void onTopicClick(String description);
     }
 }

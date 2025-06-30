@@ -2,6 +2,7 @@ package com.example.crimsonskillboostmobilev2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -67,8 +68,10 @@ public class Home extends AppCompatActivity {
         emptyStateText.setVisibility(View.GONE);
         recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
 
-        String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get logged-in user ID
-        new LoadCourses(Home.this, recyclerViewCourses, "available", studentId); // Pass "available" mode
+        String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Log.d("Home", "Loading available courses for studentId: " + studentId);
+
+        new LoadCourses(Home.this, recyclerViewCourses, "available", studentId);
     }
 
     private void showEnrolledCourses() {
@@ -79,7 +82,9 @@ public class Home extends AppCompatActivity {
         emptyStateText.setVisibility(View.GONE);
         recyclerViewCourses.setLayoutManager(new LinearLayoutManager(this));
 
-        String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get logged-in user ID
-        new LoadCourses(Home.this, recyclerViewCourses, "enrolled", studentId); // Pass "enrolled" mode
+        String studentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        Log.d("Home", "Loading enrolled courses for studentId: " + studentId);
+
+        new LoadCourses(Home.this, recyclerViewCourses, "enrolled", studentId);
     }
 }

@@ -27,7 +27,7 @@
                 android:layout_marginTop="64dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/hamburger_icon"
-                android:tint="#000000" />
+                app:tint="#000000" />
 
             <TextView
                 android:id="@+id/headerTitle"
@@ -60,7 +60,6 @@
         android:layout_gravity="start"
         android:background="#EAEAFF"
         app:menu="@menu/drawer_menu" />
-        <!--drawer menu can be found on the menu folder -->
 </androidx.drawerlayout.widget.DrawerLayout>
 
 
