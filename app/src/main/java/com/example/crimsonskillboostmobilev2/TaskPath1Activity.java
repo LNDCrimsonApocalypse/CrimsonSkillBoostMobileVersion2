@@ -28,19 +28,29 @@ public class TaskPath1Activity extends AppCompatActivity {
         taskListContainer = findViewById(R.id.taskListContainer);
         ImageButton backButton = findViewById(R.id.backButtonTask);
 
-        backButton.setOnClickListener(v -> finish()); // Navigate back
-        fetchTasksFromFirebase();
+        backButton.setOnClickListener(v -> finish());
+        fetchAllTasksFromAllCourses();
     }
 
-    private void fetchTasksFromFirebase() {
+    private void fetchAllTasksFromAllCourses() {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        firestore.collection("tasks")
+
+        // Query every 'tasks' subcollection under all courses using collectionGroup
+        firestore.collectionGroup("tasks")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<TaskModel> tasks = new ArrayList<>();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         TaskModel task = document.toObject(TaskModel.class);
-                        task.setId(document.getId()); // Set Firestore document ID
+                        task.setId(document.getId());
+
+                        // Optional: Extract courseId from the path
+                        String[] pathSegments = document.getReference().getPath().split("/");
+                        if (pathSegments.length >= 2) {
+                            String courseId = pathSegments[1];
+                            task.setCourseId(courseId); // Add this to your model
+                        }
+
                         tasks.add(task);
                     }
                     populateTaskList(tasks);
@@ -60,11 +70,12 @@ public class TaskPath1Activity extends AppCompatActivity {
             TextView taskDueDate = taskItemView.findViewById(R.id.taskDueDate);
 
             taskTitle.setText(task.getTitle());
-            taskDueDate.setText("Due: " + task.getDueDate());
+            taskDueDate.setText("Due: " + (task.getDueDate() != null ? task.getDueDate() : "N/A"));
 
             taskItemView.setOnClickListener(v -> {
                 Intent intent = new Intent(this, TaskPath2Activity.class);
                 intent.putExtra("taskId", task.getId());
+                intent.putExtra("courseId", task.getCourseId()); // Include courseId
                 startActivity(intent);
             });
 

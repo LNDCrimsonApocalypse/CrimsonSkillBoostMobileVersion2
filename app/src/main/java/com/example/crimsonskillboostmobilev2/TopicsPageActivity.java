@@ -1,60 +1,99 @@
 package com.example.crimsonskillboostmobilev2;
 
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 public class TopicsPageActivity extends AppCompatActivity {
 
-    private RecyclerView rvTopics;
-    private TextView tvLessonDescription;
-    private TopicsAdapter topicsAdapter;
+    private FrameLayout contentViewer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.topics_page);
 
-        rvTopics = findViewById(R.id.rvTopics);
-        tvLessonDescription = findViewById(R.id.tvLessonDescription);
+        // Initialize views
+        contentViewer = findViewById(R.id.contentViewer);
 
-        rvTopics.setLayoutManager(new LinearLayoutManager(this));
-        topicsAdapter = new TopicsAdapter(new ArrayList<>(), description -> {
-            // Display the lesson description when a topic is clicked
-            tvLessonDescription.setText(description);
-        });
-        rvTopics.setAdapter(topicsAdapter);
+        // Retrieve the topic description from the intent
+        String topicDescription = getIntent().getStringExtra("topic_description");
 
-        loadTopics();
+        // Load content dynamically into the contentViewer
+        loadContentIntoViewer(topicDescription);
     }
 
-    private void loadTopics() {
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        String courseId = getIntent().getStringExtra("course_id");
+    private void loadContentIntoViewer(String descriptionOrUrl) {
+        contentViewer.removeAllViews();
 
-        firestore.collection("courses").document(courseId).collection("topics")
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<TopicModel> topics = new ArrayList<>();
-                    querySnapshot.forEach(document -> {
-                        TopicModel topic = new TopicModel();
-                        topic.setTitle(document.getString("title"));
-                        topic.setDescription(document.getString("description"));
-                        topic.setCreatedAt(document.getTimestamp("created_at"));
-                        topics.add(topic);
+        if (descriptionOrUrl.endsWith(".pdf")) {
+            WebView webView = new WebView(this);
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.setWebViewClient(new WebViewClient());
+            webView.loadUrl("https://docs.google.com/gview?embedded=true&url=" + descriptionOrUrl);
+            contentViewer.addView(webView);
+        } else if (descriptionOrUrl.endsWith(".mp4")) {
+            VideoView videoView = new VideoView(this);
+            MediaController mediaController = new MediaController(this);
+            mediaController.setAnchorView(videoView);
+            videoView.setMediaController(mediaController);
+            videoView.setVideoURI(Uri.parse(descriptionOrUrl));
+            videoView.start();
+            contentViewer.addView(videoView);
+        } else if (descriptionOrUrl.endsWith(".jpg") || descriptionOrUrl.endsWith(".jpeg") || descriptionOrUrl.endsWith(".png")) {
+            ImageView imageView = new ImageView(this);
+            imageView.setLayoutParams(new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            ));
+            Glide.with(this).load(descriptionOrUrl).into(imageView);
+            contentViewer.addView(imageView);
+        } else if (descriptionOrUrl.endsWith(".txt")) {
+            new Thread(() -> {
+                try {
+                    URL fileUrl = new URL(descriptionOrUrl);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(fileUrl.openStream()));
+                    StringBuilder text = new StringBuilder();
+                    String line;
+                    while ((line = in.readLine()) != null) {
+                        text.append(line).append("\n");
+                    }
+                    in.close();
+
+                    runOnUiThread(() -> {
+                        TextView textView = new TextView(TopicsPageActivity.this);
+                        textView.setText(text.toString());
+                        textView.setTextSize(16f);
+                        contentViewer.addView(textView);
                     });
-                    topicsAdapter.updateTopics(topics);
-                })
-                .addOnFailureListener(e -> {
-                    // Handle error
-                });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        } else {
+            // Display the topic description directly
+            TextView descriptionView = new TextView(this);
+            descriptionView.setText(descriptionOrUrl);
+            descriptionView.setTextSize(16f);
+            descriptionView.setTextColor(Color.BLACK);
+            contentViewer.addView(descriptionView);
+        }
     }
 }

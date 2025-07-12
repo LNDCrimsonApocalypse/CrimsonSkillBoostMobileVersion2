@@ -54,5 +54,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging) // optional: logging interceptor
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
 
 }

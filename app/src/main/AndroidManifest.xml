@@ -61,6 +61,7 @@
 
         <!-- Code Activities -->
         <activity android:name=".CodingPathActivity" />
+        <activity android:name=".TopicsPageActivity" />
 <!--        <activity android:name="." />-->
 
 

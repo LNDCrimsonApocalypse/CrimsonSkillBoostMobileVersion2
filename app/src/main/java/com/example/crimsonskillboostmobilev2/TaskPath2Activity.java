@@ -20,6 +20,7 @@ public class TaskPath2Activity extends AppCompatActivity {
     private TextView taskTitle, taskDescription, taskDueDate, fileNameText;
     private LinearLayout uploadContainer;
     private String taskId;
+    private String courseId;
     private Uri selectedFileUri;
 
     @Override
@@ -36,8 +37,17 @@ public class TaskPath2Activity extends AppCompatActivity {
         Button submitButton = findViewById(R.id.submitBtn);
 
         backButton.setOnClickListener(v -> finish());
+
         taskId = getIntent().getStringExtra("taskId");
-        fetchTaskDetails(taskId);
+        courseId = getIntent().getStringExtra("courseId");
+
+        if (taskId == null || courseId == null) {
+            Toast.makeText(this, "Missing task or course information", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        fetchTaskDetails(courseId, taskId);
 
         uploadContainer.setOnClickListener(v -> openFilePicker());
         submitButton.setOnClickListener(v -> uploadTask());
@@ -56,16 +66,19 @@ public class TaskPath2Activity extends AppCompatActivity {
         if (requestCode == 100 && resultCode == RESULT_OK && data != null) {
             selectedFileUri = data.getData();
             if (selectedFileUri != null) {
-                fileNameText.setText(new File(selectedFileUri.getPath()).getName());
+                String name = new File(selectedFileUri.getPath()).getName();
+                fileNameText.setText(name);
             } else {
                 Toast.makeText(this, "Unable to retrieve file path", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void fetchTaskDetails(String taskId) {
+    private void fetchTaskDetails(String courseId, String taskId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-        firestore.collection("tasks")
+        firestore.collection("courses")
+                .document(courseId)
+                .collection("tasks")
                 .document(taskId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -91,7 +104,12 @@ public class TaskPath2Activity extends AppCompatActivity {
             return;
         }
 
-//        StorageReference storageReference = FirebaseStorage.getInstance().getReference("task_submissions/" + taskId);
+        // TODO: Implement Firebase Storage upload here
+        // Example placeholder
+        Toast.makeText(this, "Upload logic not implemented yet", Toast.LENGTH_SHORT).show();
+
+//        StorageReference storageReference = FirebaseStorage.getInstance()
+//                .getReference("task_submissions/" + courseId + "/" + taskId + "/" + userId);
 //        storageReference.putFile(selectedFileUri)
 //                .addOnSuccessListener(taskSnapshot -> {
 //                    Toast.makeText(this, "File uploaded successfully", Toast.LENGTH_SHORT).show();

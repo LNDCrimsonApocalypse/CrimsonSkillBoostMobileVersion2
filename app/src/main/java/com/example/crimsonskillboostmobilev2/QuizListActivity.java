@@ -48,9 +48,15 @@ public class QuizListActivity extends AppCompatActivity {
                     quizList.clear();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         QuizModel quiz = new QuizModel();
-                        quiz.setId(document.getId()); // Firestore document ID
+                        quiz.setId(document.getId());
                         quiz.setTitle(document.getString("title"));
                         quiz.setDescription(document.getString("description"));
+                        quiz.setCourseId(document.getString("course_id"));
+                        quiz.setCreatedAt(document.getString("created_at"));
+                        quiz.setPublished(document.getBoolean("published") != null ? document.getBoolean("published") : false);
+                        quiz.setPublishedAt(document.getString("published_at"));
+                        quiz.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
+                        quiz.setCompleted(document.getBoolean("completed") != null ? document.getBoolean("completed") : false); // Null check added
                         quizList.add(quiz);
                     }
                     quizAdapter.notifyDataSetChanged();

@@ -10,7 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -25,6 +26,8 @@ public class QuizActivity extends AppCompatActivity {
     private int currentQuestionIndex = 0;
     private int score = 0;
     private String selectedAnswer;
+    FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    String userId = currentUser != null ? currentUser.getUid() : "anonymous";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,11 +47,23 @@ public class QuizActivity extends AppCompatActivity {
         checkQuizCompletion(quizId); // Check completion before fetching questions
 
         btnNext.setOnClickListener(v -> {
-            if (currentQuestionIndex < questionList.size() - 1) {
-                currentQuestionIndex++;
-                displayQuestion();
+            if (currentQuestionIndex < questionList.size()) {
+                QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
+
+                // Check if the selected answer matches the correct option
+                if (selectedAnswer != null && selectedAnswer.equals(currentQuestion.getOptions().get(currentQuestion.getCorrectOption()))) {
+                    score += currentQuestion.getPoints(); // Add points for correct answer
+                }
+
+                // Move to the next question or finish the quiz
+                if (currentQuestionIndex < questionList.size() - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                } else {
+                    finishQuiz(quizId); // Mark quiz as completed and navigate to ResultActivity
+                }
             } else {
-                finishQuiz(quizId); // Mark quiz as completed and navigate to ResultActivity
+                Toast.makeText(this, "Please select an answer before proceeding.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -57,36 +72,28 @@ public class QuizActivity extends AppCompatActivity {
 
     private void checkQuizCompletion(String quizId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String userId = currentUser != null ? currentUser.getUid() : "anonymous";
+
         firestore.collection("quizzes")
                 .document(quizId)
+                .collection("submissions")
+                .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        Boolean isCompleted = documentSnapshot.getBoolean("completed");
-                        Long maxAttempts = documentSnapshot.getLong("max_attempts");
-                        Long currentAttempts = documentSnapshot.getLong("attempts");
-
-                        if (isCompleted != null && isCompleted) {
-                            Toast.makeText(this, "This quiz is already completed and cannot be retaken.", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else if (currentAttempts != null && maxAttempts != null && currentAttempts >= maxAttempts) {
-                            Toast.makeText(this, "You have reached the maximum number of attempts for this quiz.", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            fetchQuestionsFromFirebase(quizId);
-                        }
-                    } else {
-                        Toast.makeText(this, "Quiz not found.", Toast.LENGTH_SHORT).show();
-                        Log.e("QuizActivity", "Quiz document does not exist");
+                        Toast.makeText(this, "You have already completed this quiz.", Toast.LENGTH_SHORT).show();
                         finish();
+                    } else {
+                        fetchQuestionsFromFirebase(quizId);
                     }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error checking quiz completion: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("QuizActivity", "Error checking quiz completion", e);
+                    Toast.makeText(this, "Error checking submission: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     finish();
                 });
     }
+
 
     private void fetchQuestionsFromFirebase(String quizId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -98,19 +105,17 @@ public class QuizActivity extends AppCompatActivity {
                     questionList.clear();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         try {
-                            String questionText = document.getString("question_text");
+                            String questionText = document.getString("question");
                             List<String> options = (List<String>) document.get("options");
-                            Object correctAnswerObj = document.get("correct_answer");
-                            String correctAnswer = correctAnswerObj != null ? correctAnswerObj.toString() : null;
+                            int correctOption = document.getLong("correct_option").intValue();
+                            int points = document.getLong("points") != null ? document.getLong("points").intValue() : 1; // Default to 1 if null
 
-                            if (questionText != null && options != null && options.size() == 4 && correctAnswer != null) {
+                            if (questionText != null && options != null && options.size() == 4) {
                                 QuestionModel question = new QuestionModel();
                                 question.setQuestion(questionText);
-                                question.setOption1(options.get(0));
-                                question.setOption2(options.get(1));
-                                question.setOption3(options.get(2));
-                                question.setOption4(options.get(3));
-                                question.setCorrectAnswer(correctAnswer);
+                                question.setOptions(options);
+                                question.setCorrectOption(correctOption);
+                                question.setPoints(points); // Set points
                                 questionList.add(question);
                             } else {
                                 Log.w("QuizActivity", "Invalid question data: " + document.getId());
@@ -139,10 +144,10 @@ public class QuizActivity extends AppCompatActivity {
         if (currentQuestionIndex < questionList.size()) {
             QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
             textQuestion.setText(currentQuestion.getQuestion());
-            option1.setText(currentQuestion.getOption1());
-            option2.setText(currentQuestion.getOption2());
-            option3.setText(currentQuestion.getOption3());
-            option4.setText(currentQuestion.getOption4());
+            option1.setText(currentQuestion.getOptions().get(0));
+            option2.setText(currentQuestion.getOptions().get(1));
+            option3.setText(currentQuestion.getOptions().get(2));
+            option4.setText(currentQuestion.getOptions().get(3));
             textQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + " of " + questionList.size());
         }
     }
@@ -170,16 +175,16 @@ public class QuizActivity extends AppCompatActivity {
 
             // Highlight the selected button
             if (v.getId() == R.id.option1) {
-                selectedAnswer = currentQuestion.getOption1();
+                selectedAnswer = currentQuestion.getOptions().get(0);
                 option1.setBackgroundColor(getResources().getColor(R.color.purple_500));
             } else if (v.getId() == R.id.option2) {
-                selectedAnswer = currentQuestion.getOption2();
+                selectedAnswer = currentQuestion.getOptions().get(1);
                 option2.setBackgroundColor(getResources().getColor(R.color.purple_500));
             } else if (v.getId() == R.id.option3) {
-                selectedAnswer = currentQuestion.getOption3();
+                selectedAnswer = currentQuestion.getOptions().get(2);
                 option3.setBackgroundColor(getResources().getColor(R.color.purple_500));
             } else if (v.getId() == R.id.option4) {
-                selectedAnswer = currentQuestion.getOption4();
+                selectedAnswer = currentQuestion.getOptions().get(3);
                 option4.setBackgroundColor(getResources().getColor(R.color.purple_500));
             }
         };
@@ -188,52 +193,57 @@ public class QuizActivity extends AppCompatActivity {
         option2.setOnClickListener(listener);
         option3.setOnClickListener(listener);
         option4.setOnClickListener(listener);
-
-        btnNext.setOnClickListener(v -> {
-            // Check if the selected answer is correct
-            QuestionModel currentQuestion = questionList.get(currentQuestionIndex);
-            if (selectedAnswer != null && selectedAnswer.trim().equalsIgnoreCase(currentQuestion.getCorrectAnswer().trim())) {
-                score++;
-            }
-
-            // Move to the next question or finish the quiz
-            if (currentQuestionIndex < questionList.size() - 1) {
-                currentQuestionIndex++;
-                displayQuestion();
-
-                // Reset selectedAnswer and button states
-                selectedAnswer = null;
-                option1.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                option2.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                option3.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-                option4.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
-            } else {
-                finishQuiz(getIntent().getStringExtra("quizId"));
-            }
-        });
     }
 
+    // In QuizActivity.java
+
     private void finishQuiz(String quizId) {
-        markQuizAsCompleted(quizId);
+        submitQuiz(quizId);
+
+        // Calculate the actual maximum possible score
+        int totalPossiblePoints = 0;
+        for (QuestionModel question : questionList) {
+            totalPossiblePoints += question.getPoints();
+        }
 
         Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
         intent.putExtra("score", score);
-        intent.putExtra("maxScore", questionList.size());
+        intent.putExtra("maxScore", totalPossiblePoints); // Pass the correct total possible points
         startActivity(intent);
         finish();
     }
 
-    private void markQuizAsCompleted(String quizId) {
+    private void submitQuiz(String quizId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        String userId = currentUser != null ? currentUser.getUid() : "anonymous";
+
+        // Prepare submission data
+        int totalPossiblePoints = 0;
+        for (QuestionModel question : questionList) {
+            totalPossiblePoints += question.getPoints();
+        }
+
+        SubmissionModel submission = new SubmissionModel(score, totalPossiblePoints, System.currentTimeMillis(), userId);
+
+        int finalTotalPossiblePoints = totalPossiblePoints;
         firestore.collection("quizzes")
                 .document(quizId)
-                .update("completed", true, "attempts", FieldValue.increment(1))
+                .collection("submissions")
+                .document(userId)
+                .set(submission)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Quiz marked as completed.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Quiz submitted.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(QuizActivity.this, ResultActivity.class);
+                    intent.putExtra("score", score);
+                    intent.putExtra("maxScore", finalTotalPossiblePoints);
+                    startActivity(intent);
+                    finish();
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error marking quiz as completed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("QuizActivity", "Error marking quiz as completed", e);
+                    Toast.makeText(this, "Error submitting quiz: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("QuizActivity", "Error submitting quiz", e);
                 });
     }
+
 }

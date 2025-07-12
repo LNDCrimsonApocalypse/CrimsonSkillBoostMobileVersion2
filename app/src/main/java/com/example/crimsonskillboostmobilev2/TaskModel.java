@@ -3,7 +3,8 @@ package com.example.crimsonskillboostmobilev2;
 import com.google.gson.annotations.SerializedName;
 
 public class TaskModel {
-    private String id; // Change from int to String
+    private String id; // Firestore document ID
+    private String courseId; // Parent course ID from Firestore path
 
     @SerializedName("title")
     private String title;
@@ -17,12 +18,13 @@ public class TaskModel {
     @SerializedName("status")
     private String status;
 
-    public String getId() { // Update getter
+    // Getters
+    public String getId() {
         return id;
     }
 
-    public void setId(String id) { // Update setter
-        this.id = id;
+    public String getCourseId() {
+        return courseId;
     }
 
     public String getTitle() {
@@ -39,6 +41,15 @@ public class TaskModel {
 
     public String getStatus() {
         return status;
+    }
+
+    // Setters
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
     }
 
     public void setTitle(String title) {

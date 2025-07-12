@@ -1,5 +1,6 @@
 package com.example.crimsonskillboostmobilev2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -54,7 +55,12 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
         // Initialize RecyclerViews
         rvTopics.setLayoutManager(new LinearLayoutManager(this));
-        topicsAdapter = new TopicsAdapter(new ArrayList<>());
+        topicsAdapter = new TopicsAdapter(new ArrayList<>(), description -> {
+            // Navigate to TopicsPageActivity
+            Intent intent = new Intent(this, TopicsPageActivity.class);
+            intent.putExtra("topic_description", description); // Pass the topic description
+            startActivity(intent);
+        });
         rvTopics.setAdapter(topicsAdapter);
 
         rvTasks.setLayoutManager(new LinearLayoutManager(this));

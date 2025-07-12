@@ -1,41 +1,36 @@
 package com.example.crimsonskillboostmobilev2;
 
 public class SubmissionModel {
-    private int id;
-    private int quizId;
-    private String userId;
     private int score;
+    private int maxScore;
+    private long timestamp;
+    private String userId;
 
-    // Getters and setters
-    public int getId() {
-        return id;
+    public SubmissionModel() {
+        // Firestore requires a public no-arg constructor
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public int getQuizId() {
-        return quizId;
-    }
-
-    public void setQuizId(int quizId) {
-        this.quizId = quizId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
+    public SubmissionModel(int score, int maxScore, long timestamp, String userId) {
+        this.score = score;
+        this.maxScore = maxScore;
+        this.timestamp = timestamp;
         this.userId = userId;
     }
 
+    // Getters
     public int getScore() {
         return score;
     }
 
-    public void setScore(int score) {
-        this.score = score;
+    public int getMaxScore() {
+        return maxScore;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }
