@@ -12,7 +12,8 @@ generativeai = "0.9.0"
 firebaseDatabase = "21.0.0"
 retrofit = "2.9.0"
 firebaseFirestore = "25.1.4"
-okhttp = "4.12.0" # or latest version
+okhttp = "4.12.0"
+firebaseStorage = "21.0.2" # or latest version
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -31,6 +32,7 @@ firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore
 photoview = { module = "com.github.chrisbanes:PhotoView", version = "2.3.0" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 
 
 [plugins]

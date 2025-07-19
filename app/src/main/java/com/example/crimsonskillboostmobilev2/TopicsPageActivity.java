@@ -3,6 +3,7 @@ package com.example.crimsonskillboostmobilev2;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -12,6 +13,7 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -29,6 +31,13 @@ public class TopicsPageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.topics_page);
 
+        // ✅ Enable back button on the ActionBar
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true); // Show back arrow
+            actionBar.setTitle("Topic Content"); // Optional title
+        }
+
         // Initialize views
         contentViewer = findViewById(R.id.contentViewer);
 
@@ -39,8 +48,27 @@ public class TopicsPageActivity extends AppCompatActivity {
         loadContentIntoViewer(topicDescription);
     }
 
+    // ✅ Handle back arrow click
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // Close this activity and go back
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void loadContentIntoViewer(String descriptionOrUrl) {
         contentViewer.removeAllViews();
+
+        if (descriptionOrUrl == null) {
+            TextView errorView = new TextView(this);
+            errorView.setText("No content to display.");
+            errorView.setTextColor(Color.RED);
+            errorView.setTextSize(16f);
+            contentViewer.addView(errorView);
+            return;
+        }
 
         if (descriptionOrUrl.endsWith(".pdf")) {
             WebView webView = new WebView(this);
