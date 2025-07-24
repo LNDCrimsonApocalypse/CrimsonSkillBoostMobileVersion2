@@ -19,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -75,44 +77,13 @@ public class SetupProfile extends AppCompatActivity {
         // Profile picture selector
         cameraIcon.setOnClickListener(v -> openImagePicker());
 
-        // Save button
-        saveBtn.setOnClickListener(v -> {
-            String year = yearDropdown.getText().toString().trim();
-            String section = sectionDropdown.getText().toString().trim();
-            String bio = bioEditText.getText().toString().trim();
+        // Save button with image upload
+        saveBtn.setOnClickListener(v -> saveProfile());
 
-            if (year.isEmpty() || section.isEmpty() || bio.isEmpty()) {
-                Toast.makeText(this, "Please complete all fields.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            FirebaseUser currentUser = auth.getCurrentUser();
-            if (currentUser == null) {
-                Toast.makeText(this, "User not signed in.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("year", year);
-            updates.put("section", section);
-            updates.put("bio", bio);
-
-            db.collection("users").document(currentUser.getUid())
-                    .update(updates)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(SetupProfile.this, Home.class));
-                        finish();
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
-        });
-
-        // Load Firebase user data
+        // Load existing user info
         loadUserInfo();
     }
 
-    // Fix in SetupProfile.java
     private void loadUserInfo() {
         FirebaseUser currentUser = auth.getCurrentUser();
         if (currentUser != null) {
@@ -127,6 +98,10 @@ public class SetupProfile extends AppCompatActivity {
                             yearDropdown.setText(documentSnapshot.getString("year"), false);
                             sectionDropdown.setText(documentSnapshot.getString("section"), false);
                             bioEditText.setText(documentSnapshot.getString("bio"));
+                            // If you want to show existing photoURL, you can use a library like Glide here
+                            // Example:
+                            // String photoURL = documentSnapshot.getString("photoURL");
+                            // Glide.with(this).load(photoURL).into(profileImageView);
                         } else {
                             Toast.makeText(this, "User profile not found.", Toast.LENGTH_SHORT).show();
                         }
@@ -177,20 +152,50 @@ public class SetupProfile extends AppCompatActivity {
             return;
         }
 
-        // Prepare data to save
+        String uid = currentUser.getUid();
+
         Map<String, Object> updates = new HashMap<>();
         updates.put("year", year);
         updates.put("section", section);
         updates.put("bio", bio);
 
-        db.collection("users").document(currentUser.getUid())
-                .update(updates)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(SetupProfile.this, Home.class));
-                    finish();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        if (selectedImageUri != null) {
+            // ✅ Upload image first
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+            String filename = System.currentTimeMillis() + ".jpg";
+            StorageReference userPicRef = storageRef.child("profile_pics/" + uid + "/" + filename);
+
+            userPicRef.putFile(selectedImageUri)
+                    .addOnSuccessListener(taskSnapshot -> {
+                        userPicRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            updates.put("photoURL", uri.toString());
+
+                            // Update Firestore
+                            db.collection("users").document(uid)
+                                    .update(updates)
+                                    .addOnSuccessListener(aVoid -> {
+                                        Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(SetupProfile.this, Home.class));
+                                        finish();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(this, "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                        });
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Failed to upload image: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            // ✅ No image selected, just update Firestore
+            db.collection("users").document(uid)
+                    .update(updates)
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Profile saved!", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(SetupProfile.this, Home.class));
+                        finish();
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(this, "Error saving profile: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+        }
     }
 }

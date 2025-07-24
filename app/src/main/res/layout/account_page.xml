@@ -363,7 +363,7 @@
 
                         <!-- second Course -->
                         <TextView
-                            android:id="@+id/textViewCourseTitle1"
+                            android:id="@+id/textViewCourseTitle2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Wed Development"
@@ -377,7 +377,7 @@
                             />
 
                         <TextView
-                            android:id="@+id/textViewProgress1"
+                            android:id="@+id/textViewProgress2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
@@ -398,7 +398,7 @@
                         android:layout_marginBottom="30dp">
 
                         <ProgressBar
-                            android:id="@+id/progressBar1"
+                            android:id="@+id/progressBar2"
                             style="@android:style/Widget.ProgressBar.Horizontal"
                             android:layout_width="0dp"
                             android:layout_height="15dp"
@@ -687,44 +687,3 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-<!-- suggested script to trigger the settings button
-// Inside your Activity class
-
-ImageView settingsButton = findViewById(R.id.settings_button); // Your settings icon
-
-settingsButton.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        // Inflate popup layout
-        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = inflater.inflate(R.layout.popup_menu, null);
-
-        // Create PopupWindow
-        final PopupWindow popupWindow = new PopupWindow(
-                popupView,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                true // Focusable
-        );
-
-        // Optional: make outside click dismiss the popup
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        popupWindow.setElevation(10f); // Requires API 21+
-
-        // Measure the popupView to get its width
-        popupView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        int popupWidth = popupView.getMeasuredWidth();
-
-        // Calculate offset to align popup to right of button
-        int xOffset = v.getWidth() - popupWidth;
-        int yOffset = 0; // Adjust if you want to move it up/down
-
-        // Show the popup just below the settings icon, right-aligned
-        popupWindow.showAsDropDown(v, xOffset, yOffset);
-    }
-});
-
-
--->
-

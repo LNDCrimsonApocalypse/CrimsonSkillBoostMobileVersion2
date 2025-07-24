@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -22,6 +23,7 @@ public class AccountPage extends AppCompatActivity {
 
     // Personal Info
     private TextView tvName, tvUsername, tvEmail, tvYear, tvSection, bioEditText;
+    private ImageView profileImageView;
 
     // Progress Texts
     private TextView courseTitle1, progress1, courseTitle2, progress2;
@@ -51,15 +53,14 @@ public class AccountPage extends AppCompatActivity {
 
         // Settings button functionality
         ImageView settingsButton = findViewById(R.id.settings);
-        settingsButton.setOnClickListener(v -> showSettingsMenu(v)); // Call showSettingsMenu here
+        settingsButton.setOnClickListener(this::showSettingsMenu);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_OK) {
-            // Reload user data after editing
-            loadUserData();
+            loadUserData(); // Reload user data after editing
         }
     }
 
@@ -97,45 +98,28 @@ public class AccountPage extends AppCompatActivity {
         tvYear = findViewById(R.id.tvYear);
         tvSection = findViewById(R.id.tvSection);
         bioEditText = findViewById(R.id.bioEditText);
+        profileImageView = findViewById(R.id.profileImageView); // add this in your layout
 
         courseTitle1 = findViewById(R.id.textViewCourseTitle1);
         progress1 = findViewById(R.id.textViewProgress1);
         progressBar1 = findViewById(R.id.progressBar1);
 
-        // Initialize all ImageButtons
+        courseTitle2 = findViewById(R.id.textViewCourseTitle2);
+        progress2 = findViewById(R.id.textViewProgress2);
+        progressBar2 = findViewById(R.id.progressBar2);
+
         btnQuiz = findViewById(R.id.btnQuiz);
         btnTask = findViewById(R.id.btnTask);
         btnCode = findViewById(R.id.btnCode);
         btnHome = findViewById(R.id.btnHome);
         btnFlow = findViewById(R.id.btnFlow);
-
-        // Verify initialization
-        if (btnQuiz == null || btnTask == null || btnCode == null || btnHome == null || btnFlow == null) {
-            throw new NullPointerException("One or more ImageButtons are not properly initialized. Check layout IDs.");
-        }
     }
 
     private void setupNavigation() {
-        btnQuiz.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountPage.this, QuizListActivity.class);
-            startActivity(intent);
-        });
-
-        btnTask.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountPage.this, TaskPath1Activity.class);
-            startActivity(intent);
-        });
-
-        btnCode.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountPage.this, CodingPathActivity.class);
-            startActivity(intent);
-        });
-        // Bottom navigation buttons
-        btnHome.setOnClickListener(v -> {
-            Intent intent = new Intent(AccountPage.this, Home.class);
-            startActivity(intent);
-        });
-
+        btnQuiz.setOnClickListener(v -> startActivity(new Intent(AccountPage.this, QuizListActivity.class)));
+        btnTask.setOnClickListener(v -> startActivity(new Intent(AccountPage.this, TaskPath1Activity.class)));
+        btnCode.setOnClickListener(v -> startActivity(new Intent(AccountPage.this, CodingPathActivity.class)));
+        btnHome.setOnClickListener(v -> startActivity(new Intent(AccountPage.this, Home.class)));
         btnFlow.setOnClickListener(v -> {
             startActivity(new Intent(AccountPage.this, StructuredPathActivity.class));
             finish();
@@ -158,14 +142,12 @@ public class AccountPage extends AppCompatActivity {
                         Toast.makeText(this, "No user data found.", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error loading data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Error loading data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
+
     private void loadCourseProgress() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-
         firestore.collection("course_progress")
                 .whereEqualTo("student_id", userId)
                 .get()
@@ -175,26 +157,24 @@ public class AccountPage extends AppCompatActivity {
                             String courseTitle = document.getString("course_title");
                             int progress = document.getLong("progress").intValue();
 
-                            // Update UI based on course title
                             if ("Course 1".equals(courseTitle)) {
-                                if (courseTitle1 != null) courseTitle1.setText(courseTitle);
-                                if (progress1 != null) progress1.setText(progress + "%");
-                                if (progressBar1 != null) progressBar1.setProgress(progress);
+                                courseTitle1.setText(courseTitle);
+                                progress1.setText(progress + "%");
+                                progressBar1.setProgress(progress);
                             } else if ("Course 2".equals(courseTitle)) {
-                                if (courseTitle2 != null) courseTitle2.setText(courseTitle);
-                                if (progress2 != null) progress2.setText(progress + "%");
-                                if (progressBar2 != null) progressBar2.setProgress(progress);
+                                courseTitle2.setText(courseTitle);
+                                progress2.setText(progress + "%");
+                                progressBar2.setProgress(progress);
                             }
                         }
                     } else {
-                        // Clear progress-related UI elements
-                        if (courseTitle1 != null) courseTitle1.setText("");
-                        if (progress1 != null) progress1.setText("");
-                        if (progressBar1 != null) progressBar1.setProgress(0);
+                        courseTitle1.setText("");
+                        progress1.setText("");
+                        progressBar1.setProgress(0);
 
-                        if (courseTitle2 != null) courseTitle2.setText("");
-                        if (progress2 != null) progress2.setText("");
-                        if (progressBar2 != null) progressBar2.setProgress(0);
+                        courseTitle2.setText("");
+                        progress2.setText("");
+                        progressBar2.setProgress(0);
 
                         Toast.makeText(this, "No progress data found.", Toast.LENGTH_SHORT).show();
                     }
@@ -205,15 +185,25 @@ public class AccountPage extends AppCompatActivity {
                 });
     }
 
-    // Fix in AccountPage.java
     private void populateFields(DocumentSnapshot document) {
         tvName.setText(document.getString("fullName"));
         tvUsername.setText(document.getString("username") != null ? document.getString("username") : "Not set");
         tvEmail.setText(document.getString("email") != null ? document.getString("email") : "Not set");
-
-        // Ensure year, section, and bio are retrieved correctly
         tvYear.setText(document.getString("year") != null ? document.getString("year") : "Not set");
         tvSection.setText(document.getString("section") != null ? document.getString("section") : "Not set");
         bioEditText.setText(document.getString("bio") != null ? document.getString("bio") : "No bio available");
+
+        // ✅ Load profile image if available
+        String photoURL = document.getString("photoURL");
+        if (photoURL != null && !photoURL.isEmpty()) {
+            Glide.with(this)
+                    .load(photoURL)
+                    .placeholder(R.drawable.profile) // add a default icon in drawable
+                    .error(R.drawable.profile)
+                    .circleCrop()
+                    .into(profileImageView);
+        } else {
+            profileImageView.setImageResource(R.drawable.profile);
+        }
     }
 }
