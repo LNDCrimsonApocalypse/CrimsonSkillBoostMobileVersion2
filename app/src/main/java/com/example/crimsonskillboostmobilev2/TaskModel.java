@@ -3,8 +3,8 @@ package com.example.crimsonskillboostmobilev2;
 import com.google.gson.annotations.SerializedName;
 
 public class TaskModel {
-    private String id; // Firestore document ID
-    private String courseId; // Parent course ID from Firestore path
+    private String id;
+    private String courseId;
 
     @SerializedName("title")
     private String title;
@@ -12,59 +12,38 @@ public class TaskModel {
     @SerializedName("description")
     private String description;
 
-    @SerializedName("due_date")
-    private String dueDate;
+    @SerializedName("end_date") // must match Firestore field
+    private String endDate;
+
+    @SerializedName("start_date")
+    private String startDate;
 
     @SerializedName("status")
     private String status;
 
-    // Getters
-    public String getId() {
-        return id;
-    }
+    @SerializedName("allow_late")
+    private boolean allowLate;
 
-    public String getCourseId() {
-        return courseId;
-    }
+    @SerializedName("attempts")
+    private int attempts;
 
-    public String getTitle() {
-        return title;
-    }
+    public String getId() { return id; }
+    public String getCourseId() { return courseId; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public String getEndDate() { return endDate; }
+    public String getStartDate() { return startDate; }
+    public String getStatus() { return status; }
+    public boolean isAllowLate() { return allowLate; }
+    public int getAttempts() { return attempts; }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public String getDueDate() {
-        return dueDate;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    // Setters
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setDueDate(String dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public void setId(String id) { this.id = id; }
+    public void setCourseId(String courseId) { this.courseId = courseId; }
+    public void setTitle(String title) { this.title = title; }
+    public void setDescription(String description) { this.description = description; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public void setStatus(String status) { this.status = status; }
+    public void setAllowLate(boolean allowLate) { this.allowLate = allowLate; }
+    public void setAttempts(int attempts) { this.attempts = attempts; }
 }

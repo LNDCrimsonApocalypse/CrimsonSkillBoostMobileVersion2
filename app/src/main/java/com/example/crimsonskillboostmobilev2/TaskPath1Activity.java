@@ -2,13 +2,13 @@ package com.example.crimsonskillboostmobilev2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
+import android.util.Log;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -18,68 +18,82 @@ import java.util.List;
 
 public class TaskPath1Activity extends AppCompatActivity {
 
-    private LinearLayout taskListContainer;
+    private static final String TAG = "TaskPath1Activity";
+    private RecyclerView taskRecyclerView;
+    private TasksAdapter tasksAdapter;
+    private final List<TaskModel> tasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.task_path1);
 
-        taskListContainer = findViewById(R.id.taskListContainer);
+        // ✅ Set up custom back button from XML header
         ImageButton backButton = findViewById(R.id.backButtonTask);
+        backButton.setOnClickListener(v -> {
+            // Go back to previous screen
+            finish();
+        });
 
-        backButton.setOnClickListener(v -> finish());
+        // ✅ Find RecyclerView
+        taskRecyclerView = findViewById(R.id.taskRecyclerView);
+        if (taskRecyclerView == null) {
+            Log.e(TAG, "RecyclerView is null. Check the layout file and ID.");
+            return;
+        }
+
+        setupRecyclerView();
         fetchAllTasksFromAllCourses();
+    }
+
+    private void setupRecyclerView() {
+        tasksAdapter = new TasksAdapter(tasks, task -> {
+            // Debugging: Log task details before navigating
+            Log.d(TAG, "Task clicked: ID = " + task.getId() + ", CourseID = " + task.getCourseId());
+
+            if (task.getId() == null || task.getCourseId() == null) {
+                Log.e(TAG, "Task or Course ID is null. Cannot navigate to TaskPath2Activity.");
+                Toast.makeText(this, "Task or Course ID is missing", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Navigate to TaskPath2Activity with task details
+            Intent intent = new Intent(TaskPath1Activity.this, TaskPath2Activity.class);
+            intent.putExtra("taskId", task.getId());      // Pass taskId
+            intent.putExtra("courseId", task.getCourseId()); // Pass courseId
+            startActivity(intent);
+        });
+
+        taskRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        taskRecyclerView.setAdapter(tasksAdapter);
     }
 
     private void fetchAllTasksFromAllCourses() {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        // Query every 'tasks' subcollection under all courses using collectionGroup
         firestore.collectionGroup("tasks")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    List<TaskModel> tasks = new ArrayList<>();
+                    tasks.clear();
                     for (QueryDocumentSnapshot document : querySnapshot) {
                         TaskModel task = document.toObject(TaskModel.class);
-                        task.setId(document.getId());
+                        task.setId(document.getId()); // Set task ID
 
-                        // Optional: Extract courseId from the path
-                        String[] pathSegments = document.getReference().getPath().split("/");
-                        if (pathSegments.length >= 2) {
-                            String courseId = pathSegments[1];
-                            task.setCourseId(courseId); // Add this to your model
+                        // Extract courseId from the document path
+                        String path = document.getReference().getPath(); // e.g., courses/{courseId}/tasks/{taskId}
+                        String[] segments = path.split("/");
+                        if (segments.length >= 2) {
+                            task.setCourseId(segments[1]); // Set courseId
                         }
 
+                        Log.d(TAG, "Fetched Task: ID = " + task.getId() + ", CourseID = " + task.getCourseId());
                         tasks.add(task);
                     }
-                    populateTaskList(tasks);
+                    tasksAdapter.updateTasks(tasks);
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(TaskPath1Activity.this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to load tasks: " + e.getMessage(), e);
+                    Toast.makeText(this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
-    }
-
-    private void populateTaskList(List<TaskModel> tasks) {
-        taskListContainer.removeAllViews();
-
-        for (TaskModel task : tasks) {
-            View taskItemView = getLayoutInflater().inflate(R.layout.task_item, taskListContainer, false);
-
-            TextView taskTitle = taskItemView.findViewById(R.id.taskTitle);
-            TextView taskDueDate = taskItemView.findViewById(R.id.taskDueDate);
-
-            taskTitle.setText(task.getTitle());
-            taskDueDate.setText("Due: " + (task.getDueDate() != null ? task.getDueDate() : "N/A"));
-
-            taskItemView.setOnClickListener(v -> {
-                Intent intent = new Intent(this, TaskPath2Activity.class);
-                intent.putExtra("taskId", task.getId());
-                intent.putExtra("courseId", task.getCourseId()); // Include courseId
-                startActivity(intent);
-            });
-
-            taskListContainer.addView(taskItemView);
-        }
     }
 }

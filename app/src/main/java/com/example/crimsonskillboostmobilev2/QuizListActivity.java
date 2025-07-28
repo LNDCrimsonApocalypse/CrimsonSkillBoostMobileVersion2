@@ -1,12 +1,11 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,30 +28,16 @@ public class QuizListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_list);
 
-        // Enable back button on the ActionBar
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true); // Show back arrow
-            actionBar.setHomeButtonEnabled(true); // Ensure the back button is clickable
-            actionBar.setTitle("Quizzes"); // Optional: set title
-        }
+        // ✅ Hook up the custom back button in your header
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish());
 
+        // ✅ Set up RecyclerView and empty state
         quizRecyclerView = findViewById(R.id.quizRecyclerView);
         emptyStateText = findViewById(R.id.emptyStateText);
 
         setupRecyclerView();
         fetchQuizzesFromFirebase();
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            // Handle back button click
-            finish(); // Close the current activity and return to the previous one
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
     private void setupRecyclerView() {

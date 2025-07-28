@@ -114,12 +114,15 @@ public class TaskPath2Activity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        TaskModel task = documentSnapshot.toObject(TaskModel.class);
-                        if (task != null) {
-                            taskTitle.setText(task.getTitle());
-                            taskDescription.setText(task.getDescription());
-                            taskDueDate.setText("Due: " + task.getDueDate());
-                        }
+                        // Manually map fields since Firestore uses "end_date"
+                        String title = documentSnapshot.getString("title");
+                        String description = documentSnapshot.getString("description");
+                        String endDate = documentSnapshot.getString("end_date"); // ✅ use end_date field
+
+                        // Set UI text
+                        taskTitle.setText(title != null ? title : "No Title");
+                        taskDescription.setText(description != null ? description : "No Description");
+                        taskDueDate.setText(endDate != null ? "Due: " + endDate : "No due date");
                     } else {
                         Toast.makeText(this, "Task not found", Toast.LENGTH_SHORT).show();
                     }
@@ -128,6 +131,7 @@ public class TaskPath2Activity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to load task details: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 
     private void uploadTask() {
         if (selectedFileUri == null) {

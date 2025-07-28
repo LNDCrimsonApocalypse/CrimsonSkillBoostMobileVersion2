@@ -27,9 +27,10 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // ✅ Must set layout before accessing views
         setContentView(R.layout.subject_details_enrolled_course);
 
-        // View bindings
+        // ✅ View bindings
         tvCourseTitle = findViewById(R.id.tvCourseTitle);
         tvInstructorName = findViewById(R.id.tvInstructorName);
         tvInstructorEmail = findViewById(R.id.tvInstructorEmail);
@@ -39,44 +40,48 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         rvQuizzes = findViewById(R.id.rvQuizzes);
         ImageView ivBack = findViewById(R.id.ivBack);
 
-        // Retrieve courseId from intent
+        // ✅ Retrieve courseId
         String courseId = getIntent().getStringExtra("course_id");
         Log.d("SubjectDetailsEnrolledCourse", "Received course_id: " + courseId);
 
-        // Validate courseId
         if (courseId == null || courseId.isEmpty()) {
             Toast.makeText(this, "Invalid course ID received", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Back button behavior
+        // ✅ Back button
         ivBack.setOnClickListener(v -> finish());
 
-        // Initialize RecyclerViews
+        // ✅ Setup RecyclerViews and load data
         rvTopics.setLayoutManager(new LinearLayoutManager(this));
         topicsAdapter = new TopicsAdapter(new ArrayList<>(), description -> {
-            // Navigate to TopicsPageActivity
             Intent intent = new Intent(this, TopicsPageActivity.class);
-            intent.putExtra("topic_description", description); // Pass the topic description
+            intent.putExtra("topic_description", description);
             startActivity(intent);
         });
         rvTopics.setAdapter(topicsAdapter);
 
         rvTasks.setLayoutManager(new LinearLayoutManager(this));
-        tasksAdapter = new TasksAdapter(new ArrayList<>());
+        tasksAdapter = new TasksAdapter(new ArrayList<>(), task -> {
+            Intent intent = new Intent(this, TaskPath2Activity.class);
+            intent.putExtra("taskId", task.getId());
+            intent.putExtra("courseId", courseId);
+            startActivity(intent);
+        });
         rvTasks.setAdapter(tasksAdapter);
 
         rvQuizzes.setLayoutManager(new LinearLayoutManager(this));
         quizzesAdapter = new QuizzesAdapter(new ArrayList<>());
         rvQuizzes.setAdapter(quizzesAdapter);
 
-        // Load course details, topics, tasks, and quizzes
+        // ✅ Load Firestore data
         loadCourseDetails(courseId);
         loadCourseTopics(courseId);
         loadCourseTasks(courseId);
         loadCourseQuizzes(courseId);
     }
+
 
     private void loadCourseDetails(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -150,18 +155,28 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
     private void loadCourseTasks(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        // Fetch tasks from Firestore
         firestore.collection("courses").document(courseId).collection("tasks")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    List<String> tasks = new ArrayList<>();
-                    querySnapshot.forEach(document -> tasks.add(document.getString("name")));
+                    List<TaskModel> tasks = new ArrayList<>();
+                    querySnapshot.forEach(document -> {
+                        TaskModel task = new TaskModel();
+                        // ✅ Use the correct Firestore fields
+                        task.setTitle(document.getString("title"));           // Firestore: "title"
+                        task.setEndDate(document.getString("end_date"));      // Firestore: "end_date"
+                        task.setStatus(document.getString("status"));         // optional, if present
+                        task.setId(document.getId());                         // document ID
+                        task.setCourseId(courseId);                           // parent course ID
+                        tasks.add(task);
+                    });
                     tasksAdapter.updateTasks(tasks);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("CourseTasksError", e.getMessage(), e);
                 });
     }
+
 
     private void loadCourseQuizzes(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
