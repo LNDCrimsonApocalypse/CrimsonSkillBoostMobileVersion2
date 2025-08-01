@@ -1,127 +1,138 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.MediaController;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.VideoView;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.bumptech.glide.Glide;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 public class TopicsPageActivity extends AppCompatActivity {
 
+    private DrawerLayout drawerLayout;
+    private ImageButton navButton, backButton;
     private FrameLayout contentViewer;
+    private LinearLayout subtopicList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.topics_page);
 
-        // ✅ Enable back button on the ActionBar
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true); // Show back arrow
-            actionBar.setTitle("Topic Content"); // Optional title
-        }
-
-        // Initialize views
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navButton = findViewById(R.id.navButton);
+        backButton = findViewById(R.id.backButton);
         contentViewer = findViewById(R.id.contentViewer);
+        subtopicList = findViewById(R.id.subtopicList);
 
-        // Retrieve the topic description from the intent
+        // Open drawer
+        navButton.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+
+        // Go back to previous screen
+        backButton.setOnClickListener(v -> finish());
+
+        // Get passed topic description
         String topicDescription = getIntent().getStringExtra("topic_description");
 
-        // Load content dynamically into the contentViewer
+        // Load parsed content
         loadContentIntoViewer(topicDescription);
     }
 
-    // ✅ Handle back arrow click
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // Close this activity and go back
-            return true;
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed(); // ✅ Proper override
         }
-        return super.onOptionsItemSelected(item);
     }
 
-    private void loadContentIntoViewer(String descriptionOrUrl) {
+    private void loadContentIntoViewer(String description) {
         contentViewer.removeAllViews();
+        subtopicList.removeAllViews();
 
-        if (descriptionOrUrl == null) {
-            TextView errorView = new TextView(this);
-            errorView.setText("No content to display.");
-            errorView.setTextColor(Color.RED);
-            errorView.setTextSize(16f);
-            contentViewer.addView(errorView);
+        if (description == null || description.trim().isEmpty()) {
+            TextView error = new TextView(this);
+            error.setText("No content available.");
+            error.setTextColor(Color.RED);
+            error.setTextSize(16f);
+            contentViewer.addView(error);
             return;
         }
 
-        if (descriptionOrUrl.endsWith(".pdf")) {
-            WebView webView = new WebView(this);
-            webView.getSettings().setJavaScriptEnabled(true);
-            webView.setWebViewClient(new WebViewClient());
-            webView.loadUrl("https://docs.google.com/gview?embedded=true&url=" + descriptionOrUrl);
-            contentViewer.addView(webView);
-        } else if (descriptionOrUrl.endsWith(".mp4")) {
-            VideoView videoView = new VideoView(this);
-            MediaController mediaController = new MediaController(this);
-            mediaController.setAnchorView(videoView);
-            videoView.setMediaController(mediaController);
-            videoView.setVideoURI(Uri.parse(descriptionOrUrl));
-            videoView.start();
-            contentViewer.addView(videoView);
-        } else if (descriptionOrUrl.endsWith(".jpg") || descriptionOrUrl.endsWith(".jpeg") || descriptionOrUrl.endsWith(".png")) {
-            ImageView imageView = new ImageView(this);
-            imageView.setLayoutParams(new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            Glide.with(this).load(descriptionOrUrl).into(imageView);
-            contentViewer.addView(imageView);
-        } else if (descriptionOrUrl.endsWith(".txt")) {
-            new Thread(() -> {
-                try {
-                    URL fileUrl = new URL(descriptionOrUrl);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(fileUrl.openStream()));
-                    StringBuilder text = new StringBuilder();
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        text.append(line).append("\n");
-                    }
-                    in.close();
+        String[] blocks = description.split("\\n\\s*\\n");
+        boolean hasSubtopics = false;
 
-                    runOnUiThread(() -> {
-                        TextView textView = new TextView(TopicsPageActivity.this);
-                        textView.setText(text.toString());
-                        textView.setTextSize(16f);
-                        contentViewer.addView(textView);
-                    });
+        for (int i = 0; i < blocks.length; i++) {
+            String[] lines = blocks[i].split("\\n", 2);
+            if (lines.length >= 2) {
+                hasSubtopics = true;
+                String title = lines[0].trim();
+                String content = lines[1].trim();
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                TextView subtopicButton = new TextView(this);
+                subtopicButton.setText(title);
+                subtopicButton.setPadding(16, 16, 16, 16);
+                subtopicButton.setBackgroundColor(Color.parseColor("#eef3fb"));
+                subtopicButton.setTextSize(16f);
+                subtopicButton.setClickable(true);
+
+                int index = i;
+                subtopicButton.setOnClickListener(v -> {
+                    renderSubtopicContent(title, content);
+                    highlightSelected(index);
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                });
+
+                subtopicList.addView(subtopicButton);
+
+                // Auto-select first subtopic
+                if (i == 0) {
+                    subtopicButton.performClick();
                 }
-            }).start();
-        } else {
-            // Display the topic description directly
+            }
+        }
+
+        if (!hasSubtopics) {
             TextView descriptionView = new TextView(this);
-            descriptionView.setText(descriptionOrUrl);
+            descriptionView.setText(description);
             descriptionView.setTextSize(16f);
-            descriptionView.setTextColor(Color.BLACK);
             contentViewer.addView(descriptionView);
+        }
+    }
+
+    private void renderSubtopicContent(String title, String content) {
+        contentViewer.removeAllViews();
+
+        TextView titleView = new TextView(this);
+        titleView.setText(title);
+        titleView.setTextSize(18f);
+        titleView.setTextColor(Color.BLACK);
+        titleView.setPadding(0, 0, 0, 12);
+
+        TextView contentView = new TextView(this);
+        contentView.setText(content);
+        contentView.setTextSize(16f);
+        contentView.setTextColor(Color.DKGRAY);
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(24, 24, 24, 24);
+        layout.addView(titleView);
+        layout.addView(contentView);
+
+        contentViewer.addView(layout);
+    }
+
+    private void highlightSelected(int selectedIndex) {
+        for (int i = 0; i < subtopicList.getChildCount(); i++) {
+            View view = subtopicList.getChildAt(i);
+            view.setBackgroundColor(i == selectedIndex ? Color.WHITE : Color.parseColor("#eef3fb"));
         }
     }
 }

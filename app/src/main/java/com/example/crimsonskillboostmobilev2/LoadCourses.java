@@ -35,85 +35,115 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         fetchCoursesFromFirestore();
     }
 
-    // Updated fetchCoursesFromFirestore method in LoadCourses.java
-    // Updated fetchCoursesFromFirestore method in LoadCourses.java
     public void fetchCoursesFromFirestore() {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         if (mode.equals("enrolled")) {
-            // Fetch approved enrollment requests
             firestore.collection("enrollment_requests")
                     .whereEqualTo("student_id", studentId)
                     .whereEqualTo("status", "approved")
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
-                        courseList.clear();
-                        Log.d("LoadCourses", "Query successful. Number of enrollment requests: " + querySnapshot.size());
+                        List<CourseModel> tempCourseList = new ArrayList<>();
+                        int totalRequests = querySnapshot.size();
+                        final int[] processedRequests = {0};
+
+                        if (totalRequests == 0) {
+                            // No enrollments found
+                            courseList.clear();
+                            notifyDataSetChanged();
+                            return;
+                        }
+
                         for (QueryDocumentSnapshot document : querySnapshot) {
                             String courseId = document.getString("course_id");
 
-                            // Fetch course by document ID
                             firestore.collection("courses").document(courseId)
                                     .get()
                                     .addOnSuccessListener(courseDoc -> {
+                                        processedRequests[0]++;
                                         if (courseDoc.exists()) {
-                                            CourseModel course = new CourseModel();
-                                            course.setCourseId(courseId); // Set courseId properly
-                                            course.setCourseName(courseDoc.getString("course_name"));
-                                            course.setInstructorName(courseDoc.getString("instructor_name"));
-                                            course.setOverview(courseDoc.getString("overview"));
-                                            course.setRequirements(courseDoc.getString("requirements"));
-                                            course.setYear(courseDoc.getString("year"));
-                                            course.setSection(courseDoc.getString("section"));
-                                            course.setSemester(courseDoc.getString("semester"));
-                                            course.setUserId(courseDoc.getString("user_id"));
+                                            String status = courseDoc.getString("status");
+                                            if (!"inactive".equals(status)) {
+                                                CourseModel course = new CourseModel();
+                                                course.setCourseId(courseId);
+                                                course.setCourseName(courseDoc.getString("course_name"));
+                                                course.setInstructorName(courseDoc.getString("instructor_name"));
+                                                course.setOverview(courseDoc.getString("overview"));
+                                                course.setRequirements(courseDoc.getString("requirements"));
+                                                course.setYear(courseDoc.getString("year"));
+                                                course.setSection(courseDoc.getString("section"));
+                                                course.setSemester(courseDoc.getString("semester"));
+                                                course.setUserId(courseDoc.getString("user_id"));
 
-                                            courseList.add(course);
-                                            notifyDataSetChanged();
+                                                tempCourseList.add(course);
+                                            }
                                         } else {
-                                            Log.e("LoadCourses", "Course not found for ID: " + courseId);
+                                            Log.e("LoadCourses", "Course not found: " + courseId);
+                                        }
+
+                                        if (processedRequests[0] == totalRequests) {
+                                            courseList.clear();
+                                            courseList.addAll(tempCourseList);
+                                            notifyDataSetChanged();
                                         }
                                     })
-                                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching course details: " + e.getMessage(), e));
+                                    .addOnFailureListener(e -> {
+                                        processedRequests[0]++;
+                                        Log.e("LoadCourses", "Error fetching course details: " + e.getMessage(), e);
+                                        if (processedRequests[0] == totalRequests) {
+                                            courseList.clear();
+                                            courseList.addAll(tempCourseList);
+                                            notifyDataSetChanged();
+                                        }
+                                    });
                         }
                     })
-                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching enrollment requests: " + e.getMessage(), e));
+                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching enrollments: " + e.getMessage(), e));
+
         } else {
-            // Fetch available courses
-            firestore.collection("users").document(studentId).get()
-                    .addOnSuccessListener(userDocument -> {
-                        if (userDocument.exists()) {
-                            String year = userDocument.getString("year");
-                            String section = userDocument.getString("section");
+            firestore.collection("users").document(studentId)
+                    .get()
+                    .addOnSuccessListener(userDoc -> {
+                        if (userDoc.exists()) {
+                            String year = userDoc.getString("year");
+                            String section = userDoc.getString("section");
 
                             firestore.collection("courses")
                                     .whereEqualTo("year", year)
                                     .whereEqualTo("section", section)
                                     .get()
                                     .addOnSuccessListener(querySnapshot -> {
-                                        courseList.clear();
-                                        for (QueryDocumentSnapshot document : querySnapshot) {
-                                            CourseModel course = new CourseModel();
-                                            course.setCourseId(document.getId()); // Set courseId properly
-                                            course.setCourseName(document.getString("course_name"));
-                                            course.setInstructorName(document.getString("instructor_name"));
-                                            course.setOverview(document.getString("overview"));
-                                            course.setRequirements(document.getString("requirements"));
-                                            course.setYear(document.getString("year"));
-                                            course.setSection(document.getString("section"));
-                                            course.setSemester(document.getString("semester"));
-                                            course.setUserId(document.getString("user_id"));
+                                        List<CourseModel> tempCourseList = new ArrayList<>();
 
-                                            courseList.add(course);
+                                        for (QueryDocumentSnapshot document : querySnapshot) {
+                                            String status = document.getString("status");
+                                            if (!"inactive".equals(status)) {
+                                                CourseModel course = new CourseModel();
+                                                course.setCourseId(document.getId());
+                                                course.setCourseName(document.getString("course_name"));
+                                                course.setInstructorName(document.getString("instructor_name"));
+                                                course.setOverview(document.getString("overview"));
+                                                course.setRequirements(document.getString("requirements"));
+                                                course.setYear(document.getString("year"));
+                                                course.setSection(document.getString("section"));
+                                                course.setSemester(document.getString("semester"));
+                                                course.setUserId(document.getString("user_id"));
+
+                                                tempCourseList.add(course);
+                                            }
                                         }
+
+                                        courseList.clear();
+                                        courseList.addAll(tempCourseList);
                                         notifyDataSetChanged();
                                     })
                                     .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching courses: " + e.getMessage(), e));
                         } else {
-                            Log.e("LoadCourses", "User data not found for ID: " + studentId);
+                            Log.e("LoadCourses", "User not found for ID: " + studentId);
                         }
                     })
-                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching user data: " + e.getMessage(), e));
+                    .addOnFailureListener(e -> Log.e("LoadCourses", "Error fetching user: " + e.getMessage(), e));
         }
     }
 
@@ -124,7 +154,6 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         return new CourseViewHolder(view);
     }
 
-    // Updated onBindViewHolder method in LoadCourses.java
     @Override
     public void onBindViewHolder(@NonNull CourseViewHolder holder, int position) {
         CourseModel course = courseList.get(position);
@@ -137,16 +166,16 @@ public class LoadCourses extends RecyclerView.Adapter<LoadCourses.CourseViewHold
         holder.courseDescription.setText(overview + " | Year: " + year);
 
         holder.itemView.setOnClickListener(v -> {
-            Log.d("LoadCourses", "Navigating to SubjectDetailsEnrolledCourse with course_id: " + course.getCourseId());
+            Log.d("LoadCourses", "Navigating with course_id: " + course.getCourseId());
             Intent intent = new Intent(context, mode.equals("available") ? SubjectDetailsAvailableCourse.class : SubjectDetailsEnrolledCourse.class);
-            intent.putExtra("course_id", course.getCourseId()); // Use the correct course_id
+            intent.putExtra("course_id", course.getCourseId());
             context.startActivity(intent);
         });
     }
 
     @Override
     public int getItemCount() {
-        Log.d("LoadCourses", "RecyclerView item count: " + courseList.size());
+        Log.d("LoadCourses", "Item count: " + courseList.size());
         return courseList.size();
     }
 

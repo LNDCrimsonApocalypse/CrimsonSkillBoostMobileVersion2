@@ -1,10 +1,10 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.database.Cursor;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 public class TaskPath2Activity extends AppCompatActivity {
 
-    private TextView taskTitle, taskDescription, taskDueDate, fileNameText;
+    private TextView taskTitle, taskDescription, taskDueDate, fileNameText, scoreDisplayTextView;
     private LinearLayout uploadContainer;
     private String taskId;
     private String courseId;
@@ -39,6 +39,8 @@ public class TaskPath2Activity extends AppCompatActivity {
         taskDueDate = findViewById(R.id.taskDueDate);
         fileNameText = findViewById(R.id.fileNameText);
         uploadContainer = findViewById(R.id.uploadContainer);
+        scoreDisplayTextView = findViewById(R.id.scoreTextView); // make sure this exists in your XML
+
         ImageButton backButton = findViewById(R.id.backButtonTask2);
         Button submitButton = findViewById(R.id.submitBtn);
 
@@ -58,11 +60,17 @@ public class TaskPath2Activity extends AppCompatActivity {
 
         uploadContainer.setOnClickListener(v -> openFilePicker());
         submitButton.setOnClickListener(v -> uploadTask());
+
+        // Fetch score if user is logged in
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            fetchStudentScore(taskId, userId);
+        }
     }
 
     private void openFilePicker() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*"); // allow any file type
+        intent.setType("*/*");
         startActivityForResult(Intent.createChooser(intent, "Select a file"), 100);
     }
 
@@ -81,7 +89,6 @@ public class TaskPath2Activity extends AppCompatActivity {
         }
     }
 
-    // Safely fetch display name from content resolver
     private String getFileName(Uri uri) {
         String result = null;
         if ("content".equals(uri.getScheme())) {
@@ -98,12 +105,10 @@ public class TaskPath2Activity extends AppCompatActivity {
             }
         }
         if (result == null) {
-            // fallback to last segment
             result = uri.getLastPathSegment();
         }
         return result;
     }
-
 
     private void fetchTaskDetails(String courseId, String taskId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -114,12 +119,10 @@ public class TaskPath2Activity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        // Manually map fields since Firestore uses "end_date"
                         String title = documentSnapshot.getString("title");
                         String description = documentSnapshot.getString("description");
-                        String endDate = documentSnapshot.getString("end_date"); // ✅ use end_date field
+                        String endDate = documentSnapshot.getString("end_date");
 
-                        // Set UI text
                         taskTitle.setText(title != null ? title : "No Title");
                         taskDescription.setText(description != null ? description : "No Description");
                         taskDueDate.setText(endDate != null ? "Due: " + endDate : "No due date");
@@ -131,7 +134,6 @@ public class TaskPath2Activity extends AppCompatActivity {
                     Toast.makeText(this, "Failed to load task details: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 
     private void uploadTask() {
         if (selectedFileUri == null) {
@@ -150,7 +152,6 @@ public class TaskPath2Activity extends AppCompatActivity {
             originalName = "submission_file";
         }
 
-        // ✅ Add a file name under the userId to match your rules
         String uniqueName = System.currentTimeMillis() + "_" + originalName;
 
         StorageReference storageReference = FirebaseStorage.getInstance()
@@ -158,13 +159,12 @@ public class TaskPath2Activity extends AppCompatActivity {
                 .child(courseId)
                 .child(taskId)
                 .child(userId)
-                .child(uniqueName); // <-- IMPORTANT to match security rules
+                .child(uniqueName);
 
         String finalOriginalName = originalName;
         storageReference.putFile(selectedFileUri)
                 .addOnSuccessListener(taskSnapshot -> {
                     storageReference.getDownloadUrl().addOnSuccessListener(uri -> {
-                        // Build Firestore submission document
                         HashMap<String, Object> submissionData = new HashMap<>();
                         submissionData.put("score", 0);
                         submissionData.put("totalPossiblePoints", 0);
@@ -179,11 +179,14 @@ public class TaskPath2Activity extends AppCompatActivity {
                                 .collection("tasks")
                                 .document(taskId)
                                 .collection("submissions")
-                                .document(userId) // one submission per user; use .add() if multiple
+                                .document(userId)
                                 .set(submissionData)
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(TaskPath2Activity.this,
                                             "Submission saved successfully!", Toast.LENGTH_SHORT).show();
+
+                                    fetchStudentScore(taskId, userId); // refresh score after submission
+
                                     startActivity(new Intent(TaskPath2Activity.this, TaskPath3Activity.class));
                                     finish();
                                 })
@@ -195,6 +198,33 @@ public class TaskPath2Activity extends AppCompatActivity {
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to upload file: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void fetchStudentScore(String taskId, String userId) {
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+
+        firestore.collection("courses")
+                .document(courseId)
+                .collection("tasks")
+                .document(taskId)
+                .collection("submissions")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Long score = documentSnapshot.getLong("score");
+                        if (score != null) {
+                            scoreDisplayTextView.setText("Score: " + score);
+                        } else {
+                            scoreDisplayTextView.setText("Score not available");
+                        }
+                    } else {
+                        scoreDisplayTextView.setText("No submission found");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    scoreDisplayTextView.setText("Failed to fetch score: " + e.getMessage());
                 });
     }
 }

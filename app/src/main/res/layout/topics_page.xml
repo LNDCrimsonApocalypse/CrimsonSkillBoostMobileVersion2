@@ -20,14 +20,25 @@
             android:padding="16dp">
 
             <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="64dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/abc_ic_ab_back_material"
+                android:tint="#000000" />
+
+            <ImageButton
                 android:id="@+id/navButton"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:layout_marginLeft="0dp"
+                android:layout_toEndOf="@id/backButton"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="64dp"
                 android:background="@android:color/transparent"
                 android:src="@drawable/hamburger_icon"
-                app:tint="#000000" />
+                android:tint="#000000" />
 
             <TextView
                 android:id="@+id/headerTitle"
@@ -49,117 +60,29 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:layout_margin="16dp"
-            android:background="#FFFFFF"
-            />
-
+            android:background="#FFFFFF" />
     </LinearLayout>
 
-    <!-- DRAWER MENU -->
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navigation_view"
-        android:layout_width="wrap_content"
+    <!-- CUSTOM DRAWER CONTENT -->
+    <LinearLayout
+        android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="#EAEAFF"
-        app:menu="@menu/drawer_menu" />
+        android:orientation="vertical"
+        android:background="#EEF3FB">
+
+        <!-- Scrollable Subtopic List -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/subtopicList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp" />
+        </ScrollView>
+    </LinearLayout>
+
 </androidx.drawerlayout.widget.DrawerLayout>
-
-
-<!-- Thomas yung framelayout na yan kayang mag handle ng different types of file like pdf, text ,
-and video-->
-
-<!-- suggested code
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.MediaController;
-import android.widget.TextView;
-import android.widget.VideoView;
-import androidx.appcompat.app.AppCompatActivity;
-import com.bumptech.glide.Glide;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-
-public class ViewerActivity extends AppCompatActivity {
-
-    FrameLayout contentViewer;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_viewer); // Your layout XML here
-
-        contentViewer = findViewById(R.id.contentViewer);
-
-        String url = "https://example.com/sample.pdf"; // Replace with your dynamic URL
-        loadContentFromUrl(url);
-    }
-
-    private void loadContentFromUrl(String url) {
-        contentViewer.removeAllViews();
-
-        if (url.endsWith(".pdf")) {
-            WebView webView = new WebView(this);
-            webView.getSettings().setJavaScriptEnabled(true);
-            webView.setWebViewClient(new WebViewClient());
-            webView.loadUrl("https://docs.google.com/gview?embedded=true&url=" + url);
-            contentViewer.addView(webView);
-        } else if (url.endsWith(".mp4")) {
-            VideoView videoView = new VideoView(this);
-            MediaController mediaController = new MediaController(this);
-            mediaController.setAnchorView(videoView);
-            videoView.setMediaController(mediaController);
-            videoView.setVideoURI(Uri.parse(url));
-            videoView.start();
-            contentViewer.addView(videoView);
-        } else if (url.endsWith(".jpg") || url.endsWith(".jpeg") || url.endsWith(".png")) {
-            ImageView imageView = new ImageView(this);
-            imageView.setLayoutParams(new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            Glide.with(this).load(url).into(imageView);
-            contentViewer.addView(imageView);
-        } else if (url.endsWith(".txt")) {
-            new Thread(() -> {
-                try {
-                    URL fileUrl = new URL(url);
-                    BufferedReader in = new BufferedReader(new InputStreamReader(fileUrl.openStream()));
-                    StringBuilder text = new StringBuilder();
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        text.append(line).append("\n");
-                    }
-                    in.close();
-
-                    runOnUiThread(() -> {
-                        TextView textView = new TextView(ViewerActivity.this);
-                        textView.setText(text.toString());
-                        textView.setTextSize(16f);
-                        contentViewer.addView(textView);
-                    });
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        } else {
-            TextView unsupported = new TextView(this);
-            unsupported.setText("Unsupported file type.");
-            unsupported.setTextSize(16f);
-            unsupported.setTextColor(Color.RED);
-            contentViewer.addView(unsupported);
-        }
-    }
-}
-
--->
-
-
