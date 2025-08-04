@@ -27,10 +27,9 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // ✅ Must set layout before accessing views
         setContentView(R.layout.subject_details_enrolled_course);
 
-        // ✅ View bindings
+        // View bindings
         tvCourseTitle = findViewById(R.id.tvCourseTitle);
         tvInstructorName = findViewById(R.id.tvInstructorName);
         tvInstructorEmail = findViewById(R.id.tvInstructorEmail);
@@ -40,7 +39,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         rvQuizzes = findViewById(R.id.rvQuizzes);
         ImageView ivBack = findViewById(R.id.ivBack);
 
-        // ✅ Retrieve courseId
+        // Retrieve courseId
         String courseId = getIntent().getStringExtra("course_id");
         Log.d("SubjectDetailsEnrolledCourse", "Received course_id: " + courseId);
 
@@ -50,10 +49,10 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
             return;
         }
 
-        // ✅ Back button
+        // Back button
         ivBack.setOnClickListener(v -> finish());
 
-        // ✅ Setup RecyclerViews and load data
+        // Setup RecyclerViews and load data
         rvTopics.setLayoutManager(new LinearLayoutManager(this));
         topicsAdapter = new TopicsAdapter(new ArrayList<>(), description -> {
             Intent intent = new Intent(this, TopicsPageActivity.class);
@@ -75,23 +74,21 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         quizzesAdapter = new QuizzesAdapter(new ArrayList<>());
         rvQuizzes.setAdapter(quizzesAdapter);
 
-        // ✅ Load Firestore data
+        // Load Firestore data
         loadCourseDetails(courseId);
         loadCourseTopics(courseId);
         loadCourseTasks(courseId);
         loadCourseQuizzes(courseId);
     }
 
-
     private void loadCourseDetails(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        // Fetch course details from Firestore
         firestore.collection("courses").document(courseId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        Log.d("Firestore", "Course details fetched successfully: " + documentSnapshot.getData());
+                        Log.d("Firestore", "Course details fetched: " + documentSnapshot.getData());
                         tvCourseTitle.setText(documentSnapshot.getString("course_name"));
                         tvInstructorName.setText(documentSnapshot.getString("instructor_name"));
 
@@ -109,7 +106,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                                         }
                                     })
                                     .addOnFailureListener(e -> {
-                                        Log.e("Firestore", "Error fetching instructor email: " + e.getMessage(), e);
+                                        Log.e("Firestore", "Error fetching email: " + e.getMessage(), e);
                                         tvInstructorEmail.setText("Email Not Available");
                                     });
                         } else {
@@ -118,7 +115,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
                         tvCourseOverview.setText(documentSnapshot.getString("overview"));
                     } else {
-                        Log.e("Firestore", "Course details not found for course_id: " + courseId);
+                        Log.e("Firestore", "Course not found for ID: " + courseId);
                         Toast.makeText(this, "Course details not found.", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -131,7 +128,6 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
     private void loadCourseTopics(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        // Fetch topics from Firestore
         firestore.collection("courses").document(courseId).collection("topics")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -161,12 +157,11 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                     List<TaskModel> tasks = new ArrayList<>();
                     querySnapshot.forEach(document -> {
                         TaskModel task = new TaskModel();
-                        // ✅ Use the correct Firestore fields
-                        task.setTitle(document.getString("title"));           // Firestore: "title"
-                        task.setEndDate(document.getString("end_date"));      // Firestore: "end_date"
-                        task.setStatus(document.getString("status"));         // optional, if present
-                        task.setId(document.getId());                         // document ID
-                        task.setCourseId(courseId);                           // parent course ID
+                        task.setTitle(document.getString("title"));
+                        task.setEndDate(document.getString("end_date"));
+                        task.setStatus(document.getString("status"));
+                        task.setId(document.getId());
+                        task.setCourseId(courseId);
                         tasks.add(task);
                     });
                     tasksAdapter.updateTasks(tasks);
@@ -177,20 +172,25 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                 });
     }
 
-
     private void loadCourseQuizzes(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
-        // Fetch quizzes from Firestore
-        firestore.collection("courses").document(courseId).collection("quizzes")
+        firestore.collection("quizzes")
+                .whereEqualTo("course_id", courseId)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<String> quizzes = new ArrayList<>();
-                    querySnapshot.forEach(document -> quizzes.add(document.getString("name")));
+                    querySnapshot.forEach(document -> {
+                        String title = document.getString("title");
+                        if (title != null) {
+                            quizzes.add(title);
+                        }
+                    });
                     quizzesAdapter.updateQuizzes(quizzes);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load quizzes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("CourseQuizzesError", e.getMessage(), e);
                 });
     }
 }
