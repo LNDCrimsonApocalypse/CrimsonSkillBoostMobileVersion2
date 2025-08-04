@@ -1,8 +1,13 @@
 package com.example.crimsonskillboostmobilev2;
 
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.Html;
+import android.util.Patterns;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -11,6 +16,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TopicsPageActivity extends AppCompatActivity {
 
@@ -30,16 +38,10 @@ public class TopicsPageActivity extends AppCompatActivity {
         contentViewer = findViewById(R.id.contentViewer);
         subtopicList = findViewById(R.id.subtopicList);
 
-        // Open drawer
         navButton.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
-
-        // Go back to previous screen
         backButton.setOnClickListener(v -> finish());
 
-        // Get passed topic description
         String topicDescription = getIntent().getStringExtra("topic_description");
-
-        // Load parsed content
         loadContentIntoViewer(topicDescription);
     }
 
@@ -48,7 +50,7 @@ public class TopicsPageActivity extends AppCompatActivity {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed(); // ✅ Proper override
+            super.onBackPressed();
         }
     }
 
@@ -91,7 +93,6 @@ public class TopicsPageActivity extends AppCompatActivity {
 
                 subtopicList.addView(subtopicButton);
 
-                // Auto-select first subtopic
                 if (i == 0) {
                     subtopicButton.performClick();
                 }
@@ -99,32 +100,40 @@ public class TopicsPageActivity extends AppCompatActivity {
         }
 
         if (!hasSubtopics) {
-            TextView descriptionView = new TextView(this);
-            descriptionView.setText(description);
-            descriptionView.setTextSize(16f);
-            contentViewer.addView(descriptionView);
+            renderSubtopicContent("Topic", description);
         }
     }
 
     private void renderSubtopicContent(String title, String content) {
         contentViewer.removeAllViews();
 
-        TextView titleView = new TextView(this);
-        titleView.setText(title);
-        titleView.setTextSize(18f);
-        titleView.setTextColor(Color.BLACK);
-        titleView.setPadding(0, 0, 0, 12);
-
-        TextView contentView = new TextView(this);
-        contentView.setText(content);
-        contentView.setTextSize(16f);
-        contentView.setTextColor(Color.DKGRAY);
-
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(24, 24, 24, 24);
-        layout.addView(titleView);
-        layout.addView(contentView);
+        layout.setPadding(0, 0, 0, 0);
+
+        String pdfUrl = extractPdfUrl(content);
+
+        if (pdfUrl != null) {
+            WebView webView = new WebView(this);
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.getSettings().setBuiltInZoomControls(true);
+            webView.getSettings().setDisplayZoomControls(false);
+            webView.setWebViewClient(new WebViewClient());
+
+            String viewerUrl = "https://drive.google.com/viewerng/viewer?embedded=true&url=" + Uri.encode(pdfUrl);
+            webView.loadUrl(viewerUrl);
+
+            layout.addView(webView, new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+            ));
+        } else {
+            TextView contentView = new TextView(this);
+            contentView.setText(Html.fromHtml(content, Html.FROM_HTML_MODE_LEGACY));
+            contentView.setTextSize(16f);
+            contentView.setTextColor(Color.DKGRAY);
+            layout.addView(contentView);
+        }
 
         contentViewer.addView(layout);
     }
@@ -134,5 +143,19 @@ public class TopicsPageActivity extends AppCompatActivity {
             View view = subtopicList.getChildAt(i);
             view.setBackgroundColor(i == selectedIndex ? Color.WHITE : Color.parseColor("#eef3fb"));
         }
+    }
+
+    private String extractPdfUrl(String content) {
+        Pattern pattern = Pattern.compile("href\\s*=\\s*\"(https?://[^\"]+?\\.pdf[^\"]*)\"", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        if (content.trim().endsWith(".pdf") && Patterns.WEB_URL.matcher(content).find()) {
+            return content.trim();
+        }
+
+        return null;
     }
 }
