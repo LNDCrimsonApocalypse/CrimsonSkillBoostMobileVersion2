@@ -19,6 +19,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.List;
+
 public class AccountPage extends AppCompatActivity {
 
     // Personal Info
@@ -71,8 +73,7 @@ public class AccountPage extends AppCompatActivity {
         popupMenu.setOnMenuItemClickListener(item -> {
             int id = item.getItemId();
             if (id == R.id.menu_edit_profile) {
-                Intent intent = new Intent(this, EditProfile.class);
-                startActivity(intent);
+                startActivity(new Intent(this, EditProfile.class));
                 return true;
             } else if (id == R.id.menu_password_change) {
                 Toast.makeText(this, "Password Change selected", Toast.LENGTH_SHORT).show();
@@ -98,15 +99,7 @@ public class AccountPage extends AppCompatActivity {
         tvYear = findViewById(R.id.tvYear);
         tvSection = findViewById(R.id.tvSection);
         bioEditText = findViewById(R.id.bioEditText);
-        profileImageView = findViewById(R.id.profileImageView); // add this in your layout
-
-        courseTitle1 = findViewById(R.id.textViewCourseTitle1);
-        progress1 = findViewById(R.id.textViewProgress1);
-        progressBar1 = findViewById(R.id.progressBar1);
-
-        courseTitle2 = findViewById(R.id.textViewCourseTitle2);
-        progress2 = findViewById(R.id.textViewProgress2);
-        progressBar2 = findViewById(R.id.progressBar2);
+        profileImageView = findViewById(R.id.profileImageView);
 
         btnQuiz = findViewById(R.id.btnQuiz);
         btnTask = findViewById(R.id.btnTask);
@@ -148,41 +141,93 @@ public class AccountPage extends AppCompatActivity {
 
     private void loadCourseProgress() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        firestore.collection("course_progress")
-                .whereEqualTo("student_id", userId)
-                .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    if (!querySnapshot.isEmpty()) {
-                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                            String courseTitle = document.getString("course_title");
-                            int progress = document.getLong("progress").intValue();
 
-                            if ("Course 1".equals(courseTitle)) {
-                                courseTitle1.setText(courseTitle);
-                                progress1.setText(progress + "%");
-                                progressBar1.setProgress(progress);
-                            } else if ("Course 2".equals(courseTitle)) {
-                                courseTitle2.setText(courseTitle);
-                                progress2.setText(progress + "%");
-                                progressBar2.setProgress(progress);
-                            }
-                        }
-                    } else {
-                        courseTitle1.setText("");
-                        progress1.setText("");
-                        progressBar1.setProgress(0);
+        firestore.collection("courses").get().addOnSuccessListener(courseQuery -> {
+            final int[] shownCourses = {0};
 
-                        courseTitle2.setText("");
-                        progress2.setText("");
-                        progressBar2.setProgress(0);
+            for (DocumentSnapshot courseDoc : courseQuery.getDocuments()) {
+                String courseId = courseDoc.getId();
+                String courseTitle = courseDoc.getString("title");
 
-                        Toast.makeText(this, "No progress data found.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("ProgressLoadError", "Error loading progress: " + e.getMessage(), e);
-                    Toast.makeText(this, "Error loading progress.", Toast.LENGTH_SHORT).show();
-                });
+                firestore.collection("courses")
+                        .document(courseId)
+                        .collection("tasks")
+                        .get()
+                        .addOnSuccessListener(taskQuery -> {
+                            int totalTasks = taskQuery.size();
+
+                            firestore.collection("courses")
+                                    .document(courseId)
+                                    .collection("tasks")
+                                    .get()
+                                    .addOnSuccessListener(tasksSnapshot -> {
+                                        final int[] submittedTasks = {0};
+                                        List<DocumentSnapshot> tasks = tasksSnapshot.getDocuments();
+
+                                        for (DocumentSnapshot task : tasks) {
+                                            task.getReference()
+                                                    .collection("submissions")
+                                                    .whereEqualTo("userId", userId)
+                                                    .get()
+                                                    .addOnSuccessListener(submissionSnap -> {
+                                                        if (!submissionSnap.isEmpty()) {
+                                                            submittedTasks[0]++;
+                                                        }
+
+                                                        if (submittedTasks[0] + 1 >= tasks.size()) {
+                                                            firestore.collection("quizzes")
+                                                                    .whereEqualTo("course_id", courseId)
+                                                                    .get()
+                                                                    .addOnSuccessListener(quizQuery -> {
+                                                                        int totalQuizzes = quizQuery.size();
+                                                                        final int[] submittedQuizzes = {0};
+
+                                                                        List<DocumentSnapshot> quizzes = quizQuery.getDocuments();
+                                                                        for (DocumentSnapshot quiz : quizzes) {
+                                                                            quiz.getReference()
+                                                                                    .collection("submissions")
+                                                                                    .whereEqualTo("userId", userId)
+                                                                                    .get()
+                                                                                    .addOnSuccessListener(quizSubSnap -> {
+                                                                                        if (!quizSubSnap.isEmpty()) {
+                                                                                            submittedQuizzes[0]++;
+                                                                                        }
+
+                                                                                        if (submittedQuizzes[0] + 1 >= quizzes.size()) {
+                                                                                            int totalItems = totalTasks + totalQuizzes;
+                                                                                            int completedItems = submittedTasks[0] + submittedQuizzes[0];
+
+                                                                                            int progress = totalItems > 0 ? (int) ((completedItems * 100.0f) / totalItems) : 0;
+
+                                                                                            if (shownCourses[0] == 0) {
+                                                                                                courseTitle1.setText(courseTitle);
+                                                                                                progress1.setText(progress + "%");
+                                                                                                progressBar1.setProgress(progress);
+                                                                                            } else if (shownCourses[0] == 1) {
+                                                                                                courseTitle2.setText(courseTitle);
+                                                                                                progress2.setText(progress + "%");
+                                                                                                progressBar2.setProgress(progress);
+                                                                                            }
+
+                                                                                            shownCourses[0]++;
+                                                                                        }
+                                                                                    });
+                                                                        }
+                                                                    });
+                                                        }
+                                                    });
+                                        }
+                                    });
+                        });
+            }
+
+            if (courseQuery.isEmpty()) {
+                Toast.makeText(this, "No courses found.", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Log.e("CourseProgressError", "Error loading courses: " + e.getMessage(), e);
+            Toast.makeText(this, "Failed to load course progress.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void populateFields(DocumentSnapshot document) {
@@ -193,12 +238,11 @@ public class AccountPage extends AppCompatActivity {
         tvSection.setText(document.getString("section") != null ? document.getString("section") : "Not set");
         bioEditText.setText(document.getString("bio") != null ? document.getString("bio") : "No bio available");
 
-        // ✅ Load profile image if available
         String photoURL = document.getString("photoURL");
         if (photoURL != null && !photoURL.isEmpty()) {
             Glide.with(this)
                     .load(photoURL)
-                    .placeholder(R.drawable.profile) // add a default icon in drawable
+                    .placeholder(R.drawable.profile)
                     .error(R.drawable.profile)
                     .circleCrop()
                     .into(profileImageView);
