@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -95,6 +96,19 @@ public class EditProfile extends AppCompatActivity {
         profileImageView = findViewById(R.id.profileImageView);
         cameraIcon = findViewById(R.id.cameraIcon);
 
+        // Debugging logs
+        if (bioEditText == null) Log.e("EditProfile", "bioEditText is null");
+        if (yearDropdown == null) Log.e("EditProfile", "yearDropdown is null");
+        if (sectionDropdown == null) Log.e("EditProfile", "sectionDropdown is null");
+        if (saveBtn == null) Log.e("EditProfile", "saveBtn is null");
+        if (backBtn == null) Log.e("EditProfile", "backBtn is null");
+        if (tvName == null) Log.e("EditProfile", "tvName is null");
+        if (tvUsername == null) Log.e("EditProfile", "tvUsername is null");
+        if (tvEmail == null) Log.e("EditProfile", "tvEmail is null");
+        if (profileImageView == null) Log.e("EditProfile", "profileImageView is null");
+        if (cameraIcon == null) Log.e("EditProfile", "cameraIcon is null");
+
+        // Throw an exception if any view is null
         if (bioEditText == null || yearDropdown == null || sectionDropdown == null || saveBtn == null ||
                 backBtn == null || tvName == null || tvUsername == null || tvEmail == null ||
                 profileImageView == null || cameraIcon == null) {
@@ -123,13 +137,16 @@ public class EditProfile extends AppCompatActivity {
     private void loadUserData() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
+            Log.e("EditProfile", "User not authenticated.");
             Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        Log.d("EditProfile", "Fetching user data for UID: " + user.getUid());
         firestore.collection("users").document(user.getUid()).get()
                 .addOnSuccessListener(document -> {
                     if (document.exists()) {
+                        Log.d("EditProfile", "User data found: " + document.getData());
                         tvName.setText(document.getString("fullName") != null ? document.getString("fullName") : "");
                         tvUsername.setText(document.getString("username") != null ? document.getString("username") : "");
                         tvEmail.setText(document.getString("email") != null ? document.getString("email") : "");
@@ -149,16 +166,20 @@ public class EditProfile extends AppCompatActivity {
                             profileImageView.setImageResource(R.drawable.profile);
                         }
                     } else {
+                        Log.w("EditProfile", "No user data found.");
                         Toast.makeText(this, "No user data found.", Toast.LENGTH_SHORT).show();
                     }
                 })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, "Error loading data: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> {
+                    Log.e("EditProfile", "Error loading user data: " + e.getMessage(), e);
+                    Toast.makeText(this, "Error loading data: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     private void saveProfileChanges() {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
+            Log.e("EditProfile", "User not authenticated.");
             Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -169,25 +190,33 @@ public class EditProfile extends AppCompatActivity {
         String year = yearDropdown.getText().toString().trim();
         String section = sectionDropdown.getText().toString().trim();
 
+        Log.d("EditProfile", "Saving profile changes: fullName=" + fullName + ", username=" + username + ", bio=" + bio + ", year=" + year + ", section=" + section);
+
         if (fullName.isEmpty() || username.isEmpty() || year.isEmpty() || section.isEmpty()) {
+            Log.w("EditProfile", "Validation failed: One or more fields are empty.");
             Toast.makeText(this, "Please complete all fields.", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (selectedImageUri != null) {
-            // ✅ store under profile_pics/<uid>/<random filename>
+            Log.d("EditProfile", "Uploading new profile image.");
             String filename = UUID.randomUUID().toString() + ".jpg";
             StorageReference fileRef = storageReference.child(user.getUid()).child(filename);
 
             fileRef.putFile(selectedImageUri)
-                    .addOnSuccessListener(taskSnapshot ->
-                            fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                                updateFirestore(user.getUid(), fullName, username, bio, year, section, uri.toString());
-                            }))
-                    .addOnFailureListener(e ->
-                            Toast.makeText(this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                    .addOnSuccessListener(taskSnapshot -> {
+                        Log.d("EditProfile", "Image uploaded successfully.");
+                        fileRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            Log.d("EditProfile", "Image URL: " + uri.toString());
+                            updateFirestore(user.getUid(), fullName, username, bio, year, section, uri.toString());
+                        });
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("EditProfile", "Image upload failed: " + e.getMessage(), e);
+                        Toast.makeText(this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
         } else {
-            // just update without photo
+            Log.d("EditProfile", "No new profile image selected. Updating Firestore without image.");
             updateFirestore(user.getUid(), fullName, username, bio, year, section, null);
         }
     }
@@ -200,8 +229,11 @@ public class EditProfile extends AppCompatActivity {
         updates.put("bio", bio);
         updates.put("year", year);
         updates.put("section", section);
+
         if (photoURL != null) {
             updates.put("photoURL", photoURL);
+        } else {
+            updates.put("photoURL", null); // Explicitly set photoURL to null in Firestore
         }
 
         firestore.collection("users").document(uid).update(updates)

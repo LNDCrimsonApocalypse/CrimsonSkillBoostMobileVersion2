@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,12 +25,6 @@ public class AccountPage extends AppCompatActivity {
     // Personal Info
     private TextView tvName, tvUsername, tvEmail, tvYear, tvSection, bioEditText;
     private ImageView profileImageView;
-
-    // Progress Texts
-    private TextView courseTitle1, progress1, courseTitle2, progress2;
-
-    // Progress Bars
-    private ProgressBar progressBar1, progressBar2;
 
     // Navigation Buttons
     private ImageButton btnHome, btnQuiz, btnTask, btnFlow, btnCode;
@@ -199,15 +192,15 @@ public class AccountPage extends AppCompatActivity {
 
                                                                                             int progress = totalItems > 0 ? (int) ((completedItems * 100.0f) / totalItems) : 0;
 
-                                                                                            if (shownCourses[0] == 0) {
-                                                                                                courseTitle1.setText(courseTitle);
-                                                                                                progress1.setText(progress + "%");
-                                                                                                progressBar1.setProgress(progress);
-                                                                                            } else if (shownCourses[0] == 1) {
-                                                                                                courseTitle2.setText(courseTitle);
-                                                                                                progress2.setText(progress + "%");
-                                                                                                progressBar2.setProgress(progress);
-                                                                                            }
+//                                                                                            if (shownCourses[0] == 0) {
+//                                                                                                courseTitle1.setText(courseTitle);
+//                                                                                                progress1.setText(progress + "%");
+//                                                                                                progressBar1.setProgress(progress);
+//                                                                                            } else if (shownCourses[0] == 1) {
+//                                                                                                courseTitle2.setText(courseTitle);
+//                                                                                                progress2.setText(progress + "%");
+//                                                                                                progressBar2.setProgress(progress);
+//                                                                                            }
 
                                                                                             shownCourses[0]++;
                                                                                         }
