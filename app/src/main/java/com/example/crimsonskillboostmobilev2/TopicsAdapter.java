@@ -46,10 +46,10 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
             holder.tvCreatedAt.setText("Unknown Date");
         }
 
-        // Set click listener to show the lesson description
+        // Set click listener to send both title and description
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onTopicClick(topic.getDescription());
+                listener.onTopicClick(topic.getTitle(), topic.getDescription());
             }
         });
     }
@@ -74,7 +74,8 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
         }
     }
 
+    // ✅ Updated interface to include both title & description
     public interface OnTopicClickListener {
-        void onTopicClick(String description);
+        void onTopicClick(String title, String description);
     }
 }

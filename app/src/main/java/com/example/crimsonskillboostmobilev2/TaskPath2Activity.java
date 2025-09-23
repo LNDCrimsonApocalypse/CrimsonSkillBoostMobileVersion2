@@ -23,11 +23,16 @@ import java.util.HashMap;
 
 public class TaskPath2Activity extends AppCompatActivity {
 
-    private TextView taskTitle, taskDescription, taskDueDate, fileNameText, scoreDisplayTextView;
+    private TextView taskTitle, taskDescription, taskDueDate;
+    private TextView pdfFileName, fileNameText, scoreDisplayTextView;
     private LinearLayout uploadContainer;
     private String taskId;
     private String courseId;
     private Uri selectedFileUri;
+
+    // Educator file fields
+    private String educatorFileUrl;
+    private String educatorFileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +42,11 @@ public class TaskPath2Activity extends AppCompatActivity {
         taskTitle = findViewById(R.id.headerTitleTask);
         taskDescription = findViewById(R.id.taskDescription);
         taskDueDate = findViewById(R.id.taskDueDate);
-        fileNameText = findViewById(R.id.fileNameText);
+
+        pdfFileName = findViewById(R.id.pdfFileName); // ✅ use correct id
+        fileNameText = findViewById(R.id.fileNameText); // ✅ student upload
         uploadContainer = findViewById(R.id.uploadContainer);
-        scoreDisplayTextView = findViewById(R.id.scoreTextView); // make sure this exists in your XML
+        scoreDisplayTextView = findViewById(R.id.scoreTextView);
 
         ImageButton backButton = findViewById(R.id.backButtonTask2);
         Button submitButton = findViewById(R.id.submitBtn);
@@ -58,10 +65,11 @@ public class TaskPath2Activity extends AppCompatActivity {
 
         fetchTaskDetails(courseId, taskId);
 
+        // Student upload button
         uploadContainer.setOnClickListener(v -> openFilePicker());
         submitButton.setOnClickListener(v -> uploadTask());
 
-        // Fetch score if user is logged in
+        // Fetch student score if logged in
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             fetchStudentScore(taskId, userId);
@@ -82,7 +90,7 @@ public class TaskPath2Activity extends AppCompatActivity {
             selectedFileUri = data.getData();
             if (selectedFileUri != null) {
                 String name = getFileName(selectedFileUri);
-                fileNameText.setText(name);
+                fileNameText.setText("Your file: " + name); // ✅ student file only
             } else {
                 Toast.makeText(this, "Unable to retrieve file path", Toast.LENGTH_SHORT).show();
             }
@@ -123,9 +131,23 @@ public class TaskPath2Activity extends AppCompatActivity {
                         String description = documentSnapshot.getString("description");
                         String endDate = documentSnapshot.getString("end_date");
 
+                        // ✅ Correct snake_case
+                        educatorFileUrl = documentSnapshot.getString("file_url");
+                        educatorFileName = documentSnapshot.getString("file_name");
+
                         taskTitle.setText(title != null ? title : "No Title");
                         taskDescription.setText(description != null ? description : "No Description");
                         taskDueDate.setText(endDate != null ? "Due: " + endDate : "No due date");
+
+                        if (educatorFileUrl != null && educatorFileName != null) {
+                            pdfFileName.setText(educatorFileName);
+                            pdfFileName.setOnClickListener(v -> {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(educatorFileUrl));
+                                startActivity(intent);
+                            });
+                        } else {
+                            pdfFileName.setText("No file provided");
+                        }
                     } else {
                         Toast.makeText(this, "Task not found", Toast.LENGTH_SHORT).show();
                     }
@@ -147,8 +169,8 @@ public class TaskPath2Activity extends AppCompatActivity {
         }
 
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String originalName = fileNameText.getText().toString().trim();
-        if (originalName.isEmpty()) {
+        String originalName = getFileName(selectedFileUri);
+        if (originalName == null || originalName.isEmpty()) {
             originalName = "submission_file";
         }
 
@@ -170,8 +192,8 @@ public class TaskPath2Activity extends AppCompatActivity {
                         submissionData.put("totalPossiblePoints", 0);
                         submissionData.put("timestamp", System.currentTimeMillis());
                         submissionData.put("userId", userId);
-                        submissionData.put("fileUrl", uri.toString());
-                        submissionData.put("fileName", finalOriginalName);
+                        submissionData.put("file_url", uri.toString()); // ✅ snake_case
+                        submissionData.put("file_name", finalOriginalName); // ✅ snake_case
 
                         FirebaseFirestore.getInstance()
                                 .collection("courses")
@@ -185,7 +207,7 @@ public class TaskPath2Activity extends AppCompatActivity {
                                     Toast.makeText(TaskPath2Activity.this,
                                             "Submission saved successfully!", Toast.LENGTH_SHORT).show();
 
-                                    fetchStudentScore(taskId, userId); // refresh score after submission
+                                    fetchStudentScore(taskId, userId);
 
                                     startActivity(new Intent(TaskPath2Activity.this, TaskPath3Activity.class));
                                     finish();

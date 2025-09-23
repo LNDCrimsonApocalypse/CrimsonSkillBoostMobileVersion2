@@ -54,8 +54,9 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
         // Setup RecyclerViews and load data
         rvTopics.setLayoutManager(new LinearLayoutManager(this));
-        topicsAdapter = new TopicsAdapter(new ArrayList<>(), description -> {
+        topicsAdapter = new TopicsAdapter(new ArrayList<>(), (title, description) -> {
             Intent intent = new Intent(this, TopicsPageActivity.class);
+            intent.putExtra("topic_title", title);
             intent.putExtra("topic_description", description);
             startActivity(intent);
         });

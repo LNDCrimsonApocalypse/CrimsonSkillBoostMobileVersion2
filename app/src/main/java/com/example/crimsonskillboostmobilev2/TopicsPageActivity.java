@@ -38,12 +38,25 @@ public class TopicsPageActivity extends AppCompatActivity {
         contentViewer = findViewById(R.id.contentViewer);
         subtopicList = findViewById(R.id.subtopicList);
 
+        // ✅ Header title
+        TextView headerTitle = findViewById(R.id.headerTitle);
+
         navButton.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
         backButton.setOnClickListener(v -> finish());
 
+        // ✅ Get extras
+        String topicTitle = getIntent().getStringExtra("topic_title");
         String topicDescription = getIntent().getStringExtra("topic_description");
+
+        if (topicTitle != null && !topicTitle.trim().isEmpty()) {
+            headerTitle.setText(topicTitle);
+        } else {
+            headerTitle.setText("Topic");
+        }
+
         loadContentIntoViewer(topicDescription);
     }
+
 
     @Override
     public void onBackPressed() {
