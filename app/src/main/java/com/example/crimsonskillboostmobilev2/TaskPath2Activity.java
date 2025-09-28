@@ -192,8 +192,8 @@ public class TaskPath2Activity extends AppCompatActivity {
                         submissionData.put("totalPossiblePoints", 0);
                         submissionData.put("timestamp", System.currentTimeMillis());
                         submissionData.put("userId", userId);
-                        submissionData.put("file_url", uri.toString()); // ✅ snake_case
-                        submissionData.put("file_name", finalOriginalName); // ✅ snake_case
+                        submissionData.put("file_url", uri.toString());
+                        submissionData.put("file_name", finalOriginalName);
 
                         FirebaseFirestore.getInstance()
                                 .collection("courses")
@@ -207,9 +207,11 @@ public class TaskPath2Activity extends AppCompatActivity {
                                     Toast.makeText(TaskPath2Activity.this,
                                             "Submission saved successfully!", Toast.LENGTH_SHORT).show();
 
-                                    fetchStudentScore(taskId, userId);
-
-                                    startActivity(new Intent(TaskPath2Activity.this, TaskPath3Activity.class));
+                                    // Navigate to TaskPath3Activity
+                                    Intent intent = new Intent(TaskPath2Activity.this, TaskPath3Activity.class);
+                                    intent.putExtra("taskId", taskId);
+                                    intent.putExtra("courseId", courseId);
+                                    startActivity(intent);
                                     finish();
                                 })
                                 .addOnFailureListener(e -> {

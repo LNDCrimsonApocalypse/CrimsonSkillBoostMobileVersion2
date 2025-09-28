@@ -26,23 +26,11 @@
     <string name="pass">Password</string>
 
     <string name="html_text">
-   People who use our platform may have their account details shared with their assigned professors for academic purposes.\n
-   &lt;a href="https://yourwebsite.com/learnmore">Learn more&lt;/a>\n
+   People who use our platform may have their account details shared with their assigned professors for academic purposes. Learn more
 
+By tapping I agree, you confirm that you have read and accepted CrimsonSkillBoost\'s Terms, Privacy Policy, and Cookies Policy.
 
-   \nBy tapping I agree, you confirm that you \nhave read and accepted CrimsonSkillBoost&#8217;s
-   &lt;a href="https://yourwebsite.com/terms">Terms&lt;/a>,
-   &lt;a href="https://yourwebsite.com/privacy">Privacy Policy&lt;/a>, and
-   &lt;a href="https://yourwebsite.com/cookies">Cookies Policy&lt;/a>. \n \n
-
-
-       The Privacy Policy explains how we collect,\n
-       use, and protect your data when you\n
-       create an account. For example, we use\n
-       this information to enhance learning\n
-       experiences, provide personalized\n
-       recommendations, and improve platform\n
-       features.
+The Privacy Policy explains how we collect, use, and protect your data when you create an account. For example, we use this information to enhance learning experiences, provide personalized recommendations, and improve platform features.
 </string>
     <string name="terms_and_condition">Terms and Condition</string>
     <string name="set_up_your_profile">Set up your profile</string>
