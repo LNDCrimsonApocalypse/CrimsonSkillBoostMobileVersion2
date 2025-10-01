@@ -19,7 +19,7 @@ public class ForgetPassword1Activity extends AppCompatActivity {
 
     // Pop-up UI
     private View popupOverlay;
-    private TextView tvBack, tvTryAgain;
+    private TextView tvBack, tvTryAgain, tvDialogMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +30,12 @@ public class ForgetPassword1Activity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         // UI elements
-        emailInput = findViewById(R.id.new_pass);
+        emailInput = findViewById(R.id.emailInput); // ✅ make sure your XML uses this ID
         sendCodeButton = findViewById(R.id.sendcode);
         popupOverlay = findViewById(R.id.popupOverlay);
         tvBack = findViewById(R.id.tvBack);
         tvTryAgain = findViewById(R.id.tvTryAgain);
+        tvDialogMessage = findViewById(R.id.tvDialogMessage);
         ImageView backBtn = findViewById(R.id.new_backbtn4);
 
         sendCodeButton.setOnClickListener(v -> {
@@ -49,9 +50,10 @@ public class ForgetPassword1Activity extends AppCompatActivity {
             mAuth.sendPasswordResetEmail(email)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            showPopup(true);
+                            showPopup(true, null);
                         } else {
-                            showPopup(false);
+                            Exception e = task.getException();
+                            showPopup(false, e != null ? e.getMessage() : null);
                         }
                     });
         });
@@ -68,13 +70,13 @@ public class ForgetPassword1Activity extends AppCompatActivity {
         backBtn.setOnClickListener(v -> finish());
     }
 
-    private void showPopup(boolean success) {
+    private void showPopup(boolean success, String errorMessage) {
         popupOverlay.setVisibility(View.VISIBLE);
-        TextView tvDialogMessage = findViewById(R.id.tvDialogMessage);
         if (success) {
             tvDialogMessage.setText("Password reset link sent to your email. Please check your inbox.");
         } else {
-            tvDialogMessage.setText("Failed to send reset email. Please check your email address and try again.");
+            tvDialogMessage.setText("Failed to send reset email. " +
+                    (errorMessage != null ? errorMessage : "Please check your email address and try again."));
         }
     }
 }

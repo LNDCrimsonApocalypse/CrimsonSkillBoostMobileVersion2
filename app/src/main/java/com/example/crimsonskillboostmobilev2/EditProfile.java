@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -70,11 +69,10 @@ public class EditProfile extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
-        // ✅ follow your storage rules: profile_pics/<uid>/<filename>
         storageReference = FirebaseStorage.getInstance().getReference("profile_pics");
 
         initViews();
-        setupDropdowns();
+        // setupDropdowns(); // ❌ no longer needed since we disable them
         loadUserData();
 
         cameraIcon.setOnClickListener(v -> openImagePicker());
@@ -96,6 +94,10 @@ public class EditProfile extends AppCompatActivity {
         profileImageView = findViewById(R.id.profileImageView);
         cameraIcon = findViewById(R.id.cameraIcon);
 
+        // Make year & section non-editable
+        disableDropdown(yearDropdown);
+        disableDropdown(sectionDropdown);
+
         // Debugging logs
         if (bioEditText == null) Log.e("EditProfile", "bioEditText is null");
         if (yearDropdown == null) Log.e("EditProfile", "yearDropdown is null");
@@ -108,7 +110,6 @@ public class EditProfile extends AppCompatActivity {
         if (profileImageView == null) Log.e("EditProfile", "profileImageView is null");
         if (cameraIcon == null) Log.e("EditProfile", "cameraIcon is null");
 
-        // Throw an exception if any view is null
         if (bioEditText == null || yearDropdown == null || sectionDropdown == null || saveBtn == null ||
                 backBtn == null || tvName == null || tvUsername == null || tvEmail == null ||
                 profileImageView == null || cameraIcon == null) {
@@ -116,16 +117,13 @@ public class EditProfile extends AppCompatActivity {
         }
     }
 
-    private void setupDropdowns() {
-        ArrayAdapter<String> yearAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, years);
-        yearDropdown.setAdapter(yearAdapter);
-        yearDropdown.setOnClickListener(v -> yearDropdown.showDropDown());
-
-        ArrayAdapter<String> sectionAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_dropdown_item_1line, sections);
-        sectionDropdown.setAdapter(sectionAdapter);
-        sectionDropdown.setOnClickListener(v -> sectionDropdown.showDropDown());
+    // Disable input for AutoCompleteTextView
+    private void disableDropdown(AutoCompleteTextView dropdown) {
+        dropdown.setFocusable(false);
+        dropdown.setFocusableInTouchMode(false);
+        dropdown.setClickable(false);
+        dropdown.setLongClickable(false);
+        dropdown.setInputType(0);
     }
 
     private void openImagePicker() {
@@ -233,7 +231,7 @@ public class EditProfile extends AppCompatActivity {
         if (photoURL != null) {
             updates.put("photoURL", photoURL);
         } else {
-            updates.put("photoURL", null); // Explicitly set photoURL to null in Firestore
+            updates.put("photoURL", null);
         }
 
         firestore.collection("users").document(uid).update(updates)

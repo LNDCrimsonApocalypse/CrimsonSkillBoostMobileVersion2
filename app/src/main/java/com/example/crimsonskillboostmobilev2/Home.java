@@ -18,7 +18,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class Home extends AppCompatActivity {
 
     private Button btnEnrolledCourses, btnAvailableCourses;
-    private ImageButton btnHome, btnFlow, btnProfile;
+    private ImageButton btnHome, btnProfile;
     private EditText searchBar;
     private RecyclerView recyclerViewCourses; // Declare recyclerViewCourses
     private TextView emptyStateText; // Declare emptyStateText
@@ -32,7 +32,6 @@ public class Home extends AppCompatActivity {
         btnEnrolledCourses = findViewById(R.id.btnEnrolledCourses);
         btnAvailableCourses = findViewById(R.id.btnAvailableCourses);
         btnHome = findViewById(R.id.btnHome);
-        btnFlow = findViewById(R.id.btnFlow);
         btnProfile = findViewById(R.id.btnProfile);
         recyclerViewCourses = findViewById(R.id.recyclerViewCourses); // Initialize recyclerViewCourses
         emptyStateText = findViewById(R.id.emptyStateText); // Initialize emptyStateText
@@ -47,11 +46,6 @@ public class Home extends AppCompatActivity {
         // Bottom navigation buttons
         btnHome.setOnClickListener(v -> {
             // Already in Home
-        });
-
-        btnFlow.setOnClickListener(v -> {
-            startActivity(new Intent(Home.this, StructuredPathActivity.class));
-            finish();
         });
 
         btnProfile.setOnClickListener(v -> {

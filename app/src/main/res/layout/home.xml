@@ -148,18 +148,6 @@
             />
 
         <ImageButton
-            android:id="@+id/btnFlow"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/bg_button_unselected"
-            android:contentDescription="@string/path"
-            android:src="@drawable/path"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            android:padding="20dp"/>
-
-        <ImageButton
             android:id="@+id/btnProfile"
             android:layout_width="0dp"
             android:layout_height="match_parent"

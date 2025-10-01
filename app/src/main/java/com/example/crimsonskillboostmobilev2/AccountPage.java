@@ -68,9 +68,6 @@ public class AccountPage extends AppCompatActivity {
             if (id == R.id.menu_edit_profile) {
                 startActivity(new Intent(this, EditProfile.class));
                 return true;
-            } else if (id == R.id.menu_password_change) {
-                Toast.makeText(this, "Password Change selected", Toast.LENGTH_SHORT).show();
-                return true;
             } else if (id == R.id.menu_signout) {
                 mAuth.signOut();
                 Intent intent = new Intent(this, LoginActivity.class);
@@ -98,7 +95,6 @@ public class AccountPage extends AppCompatActivity {
         btnTask = findViewById(R.id.btnTask);
         btnCode = findViewById(R.id.btnCode);
         btnHome = findViewById(R.id.btnHome);
-        btnFlow = findViewById(R.id.btnFlow);
     }
 
     private void setupNavigation() {
@@ -106,10 +102,6 @@ public class AccountPage extends AppCompatActivity {
         btnTask.setOnClickListener(v -> startActivity(new Intent(AccountPage.this, TaskPath1Activity.class)));
         btnCode.setOnClickListener(v -> startActivity(new Intent(AccountPage.this, CodingPathActivity.class)));
         btnHome.setOnClickListener(v -> startActivity(new Intent(AccountPage.this, Home.class)));
-        btnFlow.setOnClickListener(v -> {
-            startActivity(new Intent(AccountPage.this, StructuredPathActivity.class));
-            finish();
-        });
     }
 
     private void loadUserData() {

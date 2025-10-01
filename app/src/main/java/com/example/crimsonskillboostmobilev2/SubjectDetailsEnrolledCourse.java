@@ -18,11 +18,13 @@ import java.util.List;
 
 public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
+
     private TextView tvCourseTitle, tvInstructorName, tvInstructorEmail, tvCourseOverview;
     private RecyclerView rvTopics, rvTasks, rvQuizzes;
     private TopicsAdapter topicsAdapter;
     private TasksAdapter tasksAdapter;
     private QuizzesAdapter quizzesAdapter;
+    private String courseId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         ImageView ivBack = findViewById(R.id.ivBack);
 
         // Retrieve courseId
-        String courseId = getIntent().getStringExtra("course_id");
+        courseId = getIntent().getStringExtra("course_id");
         Log.d("SubjectDetailsEnrolledCourse", "Received course_id: " + courseId);
 
         if (courseId == null || courseId.isEmpty()) {
@@ -52,7 +54,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         // Back button
         ivBack.setOnClickListener(v -> finish());
 
-        // Setup RecyclerViews and load data
+        // Setup RecyclerViews
         rvTopics.setLayoutManager(new LinearLayoutManager(this));
         topicsAdapter = new TopicsAdapter(new ArrayList<>(), (title, description) -> {
             Intent intent = new Intent(this, TopicsPageActivity.class);
@@ -72,7 +74,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         rvTasks.setAdapter(tasksAdapter);
 
         rvQuizzes.setLayoutManager(new LinearLayoutManager(this));
-        quizzesAdapter = new QuizzesAdapter(new ArrayList<>());
+        quizzesAdapter = new QuizzesAdapter(new ArrayList<>(), this, courseId);
         rvQuizzes.setAdapter(quizzesAdapter);
 
         // Load Firestore data
@@ -180,12 +182,14 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                 .whereEqualTo("course_id", courseId)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
-                    List<String> quizzes = new ArrayList<>();
+                    List<QuizModel> quizzes = new ArrayList<>();
                     querySnapshot.forEach(document -> {
-                        String title = document.getString("title");
-                        if (title != null) {
-                            quizzes.add(title);
-                        }
+                        QuizModel quiz = new QuizModel(
+                                document.getId(),
+                                document.getString("title"),
+                                document.getString("description")
+                        );
+                        quizzes.add(quiz);
                     });
                     quizzesAdapter.updateQuizzes(quizzes);
                 })
@@ -194,4 +198,5 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                     Log.e("CourseQuizzesError", e.getMessage(), e);
                 });
     }
+
 }
