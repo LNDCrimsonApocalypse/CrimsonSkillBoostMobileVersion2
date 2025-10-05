@@ -20,7 +20,6 @@ import java.util.Locale;
 
 public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
-
     private TextView tvCourseTitle, tvInstructorName, tvInstructorEmail, tvCourseOverview;
     private RecyclerView rvTopics, rvTasks, rvQuizzes;
     private TopicsAdapter topicsAdapter;
@@ -206,11 +205,41 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                 .addOnSuccessListener(querySnapshot -> {
                     List<QuizModel> quizzes = new ArrayList<>();
                     querySnapshot.forEach(document -> {
-                        QuizModel quiz = new QuizModel(
-                                document.getId(),
-                                document.getString("title"),
-                                document.getString("description")
-                        );
+                        QuizModel quiz = new QuizModel();
+                        quiz.setId(document.getId());
+                        quiz.setTitle(document.getString("title"));
+                        quiz.setDescription(document.getString("description"));
+                        quiz.setCourseId(document.getString("course_id"));
+                        quiz.setPublished(document.getBoolean("published") != null ? document.getBoolean("published") : false);
+                        quiz.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
+                        quiz.setCompleted(document.getBoolean("completed") != null ? document.getBoolean("completed") : false);
+
+                        // ✅ Handle new Firestore fields
+                        quiz.setStartDate(document.getString("start_date"));
+                        quiz.setEndDate(document.getString("end_date"));
+                        quiz.setAllowLate(document.getBoolean("allow_late") != null ? document.getBoolean("allow_late") : false);
+
+                        // Format created_at if exists
+                        Object createdAtObj = document.get("created_at");
+                        if (createdAtObj != null) {
+                            try {
+                                String formattedDate;
+                                if (createdAtObj instanceof com.google.firebase.Timestamp) {
+                                    formattedDate = formatDate(((com.google.firebase.Timestamp) createdAtObj).toDate().toString());
+                                } else if (createdAtObj instanceof String) {
+                                    formattedDate = formatDate((String) createdAtObj);
+                                } else {
+                                    formattedDate = "Invalid Date";
+                                }
+                                quiz.setCreatedAt(formattedDate);
+                            } catch (Exception e) {
+                                Log.e("SubjectDetailsEnrolledCourse", "Error formatting created_at for quiz: " + document.getId(), e);
+                                quiz.setCreatedAt("Invalid Date");
+                            }
+                        } else {
+                            quiz.setCreatedAt("No Date Available");
+                        }
+
                         quizzes.add(quiz);
                     });
                     quizzesAdapter.updateQuizzes(quizzes);
@@ -220,5 +249,4 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                     Log.e("CourseQuizzesError", e.getMessage(), e);
                 });
     }
-
 }

@@ -28,11 +28,11 @@ public class QuizListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quiz_list);
 
-        // ✅ Hook up the custom back button in your header
+        // ✅ Back button
         ImageButton backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> finish());
 
-        // ✅ Set up RecyclerView and empty state
+        // ✅ RecyclerView and empty state
         quizRecyclerView = findViewById(R.id.quizRecyclerView);
         emptyStateText = findViewById(R.id.emptyStateText);
 
@@ -63,6 +63,12 @@ public class QuizListActivity extends AppCompatActivity {
                         quiz.setPublishedAt(document.getString("published_at"));
                         quiz.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
                         quiz.setCompleted(document.getBoolean("completed") != null ? document.getBoolean("completed") : false);
+
+                        // ✅ New fields (match Firestore document)
+                        quiz.setStartDate(document.getString("start_date"));
+                        quiz.setEndDate(document.getString("end_date"));
+                        quiz.setAllowLate(document.getBoolean("allow_late") != null ? document.getBoolean("allow_late") : false);
+
                         quizList.add(quiz);
                     }
                     quizAdapter.notifyDataSetChanged();

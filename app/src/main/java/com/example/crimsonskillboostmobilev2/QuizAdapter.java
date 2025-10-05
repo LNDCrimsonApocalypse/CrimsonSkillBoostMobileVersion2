@@ -36,11 +36,21 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
         holder.quizTitle.setText(quiz.getTitle());
         holder.quizDescription.setText(quiz.getDescription());
 
+        // Format and display the end_date
+        String endDate = quiz.getEndDate();
+        if (endDate != null && !endDate.isEmpty()) {
+            holder.quizDueDate.setText("Due on: " + endDate);
+            holder.quizDueDate.setVisibility(View.VISIBLE);
+        } else {
+            holder.quizDueDate.setText("No due date");
+            holder.quizDueDate.setVisibility(View.VISIBLE);
+        }
+
         // Set click listener for the "Start Quiz" button
         holder.startQuizButton.setOnClickListener(v -> {
-            String quizId = quiz.getId(); // Pass the ID as a String
+            String quizId = quiz.getId();
             Intent intent = new Intent(context, QuizActivity.class);
-            intent.putExtra("quizId", quizId); // Pass the quizId to QuizActivity
+            intent.putExtra("quizId", quizId);
             context.startActivity(intent);
         });
     }
@@ -51,13 +61,14 @@ public class QuizAdapter extends RecyclerView.Adapter<QuizAdapter.QuizViewHolder
     }
 
     public static class QuizViewHolder extends RecyclerView.ViewHolder {
-        TextView quizTitle, quizDescription;
+        TextView quizTitle, quizDescription, quizDueDate; // Add quizDueDate
         Button startQuizButton;
 
         public QuizViewHolder(@NonNull View itemView) {
             super(itemView);
             quizTitle = itemView.findViewById(R.id.quizTitle);
             quizDescription = itemView.findViewById(R.id.quizDescription);
+            quizDueDate = itemView.findViewById(R.id.quizDueDate); // Initialize quizDueDate
             startQuizButton = itemView.findViewById(R.id.startQuizButton);
         }
     }
