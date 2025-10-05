@@ -111,7 +111,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     private Date parseDate(String dateStr) {
         if (dateStr == null || dateStr.isEmpty()) return null;
         try {
-            return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(dateStr);
+            // Update the format to match the formatted date from TaskPath1Activity
+            return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
             return null;

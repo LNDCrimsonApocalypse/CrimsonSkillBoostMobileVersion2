@@ -6,15 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-
-    <!-- Tab Layout (Enrolled / Available) -->
-
-    <!-- search tab : it can search both available and enrolled courses
-    -landing page dapat ang "available courses" once the app is open
-    - and highlighted na dapat yung "available course" and Home page navigation"-->
-
-
-
+    <!-- Search bar -->
     <EditText
         android:id="@+id/searchBar"
         android:layout_width="0dp"
@@ -25,24 +17,23 @@
         android:hint="@string/search_courses"
         android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.487"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.9" />
 
+    <!-- Tab Layout (Enrolled / Available) -->
     <LinearLayout
-        android:layout_marginTop="16dp"
         android:id="@+id/tabLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:gravity="center"
         android:orientation="horizontal"
+        android:background="@drawable/catalog"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/searchBar"
-        app:layout_constraintWidth_percent="0.9"
-        android:background="@drawable/catalog">
-
+        app:layout_constraintWidth_percent="0.9">
 
         <Button
             android:id="@+id/btnEnrolledCourses"
@@ -57,17 +48,16 @@
 
         <Button
             android:id="@+id/btnAvailableCourses"
-            android:fontFamily="@font/poppins_light"
             android:layout_width="185dp"
             android:layout_height="35dp"
-            android:textSize="13sp"
-            android:text="@string/available_courses"
             android:background="@drawable/bg_button_selected"
+            android:fontFamily="@font/poppins_light"
+            android:text="@string/available_courses"
+            android:textAllCaps="false"
             android:textColor="@color/black"
-            android:textAllCaps="false" />
+            android:textSize="13sp" />
 
     </LinearLayout>
-
 
     <!-- Empty State Text -->
     <TextView
@@ -82,31 +72,9 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
-
-
-        <!--  subject loader
-         This is connected to the available courses
-          in the back end if there is a data in the availablecourses
-          it will reflect in here-->
-
-
-    <!-- Bottom Navigation -->
-
-    <ImageView
-        android:id="@+id/coursesIcon"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="540dp"
-        android:clickable="true"
-        android:contentDescription="@string/hometask_icon"
-        android:focusable="true"
-        android:src="@drawable/taskhome"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.921"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout" />
 
+    <!-- RecyclerView (for enrolled / available courses) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewCourses"
         android:layout_width="0dp"
@@ -115,23 +83,23 @@
         android:padding="8dp"
         android:scrollbars="vertical"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintBottom_toTopOf="@id/bottomNavLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Bottom Navigation -->
     <LinearLayout
+        android:id="@+id/bottomNavLayout"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="@color/white"
         android:gravity="center"
         android:orientation="horizontal"
+        android:elevation="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:elevation="30dp">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
             android:id="@+id/btnHome"
@@ -143,9 +111,7 @@
             android:src="@drawable/home"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
-            android:padding="20dp"
-
-            />
+            android:padding="20dp" />
 
         <ImageButton
             android:id="@+id/btnProfile"
@@ -157,7 +123,7 @@
             android:src="@drawable/account"
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
-            android:padding="20dp"/>
+            android:padding="20dp" />
 
     </LinearLayout>
 

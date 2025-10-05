@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TaskPath1Activity extends AppCompatActivity {
 
@@ -76,7 +78,7 @@ public class TaskPath1Activity extends AppCompatActivity {
                 .addOnSuccessListener(querySnapshot -> {
                     tasks.clear();
                     for (QueryDocumentSnapshot document : querySnapshot) {
-                        TaskModel task = document.toObject(TaskModel.class);
+                        TaskModel task = new TaskModel();
                         task.setId(document.getId()); // Set task ID
 
                         // Extract courseId from the document path
@@ -86,7 +88,24 @@ public class TaskPath1Activity extends AppCompatActivity {
                             task.setCourseId(segments[1]); // Set courseId
                         }
 
-                        Log.d(TAG, "Fetched Task: ID = " + task.getId() + ", CourseID = " + task.getCourseId());
+                        // Fetch and format the end_date
+                        String endDate = document.getString("end_date");
+                        if (endDate != null && !endDate.isEmpty()) {
+                            try {
+                                task.setEndDate(formatDate(endDate)); // Format the date
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error formatting end_date for task: " + task.getId(), e);
+                                task.setEndDate("Invalid Date");
+                            }
+                        } else {
+                            task.setEndDate("No Due Date"); // Default message for missing dates
+                        }
+
+                        // Set other task fields
+                        task.setTitle(document.getString("title"));
+                        task.setStatus(document.getString("status"));
+
+                        Log.d(TAG, "Fetched Task: ID = " + task.getId() + ", CourseID = " + task.getCourseId() + ", End Date = " + task.getEndDate());
                         tasks.add(task);
                     }
                     tasksAdapter.updateTasks(tasks);
@@ -95,5 +114,12 @@ public class TaskPath1Activity extends AppCompatActivity {
                     Log.e(TAG, "Failed to load tasks: " + e.getMessage(), e);
                     Toast.makeText(this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    // Helper method to format the date
+    private String formatDate(String date) throws Exception {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        return outputFormat.format(inputFormat.parse(date));
     }
 }

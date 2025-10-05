@@ -13,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
@@ -161,7 +163,20 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                     querySnapshot.forEach(document -> {
                         TaskModel task = new TaskModel();
                         task.setTitle(document.getString("title"));
-                        task.setEndDate(document.getString("end_date"));
+
+                        // Format the end_date
+                        String endDate = document.getString("end_date");
+                        if (endDate != null && !endDate.isEmpty()) {
+                            try {
+                                task.setEndDate(formatDate(endDate)); // Format the date
+                            } catch (Exception e) {
+                                Log.e("SubjectDetailsEnrolledCourse", "Error formatting end_date for task: " + document.getId(), e);
+                                task.setEndDate("Invalid Date");
+                            }
+                        } else {
+                            task.setEndDate("No Due Date");
+                        }
+
                         task.setStatus(document.getString("status"));
                         task.setId(document.getId());
                         task.setCourseId(courseId);
@@ -173,6 +188,13 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                     Toast.makeText(this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("CourseTasksError", e.getMessage(), e);
                 });
+    }
+
+    // Helper method to format the date
+    private String formatDate(String date) throws Exception {
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        return outputFormat.format(inputFormat.parse(date));
     }
 
     private void loadCourseQuizzes(String courseId) {
