@@ -79,7 +79,8 @@
                     android:layout_marginEnd="6dp" />
 
                 <TextView
-                    android:text="Completed on April 2, 2025"
+                    android:id="@+id/submissionDateText"
+                    android:text="Completed on -"
                     android:textColor="#4CAF50"
                     android:textSize="12sp"
                     android:fontFamily="@font/poppins_medium"

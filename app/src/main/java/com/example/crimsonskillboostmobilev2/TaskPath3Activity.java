@@ -12,9 +12,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class TaskPath3Activity extends AppCompatActivity {
 
     private TextView submissionMessage, instructorFileName, studentFileName, headerTitleTask;
+    private TextView submissionDateText; // ✅ new field
     private String courseId, taskId, userId;
 
     @Override
@@ -26,6 +31,7 @@ public class TaskPath3Activity extends AppCompatActivity {
         instructorFileName = findViewById(R.id.instructorFileName);
         studentFileName = findViewById(R.id.studentFileName);
         headerTitleTask = findViewById(R.id.headerTitleTask);
+        submissionDateText = findViewById(R.id.submissionDateText); // ✅ new TextView in XML
 
         ImageButton backButton = findViewById(R.id.backButtonTask2);
         backButton.setOnClickListener(v -> finish());
@@ -57,16 +63,11 @@ public class TaskPath3Activity extends AppCompatActivity {
                 .addOnSuccessListener(doc -> {
                     if (doc.exists()) {
                         String taskTitle = doc.getString("title");
-                        if (taskTitle != null) {
-                            headerTitleTask.setText(taskTitle);
-                        } else {
-                            headerTitleTask.setText("No Title");
-                        }
+                        headerTitleTask.setText(taskTitle != null ? taskTitle : "No Title");
                     }
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to fetch task title: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Failed to fetch task title: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void fetchInstructorFile() {
@@ -104,6 +105,8 @@ public class TaskPath3Activity extends AppCompatActivity {
                     if (doc.exists()) {
                         String fileName = doc.getString("file_name");
                         String fileUrl = doc.getString("file_url");
+                        Long timestamp = doc.getLong("timestamp"); // ✅ get timestamp
+
                         if (fileName != null && fileUrl != null) {
                             studentFileName.setText(fileName);
                             studentFileName.setOnClickListener(v -> {
@@ -111,7 +114,19 @@ public class TaskPath3Activity extends AppCompatActivity {
                                 startActivity(intent);
                             });
                         }
+
+                        if (timestamp != null) {
+                            // ✅ Convert timestamp to readable date
+                            Date date = new Date(timestamp);
+                            SimpleDateFormat sdf = new SimpleDateFormat("MMMM d, yyyy", Locale.getDefault());
+                            String formattedDate = sdf.format(date);
+                            submissionDateText.setText("Completed on " + formattedDate);
+                        } else {
+                            submissionDateText.setText("No submission date available");
+                        }
                     }
-                });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this, "Failed to fetch submission: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }
