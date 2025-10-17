@@ -93,7 +93,7 @@ public class CreateAccountPath extends AppCompatActivity {
             firestore.collection("users").document(uid).set(profile).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(this, "Profile saved successfully!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(CreateAccountPath.this, TermsAndCondition.class));
+                    startActivity(new Intent(CreateAccountPath.this, SetupProfile.class));
                 } else {
                     Toast.makeText(this, "Failed to save profile.", Toast.LENGTH_SHORT).show();
                 }

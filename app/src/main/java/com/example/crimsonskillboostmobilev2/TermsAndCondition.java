@@ -29,7 +29,7 @@ public class TermsAndCondition extends AppCompatActivity {
         // Agree button logic
         iAgree.setOnClickListener(v -> {
             // Move to next activity (e.g., SetupProfile)
-            Intent intent = new Intent(TermsAndCondition.this, SetupProfile.class);
+            Intent intent = new Intent(TermsAndCondition.this, CreateAccount.class);
             startActivity(intent);
             finish(); // optional: prevent going back to this screen
         });
