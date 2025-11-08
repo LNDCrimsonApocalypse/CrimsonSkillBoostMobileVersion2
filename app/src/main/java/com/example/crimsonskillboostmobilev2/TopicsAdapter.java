@@ -1,9 +1,11 @@
 package com.example.crimsonskillboostmobilev2;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,8 +18,9 @@ import java.util.Locale;
 
 public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewHolder> {
 
-    private List<TopicModel> topics;
+    List<TopicModel> topics;
     private OnTopicClickListener listener;
+    private Context context;
 
     public TopicsAdapter(List<TopicModel> topics, OnTopicClickListener listener) {
         this.topics = topics;
@@ -27,6 +30,7 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
     @NonNull
     @Override
     public TopicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_topic, parent, false);
         return new TopicViewHolder(view);
     }
@@ -37,7 +41,7 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
 
         holder.tvTitle.setText(topic.getTitle());
 
-        // Format and display the created_at timestamp
+        // Format and display created_at
         Timestamp createdAt = topic.getCreatedAt();
         if (createdAt != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
@@ -46,9 +50,22 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
             holder.tvCreatedAt.setText("Unknown Date");
         }
 
-        // Set click listener to send both title and description
+        // ✅ Handle locked topics visually
+        if (topic.isLocked()) {
+            holder.tvTitle.setAlpha(0.5f);
+            holder.tvCreatedAt.setAlpha(0.5f);
+            holder.itemView.setAlpha(0.6f);
+        } else {
+            holder.tvTitle.setAlpha(1.0f);
+            holder.tvCreatedAt.setAlpha(1.0f);
+            holder.itemView.setAlpha(1.0f);
+        }
+
+        // ✅ Click handling
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
+            if (topic.isLocked()) {
+                Toast.makeText(context, "This topic is locked until you complete the required one.", Toast.LENGTH_SHORT).show();
+            } else if (listener != null) {
                 listener.onTopicClick(topic.getTitle(), topic.getDescription());
             }
         });
@@ -74,7 +91,7 @@ public class TopicsAdapter extends RecyclerView.Adapter<TopicsAdapter.TopicViewH
         }
     }
 
-    // ✅ Updated interface to include both title & description
+    // ✅ Interface
     public interface OnTopicClickListener {
         void onTopicClick(String title, String description);
     }

@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -32,7 +35,6 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.subject_details_enrolled_course);
 
-        // View bindings
         tvCourseTitle = findViewById(R.id.tvCourseTitle);
         tvInstructorName = findViewById(R.id.tvInstructorName);
         tvInstructorEmail = findViewById(R.id.tvInstructorEmail);
@@ -42,23 +44,25 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         rvQuizzes = findViewById(R.id.rvQuizzes);
         ImageView ivBack = findViewById(R.id.ivBack);
 
-        // Retrieve courseId
         courseId = getIntent().getStringExtra("course_id");
-        Log.d("SubjectDetailsEnrolledCourse", "Received course_id: " + courseId);
-
         if (courseId == null || courseId.isEmpty()) {
             Toast.makeText(this, "Invalid course ID received", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        // Back button
         ivBack.setOnClickListener(v -> finish());
 
-        // Setup RecyclerViews
         rvTopics.setLayoutManager(new LinearLayoutManager(this));
         topicsAdapter = new TopicsAdapter(new ArrayList<>(), (title, description) -> {
             Intent intent = new Intent(this, TopicsPageActivity.class);
+            // Pass topic ID also
+            for (TopicModel topic : topicsAdapter.topics) {
+                if (topic.getTitle().equals(title)) {
+                    intent.putExtra("topic_id", topic.getId());
+                    break;
+                }
+            }
             intent.putExtra("topic_title", title);
             intent.putExtra("topic_description", description);
             startActivity(intent);
@@ -78,7 +82,6 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         quizzesAdapter = new QuizzesAdapter(new ArrayList<>(), this, courseId);
         rvQuizzes.setAdapter(quizzesAdapter);
 
-        // Load Firestore data
         loadCourseDetails(courseId);
         loadCourseTopics(courseId);
         loadCourseTasks(courseId);
@@ -131,26 +134,51 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
     private void loadCourseTopics(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return;
 
-        firestore.collection("courses").document(courseId).collection("topics")
+        String userId = currentUser.getUid();
+
+        // Get completed topic IDs
+        firestore.collection("users").document(userId)
+                .collection("completedTopics")
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<TopicModel> topics = new ArrayList<>();
-                    querySnapshot.forEach(document -> {
-                        TopicModel topic = new TopicModel();
-                        topic.setTitle(document.getString("title"));
-                        topic.setDescription(document.getString("description"));
-                        topic.setCreatedAt(document.getTimestamp("created_at"));
-                        topic.setCreatedBy(document.getString("created_by"));
-                        topics.add(topic);
-                    });
-                    topicsAdapter.updateTopics(topics);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load topics: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("CourseTopicsError", e.getMessage(), e);
+                .addOnSuccessListener(completedSnapshot -> {
+                    List<String> completedIds = new ArrayList<>();
+                    for (DocumentSnapshot doc : completedSnapshot.getDocuments()) {
+                        completedIds.add(doc.getId());
+                    }
+
+                    // Get topics for this course
+                    firestore.collection("courses").document(courseId)
+                            .collection("topics")
+                            .get()
+                            .addOnSuccessListener(topicSnapshot -> {
+                                List<TopicModel> topics = new ArrayList<>();
+                                for (DocumentSnapshot document : topicSnapshot.getDocuments()) {
+                                    TopicModel topic = new TopicModel();
+                                    topic.setId(document.getId());
+                                    topic.setTitle(document.getString("title"));
+                                    topic.setDescription(document.getString("description"));
+                                    topic.setCreatedAt(document.getTimestamp("created_at"));
+                                    topic.setCreatedBy(document.getString("created_by"));
+
+                                    String requiredTopic = document.getString("requiredTopic");
+                                    topic.setRequiredTopic(requiredTopic);
+
+                                    boolean locked = false;
+                                    if (requiredTopic != null && !requiredTopic.isEmpty()) {
+                                        locked = !completedIds.contains(requiredTopic);
+                                    }
+                                    topic.setLocked(locked);
+
+                                    topics.add(topic);
+                                }
+                                topicsAdapter.updateTopics(topics);
+                            });
                 });
     }
+
 
     private void loadCourseTasks(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -163,11 +191,10 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                         TaskModel task = new TaskModel();
                         task.setTitle(document.getString("title"));
 
-                        // Format the end_date
                         String endDate = document.getString("end_date");
                         if (endDate != null && !endDate.isEmpty()) {
                             try {
-                                task.setEndDate(formatDate(endDate)); // Format the date
+                                task.setEndDate(formatDate(endDate));
                             } catch (Exception e) {
                                 Log.e("SubjectDetailsEnrolledCourse", "Error formatting end_date for task: " + document.getId(), e);
                                 task.setEndDate("Invalid Date");
@@ -189,7 +216,6 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                 });
     }
 
-    // Helper method to format the date
     private String formatDate(String date) throws Exception {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat outputFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
@@ -210,35 +236,14 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                         quiz.setTitle(document.getString("title"));
                         quiz.setDescription(document.getString("description"));
                         quiz.setCourseId(document.getString("course_id"));
-                        quiz.setPublished(document.getBoolean("published") != null ? document.getBoolean("published") : false);
+                        quiz.setPublished(document.getBoolean("published") != null && document.getBoolean("published"));
                         quiz.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
-                        quiz.setCompleted(document.getBoolean("completed") != null ? document.getBoolean("completed") : false);
+                        quiz.setCompleted(document.getBoolean("completed") != null && document.getBoolean("completed"));
 
-                        // ✅ Handle new Firestore fields
                         quiz.setStartDate(document.getString("start_date"));
                         quiz.setEndDate(document.getString("end_date"));
-                        quiz.setAllowLate(document.getBoolean("allow_late") != null ? document.getBoolean("allow_late") : false);
-
-                        // Format created_at if exists
-                        Object createdAtObj = document.get("created_at");
-                        if (createdAtObj != null) {
-                            try {
-                                String formattedDate;
-                                if (createdAtObj instanceof com.google.firebase.Timestamp) {
-                                    formattedDate = formatDate(((com.google.firebase.Timestamp) createdAtObj).toDate().toString());
-                                } else if (createdAtObj instanceof String) {
-                                    formattedDate = formatDate((String) createdAtObj);
-                                } else {
-                                    formattedDate = "Invalid Date";
-                                }
-                                quiz.setCreatedAt(formattedDate);
-                            } catch (Exception e) {
-                                Log.e("SubjectDetailsEnrolledCourse", "Error formatting created_at for quiz: " + document.getId(), e);
-                                quiz.setCreatedAt("Invalid Date");
-                            }
-                        } else {
-                            quiz.setCreatedAt("No Date Available");
-                        }
+                        quiz.setAllowLate(document.getBoolean("allow_late") != null && document.getBoolean("allow_late"));
+                        quiz.setRequiredQuiz(document.getString("requiredQuiz"));
 
                         quizzes.add(quiz);
                     });
@@ -249,4 +254,12 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                     Log.e("CourseQuizzesError", e.getMessage(), e);
                 });
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (courseId != null && !courseId.isEmpty()) {
+            loadCourseTopics(courseId); // 🔁 Refresh topics after coming back from a topic page
+        }
+    }
+
 }

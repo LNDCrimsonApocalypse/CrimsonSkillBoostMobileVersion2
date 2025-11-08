@@ -10,26 +10,24 @@ public class QuizModel {
     private String publishedAt;
     private int attempts;
     private boolean completed;
-
     private String startDate;
     private String endDate;
     private boolean allowLate;
 
+    // ✅ Firestore field
+    private String requiredQuiz;
+
+    // ✅ Local-only field (not saved in Firestore)
+    private boolean locked = false;
+
     // Empty constructor (needed for Firestore)
     public QuizModel() {}
-
-    // Minimal constructor
-    public QuizModel(String id, String title, String description) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-    }
 
     // Full constructor
     public QuizModel(String id, String title, String description, String courseId,
                      String createdAt, boolean published, String publishedAt,
                      int attempts, boolean completed, String startDate,
-                     String endDate, boolean allowLate) {
+                     String endDate, boolean allowLate, String requiredQuiz) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -42,9 +40,10 @@ public class QuizModel {
         this.startDate = startDate;
         this.endDate = endDate;
         this.allowLate = allowLate;
+        this.requiredQuiz = requiredQuiz;
     }
 
-    // Getters and setters
+    // --- Getters & Setters ---
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -80,4 +79,11 @@ public class QuizModel {
 
     public boolean isAllowLate() { return allowLate; }
     public void setAllowLate(boolean allowLate) { this.allowLate = allowLate; }
+
+    public String getRequiredQuiz() { return requiredQuiz; }
+    public void setRequiredQuiz(String requiredQuiz) { this.requiredQuiz = requiredQuiz; }
+
+    // ✅ Local field (not in Firestore)
+    public boolean isLocked() { return locked; }
+    public void setLocked(boolean locked) { this.locked = locked; }
 }

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.webkit.WebView;
@@ -12,11 +13,18 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,13 +46,13 @@ public class TopicsPageActivity extends AppCompatActivity {
         contentViewer = findViewById(R.id.contentViewer);
         subtopicList = findViewById(R.id.subtopicList);
 
-        // ✅ Header title
         TextView headerTitle = findViewById(R.id.headerTitle);
 
         navButton.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
         backButton.setOnClickListener(v -> finish());
 
-        // ✅ Get extras
+        // Get extras
+        String topicId = getIntent().getStringExtra("topic_id");
         String topicTitle = getIntent().getStringExtra("topic_title");
         String topicDescription = getIntent().getStringExtra("topic_description");
 
@@ -54,9 +62,38 @@ public class TopicsPageActivity extends AppCompatActivity {
             headerTitle.setText("Topic");
         }
 
+        // ✅ Mark topic as completed by ID
+        markTopicAsCompleted(topicId);
+
         loadContentIntoViewer(topicDescription);
     }
 
+    private void markTopicAsCompleted(String topicId) {
+        if (topicId == null || topicId.isEmpty()) return;
+
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            Toast.makeText(this, "You must be logged in to track progress.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = currentUser.getUid();
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("completed", true);
+        data.put("timestamp", FieldValue.serverTimestamp());
+
+        firestore.collection("users")
+                .document(userId)
+                .collection("completedTopics")
+                .document(topicId) // ✅ save by topic ID
+                .set(data)
+                .addOnSuccessListener(aVoid ->
+                        Log.d("TopicProgress", "Marked completed: " + topicId))
+                .addOnFailureListener(e ->
+                        Log.e("TopicProgress", "Error marking topic complete", e));
+    }
 
     @Override
     public void onBackPressed() {

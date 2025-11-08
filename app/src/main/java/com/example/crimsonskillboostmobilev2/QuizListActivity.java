@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,8 @@ public class QuizListActivity extends AppCompatActivity {
     private TextView emptyStateText;
     private List<QuizModel> quizList = new ArrayList<>();
     private QuizAdapter quizAdapter;
+    private FirebaseFirestore firestore;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,11 @@ public class QuizListActivity extends AppCompatActivity {
         quizRecyclerView = findViewById(R.id.quizRecyclerView);
         emptyStateText = findViewById(R.id.emptyStateText);
 
+        firestore = FirebaseFirestore.getInstance();
+        userId = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : null;
+
         setupRecyclerView();
         fetchQuizzesFromFirebase();
     }
@@ -47,7 +56,6 @@ public class QuizListActivity extends AppCompatActivity {
     }
 
     private void fetchQuizzesFromFirebase() {
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         firestore.collection("quizzes")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
@@ -63,20 +71,56 @@ public class QuizListActivity extends AppCompatActivity {
                         quiz.setPublishedAt(document.getString("published_at"));
                         quiz.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
                         quiz.setCompleted(document.getBoolean("completed") != null ? document.getBoolean("completed") : false);
-
-                        // ✅ New fields (match Firestore document)
                         quiz.setStartDate(document.getString("start_date"));
                         quiz.setEndDate(document.getString("end_date"));
                         quiz.setAllowLate(document.getBoolean("allow_late") != null ? document.getBoolean("allow_late") : false);
+                        quiz.setRequiredQuiz(document.getString("requiredQuiz")); // ✅ Add prerequisite field
 
                         quizList.add(quiz);
                     }
-                    quizAdapter.notifyDataSetChanged();
-                    toggleEmptyState();
+
+                    // Once all quizzes are loaded, verify prerequisites
+                    checkLockedQuizzes(querySnapshot);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Error fetching quizzes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    /**
+     * ✅ Checks which quizzes should be locked based on requiredQuiz completion.
+     */
+    private void checkLockedQuizzes(QuerySnapshot querySnapshot) {
+        if (userId == null) {
+            Toast.makeText(this, "User not authenticated.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        for (QuizModel quiz : quizList) {
+            String requiredQuizId = quiz.getRequiredQuiz();
+            if (requiredQuizId != null && !requiredQuizId.isEmpty()) {
+                // Check if user has submitted a result for that required quiz
+                firestore.collection("quizzes")
+                        .document(requiredQuizId)
+                        .collection("submissions")
+                        .whereEqualTo("userId", userId)
+                        .get()
+                        .addOnSuccessListener(submissionSnapshot -> {
+                            boolean completed = !submissionSnapshot.isEmpty();
+                            quiz.setLocked(!completed); // lock if no submission found
+                            quizAdapter.notifyDataSetChanged();
+                        })
+                        .addOnFailureListener(e -> {
+                            quiz.setLocked(true);
+                            quizAdapter.notifyDataSetChanged();
+                        });
+            } else {
+                quiz.setLocked(false); // no prerequisite, always open
+            }
+        }
+
+        quizAdapter.notifyDataSetChanged();
+        toggleEmptyState();
     }
 
     private void toggleEmptyState() {
