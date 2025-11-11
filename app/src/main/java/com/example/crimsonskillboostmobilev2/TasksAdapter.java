@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,23 +44,25 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         TaskModel task = tasks.get(position);
 
-        // ✅ Title
         holder.taskTitle.setText(task.getTitle() != null ? task.getTitle() : "Untitled Task");
 
-        // ✅ Parse Firestore date (end_date field)
         Date dueDate = parseDate(task.getEndDate());
         boolean isCompleted = "completed".equalsIgnoreCase(task.getStatus());
+        boolean isLocked = task.isLocked();
 
         String labelText;
         int color;
 
-        if (isCompleted) {
-            // Completed
+        if (isLocked) {
+            labelText = "Locked — Complete previous task first";
+            color = Color.parseColor("#B0B0B0"); // gray
+            holder.itemView.setAlpha(0.6f);
+        } else if (isCompleted) {
             String formatted = (dueDate != null) ? formatDate(dueDate, "MMM d yyyy") : "";
             labelText = "Completed: " + formatted;
             color = Color.parseColor("#808080"); // gray
+            holder.itemView.setAlpha(1f);
         } else if (dueDate != null) {
-            // Compare with today/tomorrow
             Calendar today = zeroTime(Calendar.getInstance());
             Calendar tomorrow = (Calendar) today.clone();
             tomorrow.add(Calendar.DAY_OF_MONTH, 1);
@@ -78,20 +81,22 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
                 labelText = "Due on " + formatDate(dueDate, "MMM d yyyy");
                 color = Color.parseColor("#4CAF50"); // green
             }
+            holder.itemView.setAlpha(1f);
         } else {
-            // No due date
             labelText = "No due date";
-            color = Color.parseColor("#808080"); // gray
+            color = Color.parseColor("#808080");
+            holder.itemView.setAlpha(1f);
         }
 
-        // ✅ Apply to UI
         holder.taskDueDate.setText(labelText);
         holder.taskDueDate.setTextColor(color);
         holder.taskDueIcon.setColorFilter(color);
 
-        // ✅ Click listener
+        // ✅ Handle click events
         holder.itemView.setOnClickListener(v -> {
-            if (onTaskClickListener != null) {
+            if (isLocked) {
+                Toast.makeText(v.getContext(), "Complete the previous task to unlock this one.", Toast.LENGTH_SHORT).show();
+            } else if (onTaskClickListener != null) {
                 onTaskClickListener.onTaskClick(task);
             }
         });
@@ -111,7 +116,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     private Date parseDate(String dateStr) {
         if (dateStr == null || dateStr.isEmpty()) return null;
         try {
-            // Update the format to match the formatted date from TaskPath1Activity
             return new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).parse(dateStr);
         } catch (ParseException e) {
             e.printStackTrace();
@@ -136,7 +140,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
                 && a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR);
     }
 
-    // --- ViewHolder ---
     static class TaskViewHolder extends RecyclerView.ViewHolder {
         TextView taskTitle, taskDueDate;
         ImageView taskDueIcon;

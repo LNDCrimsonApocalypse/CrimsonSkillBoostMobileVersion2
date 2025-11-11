@@ -27,7 +27,6 @@ public class TaskModel {
     @SerializedName("attempts")
     private int attempts;
 
-    // ✅ Match Firestore snake_case fields
     @SerializedName("file_name")
     private String fileName;
 
@@ -39,6 +38,13 @@ public class TaskModel {
 
     @SerializedName("file_type")
     private String fileType;
+
+    // ✅ New field (for task dependencies)
+    @SerializedName("requiredTask")
+    private String requiredTask;
+
+    // ✅ Optional: Locked flag for UI logic
+    private boolean locked;
 
     // --- Getters ---
     public String getId() { return id; }
@@ -54,6 +60,8 @@ public class TaskModel {
     public String getFileName() { return fileName; }
     public long getFileSize() { return fileSize; }
     public String getFileType() { return fileType; }
+    public String getRequiredTask() { return requiredTask; }
+    public boolean isLocked() { return locked; }
 
     // --- Setters ---
     public void setId(String id) { this.id = id; }
@@ -69,4 +77,6 @@ public class TaskModel {
     public void setFileName(String fileName) { this.fileName = fileName; }
     public void setFileSize(long fileSize) { this.fileSize = fileSize; }
     public void setFileType(String fileType) { this.fileType = fileType; }
+    public void setRequiredTask(String requiredTask) { this.requiredTask = requiredTask; }
+    public void setLocked(boolean locked) { this.locked = locked; }
 }

@@ -182,39 +182,116 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
     private void loadCourseTasks(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return;
 
-        firestore.collection("courses").document(courseId).collection("tasks")
+        String userId = currentUser.getUid();
+
+        // Step 1: Get completed task IDs (from user's submissions)
+        firestore.collection("courses").document(courseId)
+                .collection("tasks")
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
+                .addOnSuccessListener(taskSnapshot -> {
                     List<TaskModel> tasks = new ArrayList<>();
-                    querySnapshot.forEach(document -> {
+
+                    for (DocumentSnapshot document : taskSnapshot.getDocuments()) {
                         TaskModel task = new TaskModel();
-                        task.setTitle(document.getString("title"));
-
-                        String endDate = document.getString("end_date");
-                        if (endDate != null && !endDate.isEmpty()) {
-                            try {
-                                task.setEndDate(formatDate(endDate));
-                            } catch (Exception e) {
-                                Log.e("SubjectDetailsEnrolledCourse", "Error formatting end_date for task: " + document.getId(), e);
-                                task.setEndDate("Invalid Date");
-                            }
-                        } else {
-                            task.setEndDate("No Due Date");
-                        }
-
-                        task.setStatus(document.getString("status"));
                         task.setId(document.getId());
                         task.setCourseId(courseId);
+                        task.setTitle(document.getString("title"));
+                        task.setDescription(document.getString("description"));
+
+                        // ✅ Firestore uses snake_case, so fetch like this:
+                        task.setEndDate(document.getString("end_date"));
+                        task.setStartDate(document.getString("start_date"));
+                        task.setStatus(document.getString("status"));
+                        task.setAllowLate(document.getBoolean("allow_late") != null && document.getBoolean("allow_late"));
+                        task.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
+
+                        // ✅ Add requiredTask for lock logic
+                        String requiredTask = document.getString("requiredTask");
+                        task.setRequiredTask(requiredTask);
+
                         tasks.add(task);
-                    });
-                    tasksAdapter.updateTasks(tasks);
+                    }
+
+                    // Step 2: Now check which tasks user has submitted
+                    firestore.collection("courses").document(courseId)
+                            .collection("tasks")
+                            .get()
+                            .addOnSuccessListener(innerSnapshot -> {
+                                List<String> completedIds = new ArrayList<>();
+
+                                // Go through every task and check submissions for this user
+                                for (DocumentSnapshot doc : innerSnapshot.getDocuments()) {
+                                    firestore.collection("courses").document(courseId)
+                                            .collection("tasks").document(doc.getId())
+                                            .collection("submissions")
+                                            .whereEqualTo("userId", userId)
+                                            .get()
+                                            .addOnSuccessListener(subSnapshot -> {
+                                                if (!subSnapshot.isEmpty()) {
+                                                    completedIds.add(doc.getId());
+                                                }
+
+                                                // Once all checks done, update lock states
+                                                for (TaskModel t : tasks) {
+                                                    boolean locked = false;
+                                                    if (t.getRequiredTask() != null && !t.getRequiredTask().isEmpty()) {
+                                                        locked = !completedIds.contains(t.getRequiredTask());
+                                                    }
+                                                    t.setLocked(locked);
+                                                }
+
+                                                tasksAdapter.updateTasks(tasks);
+                                            });
+                                }
+                            });
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("CourseTasksError", e.getMessage(), e);
                 });
     }
+
+    /**
+     * ✅ Check which tasks should be unlocked based on submissions.
+     */
+    private void checkLockedTasks(FirebaseFirestore firestore, String userId, List<TaskModel> tasks) {
+        if (tasks.isEmpty()) {
+            tasksAdapter.updateTasks(tasks);
+            return;
+        }
+
+        for (TaskModel task : tasks) {
+            String requiredTaskId = task.getRequiredTask();
+
+            if (requiredTaskId != null && !requiredTaskId.isEmpty()) {
+                // Check submissions under the required task
+                firestore.collection("tasks")
+                        .document(requiredTaskId)
+                        .collection("submissions")
+                        .whereEqualTo("userId", userId)
+                        .get()
+                        .addOnSuccessListener(subSnapshot -> {
+                            boolean hasSubmission = !subSnapshot.isEmpty();
+                            task.setLocked(!hasSubmission);
+                            tasksAdapter.updateTasks(tasks);
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("TaskUnlockError", "Error checking task submissions: " + e.getMessage());
+                            task.setLocked(true);
+                            tasksAdapter.updateTasks(tasks);
+                        });
+            } else {
+                // No dependency → always unlocked
+                task.setLocked(false);
+            }
+        }
+
+        tasksAdapter.updateTasks(tasks);
+    }
+
 
     private String formatDate(String date) throws Exception {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -258,8 +335,12 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (courseId != null && !courseId.isEmpty()) {
-            loadCourseTopics(courseId); // 🔁 Refresh topics after coming back from a topic page
+            // 🔁 Refresh all course sections when returning
+            loadCourseTopics(courseId);
+            loadCourseTasks(courseId);
+            loadCourseQuizzes(courseId);
         }
     }
+
 
 }
