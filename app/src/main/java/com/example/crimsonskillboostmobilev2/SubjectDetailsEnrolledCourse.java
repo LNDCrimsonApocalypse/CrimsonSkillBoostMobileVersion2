@@ -53,10 +53,10 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
         ivBack.setOnClickListener(v -> finish());
 
+        // --- Topics setup ---
         rvTopics.setLayoutManager(new LinearLayoutManager(this));
         topicsAdapter = new TopicsAdapter(new ArrayList<>(), (title, description) -> {
             Intent intent = new Intent(this, TopicsPageActivity.class);
-            // Pass topic ID also
             for (TopicModel topic : topicsAdapter.topics) {
                 if (topic.getTitle().equals(title)) {
                     intent.putExtra("topic_id", topic.getId());
@@ -69,6 +69,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         });
         rvTopics.setAdapter(topicsAdapter);
 
+        // --- Tasks setup ---
         rvTasks.setLayoutManager(new LinearLayoutManager(this));
         tasksAdapter = new TasksAdapter(new ArrayList<>(), task -> {
             Intent intent = new Intent(this, TaskPath2Activity.class);
@@ -78,60 +79,58 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         });
         rvTasks.setAdapter(tasksAdapter);
 
+        // --- Quizzes setup ---
         rvQuizzes.setLayoutManager(new LinearLayoutManager(this));
         quizzesAdapter = new QuizzesAdapter(new ArrayList<>(), this, courseId);
         rvQuizzes.setAdapter(quizzesAdapter);
 
+        // --- Load everything ---
         loadCourseDetails(courseId);
         loadCourseTopics(courseId);
         loadCourseTasks(courseId);
         loadCourseQuizzes(courseId);
     }
 
+    // ✅ Load course metadata
     private void loadCourseDetails(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
 
         firestore.collection("courses").document(courseId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Log.d("Firestore", "Course details fetched: " + documentSnapshot.getData());
-                        tvCourseTitle.setText(documentSnapshot.getString("course_name"));
-                        tvInstructorName.setText(documentSnapshot.getString("instructor_name"));
-
-                        // Fetch instructor email using user_id
-                        String userId = documentSnapshot.getString("user_id");
-                        if (userId != null && !userId.isEmpty()) {
-                            firestore.collection("users").document(userId)
-                                    .get()
-                                    .addOnSuccessListener(userDocument -> {
-                                        if (userDocument.exists()) {
-                                            String email = userDocument.getString("email");
-                                            tvInstructorEmail.setText(email != null ? email : "Email Not Available");
-                                        } else {
-                                            tvInstructorEmail.setText("Email Not Available");
-                                        }
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Log.e("Firestore", "Error fetching email: " + e.getMessage(), e);
-                                        tvInstructorEmail.setText("Email Not Available");
-                                    });
-                        } else {
-                            tvInstructorEmail.setText("Email Not Available");
-                        }
-
-                        tvCourseOverview.setText(documentSnapshot.getString("overview"));
-                    } else {
-                        Log.e("Firestore", "Course not found for ID: " + courseId);
-                        Toast.makeText(this, "Course details not found.", Toast.LENGTH_SHORT).show();
+                    if (!documentSnapshot.exists()) {
+                        Toast.makeText(this, "Course not found", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+
+                    tvCourseTitle.setText(documentSnapshot.getString("course_name"));
+                    tvInstructorName.setText(documentSnapshot.getString("instructor_name"));
+                    tvCourseOverview.setText(documentSnapshot.getString("overview"));
+
+                    String userId = documentSnapshot.getString("user_id");
+                    if (userId == null || userId.isEmpty()) {
+                        tvInstructorEmail.setText("Email Not Available");
+                        return;
+                    }
+
+                    firestore.collection("users").document(userId)
+                            .get()
+                            .addOnSuccessListener(userDoc -> {
+                                String email = userDoc.getString("email");
+                                tvInstructorEmail.setText(email != null ? email : "Email Not Available");
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firestore", "Error fetching email: " + e.getMessage(), e);
+                                tvInstructorEmail.setText("Email Not Available");
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Firestore", "Error fetching course details: " + e.getMessage(), e);
-                    Toast.makeText(this, "Failed to load course details: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("Firestore", "Error fetching course: " + e.getMessage(), e);
+                    Toast.makeText(this, "Error loading course", Toast.LENGTH_SHORT).show();
                 });
     }
 
+    // ✅ Load topics
     private void loadCourseTopics(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -139,7 +138,6 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
         String userId = currentUser.getUid();
 
-        // Get completed topic IDs
         firestore.collection("users").document(userId)
                 .collection("completedTopics")
                 .get()
@@ -149,7 +147,6 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                         completedIds.add(doc.getId());
                     }
 
-                    // Get topics for this course
                     firestore.collection("courses").document(courseId)
                             .collection("topics")
                             .get()
@@ -162,13 +159,12 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                                     topic.setDescription(document.getString("description"));
                                     topic.setCreatedAt(document.getTimestamp("created_at"));
                                     topic.setCreatedBy(document.getString("created_by"));
-
-                                    String requiredTopic = document.getString("requiredTopic");
-                                    topic.setRequiredTopic(requiredTopic);
+                                    topic.setRequiredTopic(document.getString("requiredTopic"));
 
                                     boolean locked = false;
-                                    if (requiredTopic != null && !requiredTopic.isEmpty()) {
-                                        locked = !completedIds.contains(requiredTopic);
+                                    String required = document.getString("requiredTopic");
+                                    if (required != null && !required.isEmpty()) {
+                                        locked = !completedIds.contains(required);
                                     }
                                     topic.setLocked(locked);
 
@@ -179,7 +175,7 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
                 });
     }
 
-
+    // ✅ Load tasks (fixed Firestore field mapping)
     private void loadCourseTasks(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -187,111 +183,74 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
 
         String userId = currentUser.getUid();
 
-        // Step 1: Get completed task IDs (from user's submissions)
-        firestore.collection("courses").document(courseId)
-                .collection("tasks")
+        // 1️⃣ Completed topics
+        firestore.collection("users").document(userId)
+                .collection("completedTopics")
                 .get()
-                .addOnSuccessListener(taskSnapshot -> {
-                    List<TaskModel> tasks = new ArrayList<>();
-
-                    for (DocumentSnapshot document : taskSnapshot.getDocuments()) {
-                        TaskModel task = new TaskModel();
-                        task.setId(document.getId());
-                        task.setCourseId(courseId);
-                        task.setTitle(document.getString("title"));
-                        task.setDescription(document.getString("description"));
-
-                        // ✅ Firestore uses snake_case, so fetch like this:
-                        task.setEndDate(document.getString("end_date"));
-                        task.setStartDate(document.getString("start_date"));
-                        task.setStatus(document.getString("status"));
-                        task.setAllowLate(document.getBoolean("allow_late") != null && document.getBoolean("allow_late"));
-                        task.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
-
-                        // ✅ Add requiredTask for lock logic
-                        String requiredTask = document.getString("requiredTask");
-                        task.setRequiredTask(requiredTask);
-
-                        tasks.add(task);
+                .addOnSuccessListener(completedTopicsSnapshot -> {
+                    List<String> completedTopicIds = new ArrayList<>();
+                    for (DocumentSnapshot doc : completedTopicsSnapshot.getDocuments()) {
+                        completedTopicIds.add(doc.getId());
                     }
 
-                    // Step 2: Now check which tasks user has submitted
-                    firestore.collection("courses").document(courseId)
-                            .collection("tasks")
+                    // 2️⃣ Completed tasks (via submissions)
+                    firestore.collectionGroup("submissions")
+                            .whereEqualTo("userId", userId)
                             .get()
-                            .addOnSuccessListener(innerSnapshot -> {
-                                List<String> completedIds = new ArrayList<>();
-
-                                // Go through every task and check submissions for this user
-                                for (DocumentSnapshot doc : innerSnapshot.getDocuments()) {
-                                    firestore.collection("courses").document(courseId)
-                                            .collection("tasks").document(doc.getId())
-                                            .collection("submissions")
-                                            .whereEqualTo("userId", userId)
-                                            .get()
-                                            .addOnSuccessListener(subSnapshot -> {
-                                                if (!subSnapshot.isEmpty()) {
-                                                    completedIds.add(doc.getId());
-                                                }
-
-                                                // Once all checks done, update lock states
-                                                for (TaskModel t : tasks) {
-                                                    boolean locked = false;
-                                                    if (t.getRequiredTask() != null && !t.getRequiredTask().isEmpty()) {
-                                                        locked = !completedIds.contains(t.getRequiredTask());
-                                                    }
-                                                    t.setLocked(locked);
-                                                }
-
-                                                tasksAdapter.updateTasks(tasks);
-                                            });
+                            .addOnSuccessListener(submissionsSnapshot -> {
+                                List<String> completedTaskIds = new ArrayList<>();
+                                for (DocumentSnapshot subDoc : submissionsSnapshot.getDocuments()) {
+                                    String[] parts = subDoc.getReference().getPath().split("/");
+                                    if (parts.length >= 4) {
+                                        completedTaskIds.add(parts[3]);
+                                    }
                                 }
+
+                                // 3️⃣ Load all course tasks
+                                firestore.collection("courses").document(courseId)
+                                        .collection("tasks")
+                                        .get()
+                                        .addOnSuccessListener(taskSnapshot -> {
+                                            List<TaskModel> tasks = new ArrayList<>();
+
+                                            for (DocumentSnapshot taskDoc : taskSnapshot.getDocuments()) {
+                                                TaskModel task = new TaskModel();
+                                                task.setId(taskDoc.getId());
+                                                task.setCourseId(courseId);
+                                                task.setTitle(taskDoc.getString("title"));
+                                                task.setDescription(taskDoc.getString("description"));
+
+                                                // ✅ Firestore uses "requiredTopic", not "topic_id"
+                                                task.setRequiredTopic(taskDoc.getString("requiredTopic"));
+                                                task.setRequiredTask(taskDoc.getString("requiredTask"));
+
+                                                boolean locked = false;
+
+                                                // Lock if required topic not completed
+                                                String requiredTopic = task.getRequiredTopic();
+                                                if (requiredTopic != null && !completedTopicIds.contains(requiredTopic)) {
+                                                    locked = true;
+                                                }
+
+                                                // Lock if required task not completed
+                                                String requiredTaskId = task.getRequiredTask();
+                                                if (requiredTaskId != null && !requiredTaskId.isEmpty()
+                                                        && !completedTaskIds.contains(requiredTaskId)) {
+                                                    locked = true;
+                                                }
+
+                                                task.setLocked(locked);
+                                                tasks.add(task);
+                                            }
+
+                                            tasksAdapter.updateTasks(tasks);
+                                        })
+                                        .addOnFailureListener(e ->
+                                                Log.e("TaskError", "Failed to load tasks: " + e.getMessage(), e)
+                                        );
                             });
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load tasks: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("CourseTasksError", e.getMessage(), e);
                 });
     }
-
-    /**
-     * ✅ Check which tasks should be unlocked based on submissions.
-     */
-    private void checkLockedTasks(FirebaseFirestore firestore, String userId, List<TaskModel> tasks) {
-        if (tasks.isEmpty()) {
-            tasksAdapter.updateTasks(tasks);
-            return;
-        }
-
-        for (TaskModel task : tasks) {
-            String requiredTaskId = task.getRequiredTask();
-
-            if (requiredTaskId != null && !requiredTaskId.isEmpty()) {
-                // Check submissions under the required task
-                firestore.collection("tasks")
-                        .document(requiredTaskId)
-                        .collection("submissions")
-                        .whereEqualTo("userId", userId)
-                        .get()
-                        .addOnSuccessListener(subSnapshot -> {
-                            boolean hasSubmission = !subSnapshot.isEmpty();
-                            task.setLocked(!hasSubmission);
-                            tasksAdapter.updateTasks(tasks);
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e("TaskUnlockError", "Error checking task submissions: " + e.getMessage());
-                            task.setLocked(true);
-                            tasksAdapter.updateTasks(tasks);
-                        });
-            } else {
-                // No dependency → always unlocked
-                task.setLocked(false);
-            }
-        }
-
-        tasksAdapter.updateTasks(tasks);
-    }
-
 
     private String formatDate(String date) throws Exception {
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -299,48 +258,78 @@ public class SubjectDetailsEnrolledCourse extends AppCompatActivity {
         return outputFormat.format(inputFormat.parse(date));
     }
 
+    // ✅ Load quizzes (unchanged)
     private void loadCourseQuizzes(String courseId) {
         FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) return;
 
-        firestore.collection("quizzes")
-                .whereEqualTo("course_id", courseId)
+        String userId = currentUser.getUid();
+
+        firestore.collection("users").document(userId)
+                .collection("completedTopics")
                 .get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<QuizModel> quizzes = new ArrayList<>();
-                    querySnapshot.forEach(document -> {
-                        QuizModel quiz = new QuizModel();
-                        quiz.setId(document.getId());
-                        quiz.setTitle(document.getString("title"));
-                        quiz.setDescription(document.getString("description"));
-                        quiz.setCourseId(document.getString("course_id"));
-                        quiz.setPublished(document.getBoolean("published") != null && document.getBoolean("published"));
-                        quiz.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
-                        quiz.setCompleted(document.getBoolean("completed") != null && document.getBoolean("completed"));
+                .addOnSuccessListener(completedTopicsSnapshot -> {
+                    List<String> completedTopicIds = new ArrayList<>();
+                    for (DocumentSnapshot doc : completedTopicsSnapshot.getDocuments()) {
+                        completedTopicIds.add(doc.getId());
+                    }
 
-                        quiz.setStartDate(document.getString("start_date"));
-                        quiz.setEndDate(document.getString("end_date"));
-                        quiz.setAllowLate(document.getBoolean("allow_late") != null && document.getBoolean("allow_late"));
-                        quiz.setRequiredQuiz(document.getString("requiredQuiz"));
+                    firestore.collection("quiz_submissions")
+                            .whereEqualTo("userId", userId)
+                            .get()
+                            .addOnSuccessListener(submissionSnapshot -> {
+                                List<String> completedQuizIds = new ArrayList<>();
+                                for (DocumentSnapshot doc : submissionSnapshot.getDocuments()) {
+                                    String quizId = doc.getString("quizId");
+                                    if (quizId != null) completedQuizIds.add(quizId);
+                                }
 
-                        quizzes.add(quiz);
-                    });
-                    quizzesAdapter.updateQuizzes(quizzes);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to load quizzes: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    Log.e("CourseQuizzesError", e.getMessage(), e);
+                                firestore.collection("quizzes")
+                                        .whereEqualTo("course_id", courseId)
+                                        .get()
+                                        .addOnSuccessListener(querySnapshot -> {
+                                            List<QuizModel> quizzes = new ArrayList<>();
+
+                                            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                                                QuizModel quiz = new QuizModel();
+                                                quiz.setId(document.getId());
+                                                quiz.setTitle(document.getString("title"));
+                                                quiz.setDescription(document.getString("description"));
+                                                quiz.setCourseId(document.getString("course_id"));
+                                                quiz.setTopicId(document.getString("topic_id"));
+                                                quiz.setRequiredQuiz(document.getString("requiredQuiz"));
+                                                quiz.setPublished(document.getBoolean("published") != null && document.getBoolean("published"));
+                                                quiz.setAttempts(document.getLong("attempts") != null ? document.getLong("attempts").intValue() : 0);
+                                                quiz.setStartDate(document.getString("start_date"));
+                                                quiz.setEndDate(document.getString("end_date"));
+                                                quiz.setAllowLate(document.getBoolean("allow_late") != null && document.getBoolean("allow_late"));
+
+                                                boolean locked = false;
+                                                if (quiz.getTopicId() != null && !completedTopicIds.contains(quiz.getTopicId())) {
+                                                    locked = true;
+                                                }
+                                                if (quiz.getRequiredQuiz() != null && !completedQuizIds.contains(quiz.getRequiredQuiz())) {
+                                                    locked = true;
+                                                }
+
+                                                quiz.setLocked(locked);
+                                                quizzes.add(quiz);
+                                            }
+
+                                            quizzesAdapter.updateQuizzes(quizzes);
+                                        });
+                            });
                 });
     }
+
     @Override
     protected void onResume() {
         super.onResume();
         if (courseId != null && !courseId.isEmpty()) {
-            // 🔁 Refresh all course sections when returning
             loadCourseTopics(courseId);
             loadCourseTasks(courseId);
             loadCourseQuizzes(courseId);
         }
     }
-
-
 }

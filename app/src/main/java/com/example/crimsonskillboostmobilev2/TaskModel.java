@@ -3,30 +3,31 @@ package com.example.crimsonskillboostmobilev2;
 import com.google.gson.annotations.SerializedName;
 
 public class TaskModel {
-    private String id;
-    private String courseId;
 
+    private String id;          // Firestore document ID
+    private String courseId;    // Parent course document ID
+
+    // 🔹 Basic info
     @SerializedName("title")
     private String title;
 
     @SerializedName("description")
     private String description;
 
-    @SerializedName("end_date")
-    private String endDate;
-
+    // 🔹 Scheduling
     @SerializedName("start_date")
     private String startDate;
 
-    @SerializedName("status")
-    private String status;
+    @SerializedName("start_time")
+    private String startTime;
 
-    @SerializedName("allow_late")
-    private boolean allowLate;
+    @SerializedName("start_datetime")
+    private String startDatetime;
 
-    @SerializedName("attempts")
-    private int attempts;
+    @SerializedName("end_date")
+    private String endDate; // optional (not always in Firestore)
 
+    // 🔹 File info
     @SerializedName("file_name")
     private String fileName;
 
@@ -39,11 +40,24 @@ public class TaskModel {
     @SerializedName("file_type")
     private String fileType;
 
-    // ✅ New field (for task dependencies)
+    // 🔹 Task dependencies
     @SerializedName("requiredTask")
     private String requiredTask;
 
-    // ✅ Optional: Locked flag for UI logic
+    @SerializedName("requiredTopic")
+    private String requiredTopic; // renamed from topicId for Firestore consistency
+
+    // 🔹 Status / configuration
+    @SerializedName("status")
+    private String status;
+
+    @SerializedName("allow_late")
+    private boolean allowLate;
+
+    @SerializedName("attempts")
+    private int attempts;
+
+    // 🔹 App-side (not from Firestore)
     private boolean locked;
 
     // --- Getters ---
@@ -51,16 +65,19 @@ public class TaskModel {
     public String getCourseId() { return courseId; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
-    public String getEndDate() { return endDate; }
     public String getStartDate() { return startDate; }
-    public String getStatus() { return status; }
-    public boolean isAllowLate() { return allowLate; }
-    public int getAttempts() { return attempts; }
-    public String getFileUrl() { return fileUrl; }
+    public String getStartTime() { return startTime; }
+    public String getStartDatetime() { return startDatetime; }
+    public String getEndDate() { return endDate; }
     public String getFileName() { return fileName; }
+    public String getFileUrl() { return fileUrl; }
     public long getFileSize() { return fileSize; }
     public String getFileType() { return fileType; }
     public String getRequiredTask() { return requiredTask; }
+    public String getRequiredTopic() { return requiredTopic; }
+    public String getStatus() { return status; }
+    public boolean isAllowLate() { return allowLate; }
+    public int getAttempts() { return attempts; }
     public boolean isLocked() { return locked; }
 
     // --- Setters ---
@@ -68,15 +85,18 @@ public class TaskModel {
     public void setCourseId(String courseId) { this.courseId = courseId; }
     public void setTitle(String title) { this.title = title; }
     public void setDescription(String description) { this.description = description; }
-    public void setEndDate(String endDate) { this.endDate = endDate; }
     public void setStartDate(String startDate) { this.startDate = startDate; }
-    public void setStatus(String status) { this.status = status; }
-    public void setAllowLate(boolean allowLate) { this.allowLate = allowLate; }
-    public void setAttempts(int attempts) { this.attempts = attempts; }
-    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
+    public void setStartTime(String startTime) { this.startTime = startTime; }
+    public void setStartDatetime(String startDatetime) { this.startDatetime = startDatetime; }
+    public void setEndDate(String endDate) { this.endDate = endDate; }
     public void setFileName(String fileName) { this.fileName = fileName; }
+    public void setFileUrl(String fileUrl) { this.fileUrl = fileUrl; }
     public void setFileSize(long fileSize) { this.fileSize = fileSize; }
     public void setFileType(String fileType) { this.fileType = fileType; }
     public void setRequiredTask(String requiredTask) { this.requiredTask = requiredTask; }
+    public void setRequiredTopic(String requiredTopic) { this.requiredTopic = requiredTopic; }
+    public void setStatus(String status) { this.status = status; }
+    public void setAllowLate(boolean allowLate) { this.allowLate = allowLate; }
+    public void setAttempts(int attempts) { this.attempts = attempts; }
     public void setLocked(boolean locked) { this.locked = locked; }
 }

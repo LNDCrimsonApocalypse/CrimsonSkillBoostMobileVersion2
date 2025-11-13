@@ -13,6 +13,8 @@ public class QuizModel {
     private String startDate;
     private String endDate;
     private boolean allowLate;
+    private String topicId;
+
 
     // ✅ Firestore field
     private String requiredQuiz;
@@ -86,4 +88,7 @@ public class QuizModel {
     // ✅ Local field (not in Firestore)
     public boolean isLocked() { return locked; }
     public void setLocked(boolean locked) { this.locked = locked; }
+    public String getTopicId() { return topicId; }
+    public void setTopicId(String topicId) { this.topicId = topicId; }
+
 }
